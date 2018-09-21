@@ -1,0 +1,312 @@
+/**
+ * Shared file between builds so that they can all use the same dependencies and
+ * maven repositories.
+ **/
+ext.deps = [:]
+def versions = [:]
+
+versions.gradle = "4.5"
+versions.android_gradle_plugin = "3.0.1"
+versions.min_sdk = 21
+versions.target_sdk = 22
+// Preferably keep this in sync
+versions.build_tools = "27.0.3"
+versions.build_sdk = 27
+versions.support = "27.0.2"
+
+versions.arch_core = "1.1.0"
+versions.room = "1.1.0-alpha1"
+versions.lifecycle = "1.1.0"
+
+versions.android_crop = "1.0.0"
+versions.apache_commons = "2.5"
+versions.atsl_rules = "1.0.1"
+versions.atsl_runner = "1.0.1"
+versions.bottomsheet = "1.3.0"
+versions.buglife = "1.2.2"
+versions.butterknife = "7.0.1"
+versions.calligraphy = "2.2.0"
+versions.card_io = "5.5.1"
+versions.constraint_layout = "1.0.2"
+versions.crashlytics = "2.6.3"
+versions.crashlytics_ndk = "1.1.6"
+versions.dagger1 = "1.2.2"
+versions.dagger2 = "2.12"
+versions.dexcount = "0.8.1"
+versions.dexmaker = "2.2.0"
+versions.dns_java = "2.1.8"
+versions.espresso = "3.0.1"
+versions.espresso_appcenter = "1.2"
+versions.events_nirvana = "1.0.6"
+versions.fabric = "1.24.2"
+versions.firebase_ui_auth = "2.4.0"
+versions.glide = "3.8.0"
+versions.gms_google_services = "3.1.1"
+versions.guava = "16.0"
+versions.hamcrest = "1.3"
+versions.imagezoom = "1.0.4"
+versions.instacart_shared_lib = "25618a6"
+versions.javafmt = "0.1.4"
+versions.jackson = "2.8.9"
+versions.jumio = "2.9.0"
+versions.junit = "4.12"
+versions.kotlin = "1.2.60"
+versions.kotterknife = "0.1.0-SNAPSHOT"
+versions.leakcanary = "1.3.1"
+versions.lottie = "2.0.0-beta4"
+versions.mapbox = "5.1.4"
+versions.mapbox_plugins = "0.1.0"
+versions.maps_google = "0.5"
+versions.mockito = "2.8.9"
+versions.mockito_all = "1.10.19"
+versions.mockito_kotlin = "1.6.0"
+versions.multidex = "1.0.2"
+versions.okhttp= "3.9.0"
+versions.otto = "1.3.4"
+versions.paging = "1.0.0-alpha5"
+versions.picasso = "2.5.2"
+versions.play_services = "11.4.0"
+versions.progressbar_material = "1.4.1"
+versions.progressbar_material_loading = "0.5.8-RELEASE"
+versions.recycler_expandable = "3.0.0-RC1"
+versions.retrofit = "2.3.0"
+versions.rollbar = "0.2.1"
+versions.rx_android = "2.0.1"
+versions.rx_bindings = "2.0.0"
+versions.rx_idler = "0.9.0"
+versions.rx_java = "2.1.14"
+versions.rx_replaying_share = "2.0.1"
+versions.rx_relay = "2.0.0"
+versions.scanner_zxing = "1.8.4"
+versions.segment = "4.0.2"
+versions.smart_location = "3.3.1"
+versions.stripe = "1.0.4"
+versions.tape = "2.0.0-SNAPSHOT"
+versions.target_tooltip = "1.3.15"
+versions.textclock_better = "1.0.1"
+versions.textview_expandable = "1.0.5"
+versions.timber = "4.5.1"
+versions.truetime = "0aef96c"
+versions.truth = "0.27"
+versions.ui_automator = "2.1.3"
+def deps = [:]
+
+
+// support
+
+
+def support = [:]
+support.annotations = "com.android.support:support-annotations:$versions.support"
+support.app_compat = "com.android.support:appcompat-v7:$versions.support"
+support.cardview = "com.android.support:cardview-v7:$versions.support"
+support.compat = "com.android.support:support-compat:$versions.support"
+support.core_utils = "com.android.support:support-core-utils:$versions.support"
+support.custom_tabs = "com.android.support:customtabs:$versions.support"
+support.design = "com.android.support:design:$versions.support"
+support.multidex = "com.android.support:multidex:$versions.multidex"
+support.percent = "com.android.support:percent:$versions.support"
+support.recyclerview = "com.android.support:recyclerview-v7:$versions.support"
+support.dynamic_animation = "com.android.support:support-dynamic-animation:$versions.support"
+support.v4 = "com.android.support:support-v4:$versions.support"
+support.vector_drawable = "com.android.support:support-vector-drawable:$versions.support"
+support.vector_drawable_animated = "com.android.support:animated-vector-drawable:$versions.support"
+deps.support = support
+
+def emoji = [:]
+emoji.appcompat = "com.android.support:support-emoji-appcompat:$versions.support"
+emoji.bundled = "com.android.support:support-emoji-bundled:$versions.support"
+deps.support.emoji = emoji
+
+
+// 3rd party
+
+
+def arch_core = [:]
+arch_core.testing = "android.arch.core:core-testing:$versions.arch_core"
+deps.arch_core = arch_core
+
+def butterknife = [:]
+butterknife.java = "com.jakewharton:butterknife:$versions.butterknife"
+butterknife.kotlin = "com.jakewharton:kotterknife:$versions.kotterknife"
+deps.butterknife = butterknife
+
+def dagger = [:]
+dagger.runtime = "com.google.dagger:dagger:$versions.dagger2"
+dagger.android = "com.google.dagger:dagger-android:$versions.dagger2"
+dagger.android_support = "com.google.dagger:dagger-android-support:$versions.dagger2"
+dagger.compiler = "com.google.dagger:dagger-compiler:$versions.dagger2"
+dagger.android_support_compiler = "com.google.dagger:dagger-android-processor:$versions.dagger2"
+deps.dagger = dagger
+
+def google = [:]
+google.firebase_core = "com.google.firebase:firebase-core:$versions.play_services"
+google.firebase_messaging = "com.google.firebase:firebase-messaging:$versions.play_services"
+google.firebase_ui_auth = "com.firebaseui:firebase-ui-auth:$versions.firebase_ui_auth"
+google.gms_gcm = "com.google.android.gms:play-services-gcm:$versions.play_services"
+google.gms_google_services = "com.google.gms:google-services:$versions.gms_google_services"
+google.gms_location = "com.google.android.gms:play-services-location:$versions.play_services"
+google.gms_vision = "com.google.android.gms:play-services-vision:$versions.play_services"
+google.maps = "com.google.maps.android:android-maps-utils:$versions.maps_google"
+google.truth = "com.google.truth:truth:$versions.truth"
+google.guava = "com.google.guava:guava:$versions.guava"
+deps.google = google
+
+def jackson = [:]
+jackson.annotations = "com.fasterxml.jackson.core:jackson-annotations:$versions.jackson"
+jackson.core = "com.fasterxml.jackson.core:jackson-core:$versions.jackson"
+jackson.databind = "com.fasterxml.jackson.core:jackson-databind:$versions.jackson"
+jackson.kotlin = "com.fasterxml.jackson.module:jackson-module-kotlin:$versions.jackson"
+deps.jackson = jackson
+
+def jumio = [:]
+jumio.core = "com.jumio.android:core:${versions.jumio}@aar"
+jumio.nv = "com.jumio.android:nv:${versions.jumio}@aar"
+jumio.nv_barcode = "com.jumio.android:nv-barcode:${versions.jumio}@aar"
+jumio.nv_mrz = "com.jumio.android:nv-mrz:${versions.jumio}@aar"
+jumio.nv_liveness = "com.jumio.android:nv-liveness:${versions.jumio}@aar"
+deps.jumio = jumio
+
+def kotlin = [:]
+kotlin.allopen = "org.jetbrains.kotlin:kotlin-allopen:$versions.kotlin"
+kotlin.stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jre7:$versions.kotlin"
+kotlin.test = "org.jetbrains.kotlin:kotlin-test-junit:$versions.kotlin"
+kotlin.plugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kotlin"
+deps.kotlin = kotlin
+
+def leakcanary = [:]
+leakcanary.lib = "com.squareup.leakcanary:leakcanary-android:$versions.leakcanary"
+leakcanary.no_op = "com.squareup.leakcanary:leakcanary-android-no-op:$versions.leakcanary"
+deps.leakcanary = leakcanary
+
+def lifecycle = [:]
+lifecycle.runtime = "android.arch.lifecycle:runtime:$versions.lifecycle"
+lifecycle.extensions = "android.arch.lifecycle:extensions:$versions.lifecycle"
+lifecycle.java8 = "android.arch.lifecycle:common-java8:$versions.lifecycle"
+lifecycle.compiler = "android.arch.lifecycle:compiler:$versions.lifecycle"
+deps.lifecycle = lifecycle
+
+def mapbox = [:]
+mapbox.core = "com.mapbox.mapboxsdk:mapbox-android-sdk:${versions.mapbox}@aar"
+mapbox.plugin_geojson = "com.mapbox.mapboxsdk:mapbox-android-plugin-geojson:$versions.mapbox_plugins"
+mapbox.plugin_locationlayer = "com.mapbox.mapboxsdk:mapbox-android-plugin-locationlayer:$versions.mapbox_plugins"
+deps.mapbox = mapbox
+
+def okhttp = [:]
+okhttp.core = "com.squareup.okhttp3:okhttp:$versions.okhttp"
+okhttp.logging_interceptor = "com.squareup.okhttp3:logging-interceptor:$versions.okhttp"
+okhttp.mock_web_server = "com.squareup.okhttp3:mockwebserver:$versions.okhttp"
+deps.okhttp = okhttp
+
+def room = [:]
+room.runtime = "android.arch.persistence.room:runtime:$versions.room"
+room.compiler = "android.arch.persistence.room:compiler:$versions.room"
+room.rx_java = "android.arch.persistence.room:rxjava2:$versions.room"
+room.testing = "android.arch.persistence.room:testing:$versions.room"
+deps.room = room
+
+def rx = [:]
+rx.java = "io.reactivex.rxjava2:rxjava:$versions.rx_java"
+rx.android = "io.reactivex.rxjava2:rxandroid:$versions.rx_android"
+rx.bindings = "com.jakewharton.rxbinding2:rxbinding:$versions.rx_bindings"
+rx.idler = "com.squareup.rx.idler:rx2-idler:$versions.rx_idler"
+deps.rx = rx
+
+def retrofit = [:]
+retrofit.runtime = "com.squareup.retrofit2:retrofit:$versions.retrofit"
+retrofit.gson = "com.squareup.retrofit2:converter-gson:$versions.retrofit"
+retrofit.mock = "com.squareup.retrofit2:retrofit-mock:$versions.retrofit"
+retrofit.adapter_rxjava = "com.squareup.retrofit2:adapter-rxjava2:$versions.retrofit"
+deps.retrofit = retrofit
+
+def truetime = [:]
+truetime.core = "com.github.instacart.truetime-android:library:$versions.truetime"
+truetime.rx = "com.github.instacart.truetime-android:library-extension-rx:$versions.truetime"
+deps.truetime = truetime
+
+// testing
+
+def espresso = [:]
+espresso.core = "com.android.support.test.espresso:espresso-core:$versions.espresso"
+espresso.contrib = "com.android.support.test.espresso:espresso-contrib:$versions.espresso"
+espresso.appcenter = "com.microsoft.appcenter:espresso-test-extension:$versions.espresso_appcenter"
+espresso.idling = "com.android.support.test.espresso:espresso-idling-resource:$versions.espresso"
+espresso.intents = "com.android.support.test.espresso:espresso-intents:$versions.espresso"
+deps.espresso = espresso
+
+def atsl = [:]
+atsl.runner = "com.android.support.test:runner:$versions.atsl_runner"
+atsl.rules = "com.android.support.test:rules:$versions.atsl_runner"
+deps.atsl = atsl
+
+def mockito = [:]
+mockito.core = "org.mockito:mockito-core:$versions.mockito"
+mockito.android = "org.mockito:mockito-android:$versions.mockito"
+mockito.all = "org.mockito:mockito-all:$versions.mockito_all"
+mockito.kotlin = "com.nhaarman:mockito-kotlin:$versions.mockito_kotlin"
+deps.mockito = mockito
+
+
+
+
+
+deps.android_crop = "com.soundcloud.android:android-crop:${versions.android_crop}@aar"
+deps.android_gradle_plugin = "com.android.tools.build:gradle:$versions.android_gradle_plugin"
+deps.bottomsheet = "com.cocosw:bottomsheet:${versions.bottomsheet}@aar"
+deps.buglife = "com.buglife.sdk:buglife-android:$versions.buglife"
+deps.calligraphy = "uk.co.chrisjenx:calligraphy:$versions.calligraphy"
+deps.card_io = "io.card:android-sdk:$versions.card_io"
+deps.constraint_layout = "com.android.support.constraint:constraint-layout:$versions.constraint_layout"
+deps.crashlytics = "com.crashlytics.sdk.android:crashlytics:${versions.crashlytics}@aar"
+deps.crashlytics_ndk = "com.crashlytics.sdk.android:crashlytics-ndk:${versions.crashlytics_ndk}@aar"
+deps.dexcount = "com.getkeepsafe.dexcount:dexcount-gradle-plugin:$versions.dexcount"
+deps.dexmaker = "com.linkedin.dexmaker:dexmaker-mockito:$versions.dexmaker"
+deps.dns_java = "dnsjava:dnsjava:$versions.dns_java"
+deps.fabric = "io.fabric.tools:gradle:$versions.fabric"
+deps.glide = "com.github.bumptech.glide:glide:$versions.glide"
+deps.hamcrest = "org.hamcrest:hamcrest-all:$versions.hamcrest"
+deps.imagezoom = "it.sephiroth.android.library.imagezoom:library:$versions.imagezoom"
+deps.javafmt = "com.f2prateek.javafmt:javafmt:$versions.javafmt"
+deps.junit = "junit:junit:$versions.junit"
+deps.lottie = "com.airbnb.android:lottie:$versions.lottie"
+deps.otto = "com.squareup:otto:$versions.otto"
+deps.paging = "android.arch.paging:runtime:$versions.paging"
+deps.picasso = "com.squareup.picasso:picasso:$versions.picasso"
+deps.progressbar_material = "me.zhanghai.android.materialprogressbar:library:$versions.progressbar_material"
+deps.progressbar_material_loading = "com.lsjwzh:materialloadingprogressbar:$versions.progressbar_material_loading"
+deps.recycler_expandable = "com.bignerdranch.android:expandablerecyclerview:$versions.recycler_expandable"
+deps.rollbar = "com.rollbar:rollbar-android:$versions.rollbar"
+deps.scanner_zxing = "me.dm7.barcodescanner:zxing:$versions.scanner_zxing"
+deps.segment = "com.segment.analytics.android:analytics:$versions.segment"
+deps.smart_location = "io.nlopez.smartlocation:library:$versions.smart_location"
+deps.stripe = "com.stripe:stripe-android:$versions.stripe"
+deps.tape = "com.squareup.tape2:tape:$versions.tape"
+deps.target_tooltip = "it.sephiroth.android.library.targettooltip:target-tooltip-library:$versions.target_tooltip"
+deps.textclock_better = "net.imknown:BetterTextClockBackportLibrary:$versions.textclock_better"
+deps.textview_expandable = "at.blogc:expandabletextview:$versions.textview_expandable"
+deps.timber = "com.jakewharton.timber:timber:$versions.timber"
+deps.uiautomator = "com.android.support.test.uiautomator:uiautomator-v18:$versions.ui_automator"
+ext.deps = deps
+
+
+
+def private_repo_versions = [:]
+private_repo_versions.events_nirvana = versions.events_nirvana
+private_repo_versions.instacart_shared_lib = versions.instacart_shared_lib
+ext.private_repo_versions = private_repo_versions
+
+def build_versions = [:]
+build_versions.min_sdk = versions.min_sdk
+build_versions.target_sdk = versions.target_sdk
+build_versions.build_tools = versions.build_tools
+build_versions.build_sdk = versions.build_sdk
+build_versions.gradle = versions.gradle
+ext.build_versions = build_versions
+
+def addRepos(RepositoryHandler handler) {
+    handler.google()
+    handler.jcenter()
+    handler.maven { url "https://jitpack.io" }
+    handler.maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+    handler.mavenLocal()
+}
+ext.addRepos = this.&addRepos

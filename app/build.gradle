@@ -1,0 +1,60 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+
+buildscript {
+    repositories {
+        addRepos(repositories)
+    }
+}
+
+androidExtensions {
+    experimental = true
+}
+
+android {
+    compileSdkVersion build_versions.build_sdk
+    buildToolsVersion build_versions.build_tools
+
+    defaultConfig {
+        applicationId "co.kaush.msusf"
+        minSdkVersion build_versions.min_sdk
+        targetSdkVersion build_versions.target_sdk
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+
+    implementation deps.constraint_layout
+    implementation deps.dagger.runtime
+    kapt deps.dagger.compiler
+    implementation deps.kotlin.stdlib
+    implementation deps.retrofit.adapter_rxjava
+    implementation deps.retrofit.gson
+    implementation deps.retrofit.runtime
+    implementation deps.rx.android
+    implementation deps.rx.bindings
+    implementation deps.rx.java
+    implementation deps.support.app_compat
+    implementation deps.support.recyclerview
+    implementation deps.timber
+
+    testImplementation deps.junit
+
+    androidTestImplementation deps.atsl.runner
+    androidTestImplementation deps.espresso.core
+}
