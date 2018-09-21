@@ -4,12 +4,19 @@ import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import co.kaush.msusf.MSApp
+import io.reactivex.Observable
 
 class MSMainVm(
         app: MSApp,
         movieRepo: MSMovieRepository
 ) : AndroidViewModel(app) {
 
+    fun send(vararg event: Observable<out MSMovieEvent>): Observable<MSMovieVs> {
+        // event -> (action) result
+        // result -> viewState
+
+        return Observable.just(MSMovieVs())
+    }
 
 
 }
