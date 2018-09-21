@@ -8,11 +8,11 @@ data class MSMovieVs(
 )
 
 sealed class MSMovieEvent {
-
-    object ScreenLoadEvent: MSMovieEvent()
-
+    object ScreenLoadEvent : MSMovieEvent()
+    data class SearchMovieEvent(val searchedMovieTitle: String = "") : MSMovieEvent()
 }
 
 sealed class MSMovieResult {
-    object ScreenLoadResult: MSMovieResult()
+    object ScreenLoadResult : MSMovieResult()
+    data class SearchMovieResult(val movie: MSMovie) : MSMovieResult()
 }

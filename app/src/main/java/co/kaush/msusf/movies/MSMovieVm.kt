@@ -5,14 +5,17 @@ import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import co.kaush.msusf.MSApp
 import co.kaush.msusf.movies.MSMovieEvent.ScreenLoadEvent
+import co.kaush.msusf.movies.MSMovieEvent.SearchMovieEvent
 import co.kaush.msusf.movies.MSMovieResult.ScreenLoadResult
+import co.kaush.msusf.movies.MSMovieResult.SearchMovieResult
 import io.reactivex.Observable
 import io.reactivex.ObservableTransformer
+import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 
 class MSMainVm(
     app: MSApp,
-    movieRepo: MSMovieRepository
+    private val movieRepo: MSMovieRepository
 ) : AndroidViewModel(app) {
 
     private var viewState: MSMovieVs = MSMovieVs()
@@ -39,7 +42,24 @@ class MSMainVm(
                 is Lce.Content -> {
                     when (result.packet) {
                         is ScreenLoadResult -> state.copy(searchBoxText = "")
+
+                        is SearchMovieResult -> {
+                            val movie: MSMovie = result.packet.movie
+
+                            state.copy(
+                                searchBoxText = "",
+                                searchedMovieTitle = movie.title,
+                                searchedMovieRating = movie.ratings.first().rating
+                            )
+                        }
                     }
+                }
+
+                is Lce.Loading -> {
+                    state.copy(
+                        searchedMovieTitle = "Searching Movie",
+                        searchedMovieRating = ""
+                    )
                 }
 
                 else -> throw RuntimeException("Unexpected result LCE state")
@@ -51,14 +71,28 @@ class MSMainVm(
         return events.publish { o ->
             Observable.merge(
                 o.ofType(ScreenLoadEvent::class.java).compose(onScreenLoad()),
-                Observable.never()
+                o.ofType(SearchMovieEvent::class.java).compose(onMovieSearch())
             )
         }
     }
 
-    private fun onScreenLoad(): ObservableTransformer<ScreenLoadEvent, Lce<out MSMovieResult>> {
+    // -----------------------------------------------------------------------------------
+    // use cases
+
+    private fun onScreenLoad(): ObservableTransformer<ScreenLoadEvent, Lce<ScreenLoadResult>> {
         return ObservableTransformer { upstream ->
             upstream.map { Lce.Content(ScreenLoadResult) }
+        }
+    }
+
+    private fun onMovieSearch(): ObservableTransformer<SearchMovieEvent, Lce<SearchMovieResult>> {
+        return ObservableTransformer { upstream ->
+            upstream.switchMap { searchMovieEvent ->
+                movieRepo.searchMovie(searchMovieEvent.searchedMovieTitle)
+                    .subscribeOn(Schedulers.io())
+                    .map { Lce.Content(SearchMovieResult(it)) as Lce<SearchMovieResult> }
+                    .startWith(Lce.Loading())
+            }
         }
     }
 }

@@ -5,6 +5,8 @@ import android.os.Bundle
 import co.kaush.msusf.MSActivity
 import co.kaush.msusf.R
 import co.kaush.msusf.movies.MSMovieEvent.ScreenLoadEvent
+import co.kaush.msusf.movies.MSMovieEvent.SearchMovieEvent
+import com.jakewharton.rxbinding2.view.RxView
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -39,8 +41,11 @@ class MSMovieActivity : MSActivity() {
         super.onResume()
 
         val screenLoadEvents: Observable<ScreenLoadEvent> = Observable.just(ScreenLoadEvent)
+        val searchMovieEvents: Observable<SearchMovieEvent> =
+            RxView.clicks(ms_mainScreen_searchBtn)
+                .map { SearchMovieEvent(ms_mainScreen_searchText.text.toString()) }
 
-        disposable = viewModel.send(screenLoadEvents)
+        disposable = viewModel.send(screenLoadEvents, searchMovieEvents)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 { vs ->
@@ -48,29 +53,8 @@ class MSMovieActivity : MSActivity() {
                     ms_mainScreen_title.text = vs.searchedMovieTitle
                     ms_mainScreen_rating.text = vs.searchedMovieRating
                 },
-                { Timber.w("something went terribly wrong") }
+                { Timber.w("something went terribly wrong", it) }
             )
-
-        /*movieApi.searchMovie("blade")
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        {
-
-                            it.body()?.let {
-                                Timber.d("-------- movie search results ${it}")
-                            }
-
-                            it.errorBody()?.let { body ->
-                                val errorResponse: MSMovieResult = Gson()
-                                        .fromJson(body.string(), MSMovieResult::class.java)
-                                Timber.d("-------- movie search result error $errorResponse")
-                            }
-                        },
-                        {
-                            Timber.e(it, "-------- Something went wrong")
-                        }
-                )*/
     }
 
     override fun onPause() {
