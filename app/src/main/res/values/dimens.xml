@@ -3,4 +3,5 @@
   <dimen name="ms_spacing">12dp</dimen>
   <dimen name="ms_mainSreen_0">0dp</dimen>
   <dimen name="ms_mainSreen_titleSize">20sp</dimen>
+  <dimen name="ms_search_titleSize">30sp</dimen>
 </resources>

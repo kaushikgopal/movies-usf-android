@@ -1,0 +1,82 @@
+package co.kaush.msusf.movies
+
+import android.annotation.SuppressLint
+import android.support.annotation.LayoutRes
+import android.support.v4.widget.CircularProgressDrawable
+import android.support.v7.recyclerview.extensions.ListAdapter
+import android.support.v7.util.DiffUtil
+import android.support.v7.widget.RecyclerView
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
+import co.kaush.msusf.R
+import com.bumptech.glide.Glide
+
+class MSMovieSearchHistoryAdapter : ListAdapter<MSMovie, MSMovieSearchVH>(
+    MSMovieSearchDiffCallback()
+) {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MSMovieSearchVH {
+        return MSMovieSearchVH(parent.inflate(R.layout.view_movie))
+    }
+
+    override fun onBindViewHolder(holder: MSMovieSearchVH, position: Int) {
+        holder.bind(getItem(position))
+    }
+}
+
+class MSMovieSearchDiffCallback : DiffUtil.ItemCallback<MSMovie>() {
+    // only one kind of item
+    override fun areItemsTheSame(oldItem: MSMovie?, newItem: MSMovie?): Boolean = true
+
+    override fun areContentsTheSame(oldItem: MSMovie?, newItem: MSMovie?): Boolean {
+        // this is just lazy!
+        return oldItem?.posterUrl.equals(newItem?.posterUrl, ignoreCase = true)
+    }
+}
+
+class MSMovieSearchVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
+
+    private val posterView: ImageView = itemView.findViewById(R.id.ms_result_poster)
+    private val ratingView: TextView = itemView.findViewById(R.id.ms_result_rating)
+    private val spinner: CircularProgressDrawable by lazy {
+        val circularProgressDrawable = CircularProgressDrawable(itemView.context)
+        circularProgressDrawable.strokeWidth = 5f
+        circularProgressDrawable.centerRadius = 30f
+        circularProgressDrawable.start()
+        circularProgressDrawable
+    }
+
+    @SuppressLint("SetTextI18n")
+    fun bind(item: MSMovie) {
+
+        (item.ratings.first()).let {
+            ratingView.text = "${it.source} : ${it.rating}"
+        }
+
+        item.posterUrl
+            .takeIf { it.isNotBlank() }
+            ?.let {
+                Glide.with(posterView.context)
+                    .load(it)
+                    .placeholder(spinner)
+                    .into(posterView)
+            } ?: run {
+            posterView.setImageResource(0)
+        }
+    }
+}
+
+// -----------------------------------------------------------------------------------
+// helpers
+
+/**
+ * Usage:
+ *      `val view = container?.inflate(R.layout.activity)`
+ *      `inflater?.inflate(R.layout.fragment_dialog_standard, c)!!`
+ */
+private fun ViewGroup.inflate(
+    @LayoutRes layoutRes: Int,
+    attachToRoot: Boolean = false
+): View = LayoutInflater.from(context).inflate(layoutRes, this, attachToRoot)
