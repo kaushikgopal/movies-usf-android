@@ -11,7 +11,7 @@ interface MSMovieApi {
     @GET("/")
     fun searchMovie(
             @Query("t") movieName: String,
-            @Query("apiKey") apiKey: String = ""
+            @Query("apiKey") apiKey: String = "238a5740"
     ): Observable<Response<MSMovieResult>>
 }
 
