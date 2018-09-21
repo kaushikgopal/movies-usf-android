@@ -8,7 +8,7 @@ import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
 
-class MSMainActivity : MSActivity() {
+class MSMovieActivity : MSActivity() {
 
 
     @Inject lateinit var movieRepo: MSMovieRepository

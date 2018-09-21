@@ -1,7 +1,7 @@
 package co.kaush.msusf
 
 import android.content.Context
-import co.kaush.msusf.movies.MSMainActivity
+import co.kaush.msusf.movies.MSMovieActivity
 import co.kaush.msusf.movies.MSMovieApi
 import dagger.Component
 import dagger.Module
@@ -48,5 +48,5 @@ class MSAppModule(private val app: MSApp) {
 @Singleton
 @Component(modules = [MSAppModule::class])
 interface MSAppComponent {
-    fun inject(activity: MSMainActivity)
+    fun inject(activity: MSMovieActivity)
 }
