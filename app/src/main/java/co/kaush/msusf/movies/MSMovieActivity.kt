@@ -6,6 +6,7 @@ import co.kaush.msusf.MSActivity
 import co.kaush.msusf.R
 import co.kaush.msusf.movies.MSMovieEvent.ScreenLoadEvent
 import co.kaush.msusf.movies.MSMovieEvent.SearchMovieEvent
+import com.bumptech.glide.Glide
 import com.jakewharton.rxbinding2.view.RxView
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -52,6 +53,16 @@ class MSMovieActivity : MSActivity() {
                     ms_mainScreen_searchText.setText(vs.searchBoxText)
                     ms_mainScreen_title.text = vs.searchedMovieTitle
                     ms_mainScreen_rating.text = vs.searchedMovieRating
+
+                    vs.searchedMoviePoster
+                        .takeIf { it.isNotBlank() }
+                        ?.let {
+                            Glide.with(ctx)
+                                .load(vs.searchedMoviePoster)
+                                .into(ms_mainScreen_poster)
+                        } ?: run {
+                        ms_mainScreen_poster.setImageResource(0)
+                    }
                 },
                 { Timber.w("something went terribly wrong", it) }
             )

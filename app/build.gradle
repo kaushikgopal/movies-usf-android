@@ -49,6 +49,7 @@ dependencies {
     implementation deps.lifecycle.runtime
     implementation deps.lifecycle.extensions
     kapt deps.lifecycle.compiler
+    implementation deps.glide
     implementation deps.kotlin.stdlib
     implementation deps.retrofit.adapter_rxjava
     implementation deps.retrofit.gson
