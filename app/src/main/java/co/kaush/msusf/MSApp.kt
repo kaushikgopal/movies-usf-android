@@ -1,6 +1,9 @@
 package co.kaush.msusf
 
 import android.app.Application
+import timber.log.Timber
+
+
 
 class MSApp : Application() {
 
@@ -14,5 +17,7 @@ class MSApp : Application() {
                         .builder()
                         .mSAppModule(MSAppModule(this))
                         .build()
+
+        Timber.plant(Timber.DebugTree())
     }
 }
