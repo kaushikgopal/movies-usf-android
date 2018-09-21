@@ -2,6 +2,7 @@ package co.kaush.msusf.movies
 
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
+import android.support.v4.widget.CircularProgressDrawable
 import co.kaush.msusf.MSActivity
 import co.kaush.msusf.R
 import co.kaush.msusf.movies.MSMovieEvent.ScreenLoadEvent
@@ -23,6 +24,14 @@ class MSMovieActivity : MSActivity() {
     lateinit var viewModel: MSMainVm
 
     var disposable: Disposable? = null
+
+    private val spinner: CircularProgressDrawable by lazy {
+        val circularProgressDrawable = CircularProgressDrawable(this)
+        circularProgressDrawable.strokeWidth = 5f
+        circularProgressDrawable.centerRadius = 30f
+        circularProgressDrawable.start()
+        circularProgressDrawable
+    }
 
     override fun inject(activity: MSActivity) {
         app.appComponent.inject(this)
@@ -59,6 +68,7 @@ class MSMovieActivity : MSActivity() {
                         ?.let {
                             Glide.with(ctx)
                                 .load(vs.searchedMoviePoster)
+                                .placeholder(spinner)
                                 .into(ms_mainScreen_poster)
                         } ?: run {
                         ms_mainScreen_poster.setImageResource(0)
