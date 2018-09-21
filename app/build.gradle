@@ -46,6 +46,9 @@ dependencies {
     implementation deps.constraint_layout
     implementation deps.dagger.runtime
     kapt deps.dagger.compiler
+    implementation deps.lifecycle.runtime
+    implementation deps.lifecycle.extensions
+    kapt deps.lifecycle.compiler
     implementation deps.kotlin.stdlib
     implementation deps.retrofit.adapter_rxjava
     implementation deps.retrofit.gson

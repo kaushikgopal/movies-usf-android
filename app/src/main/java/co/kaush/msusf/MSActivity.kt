@@ -24,6 +24,8 @@ abstract class MSActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         inject(this)
 
+
+
         movieApi.searchMovie("blade")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
