@@ -1,6 +1,7 @@
 package co.kaush.msusf
 
 import android.content.Context
+import co.kaush.msusf.movies.MSMainActivity
 import co.kaush.msusf.movies.MSMovieApi
 import dagger.Component
 import dagger.Module

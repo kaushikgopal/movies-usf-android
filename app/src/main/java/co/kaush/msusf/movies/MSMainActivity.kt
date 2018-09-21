@@ -1,6 +1,8 @@
-package co.kaush.msusf
+package co.kaush.msusf.movies
 
 import android.os.Bundle
+import co.kaush.msusf.MSActivity
+import co.kaush.msusf.R
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MSMainActivity : MSActivity() {
