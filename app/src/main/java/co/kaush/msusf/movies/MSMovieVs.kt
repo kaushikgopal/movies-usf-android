@@ -12,3 +12,7 @@ sealed class MSMovieEvent {
     object ScreenLoadEvent: MSMovieEvent()
 
 }
+
+sealed class MSMovieResult {
+    object ScreenLoadResult: MSMovieResult()
+}
