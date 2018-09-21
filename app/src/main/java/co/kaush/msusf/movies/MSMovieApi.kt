@@ -13,10 +13,10 @@ interface MSMovieApi {
     fun searchMovie(
             @Query("t") movieName: String,
             @Query("apiKey") apiKey: String = BuildConfig.OMDB_API_KEY
-    ): Observable<Response<MSMovieResult>>
+    ): Observable<Response<MSMovie>>
 }
 
-data class MSMovieResult(
+data class MSMovie(
         @SerializedName("Result") val result: Boolean,
         @SerializedName("Error") val errorMessage: String = "",
         @SerializedName("Title") val title: String = "",

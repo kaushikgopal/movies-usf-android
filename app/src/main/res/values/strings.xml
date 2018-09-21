@@ -1,3 +1,4 @@
 <resources>
   <string name="app_name">Movie Searching through USF</string>
+  <string name="ms_mainScree_searchBtnText">Search</string>
 </resources>

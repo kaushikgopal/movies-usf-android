@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <dimen name="ms_spacing">12dp</dimen>
+  <dimen name="ms_mainSreen_0">0dp</dimen>
+  <dimen name="ms_mainSreen_titleSize">20sp</dimen>
+</resources>

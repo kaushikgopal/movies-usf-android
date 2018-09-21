@@ -6,10 +6,15 @@ import co.kaush.msusf.MSActivity
 import co.kaush.msusf.R
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_main.*
+import javax.inject.Inject
 
 class MSMainActivity : MSActivity() {
 
+
+    @Inject lateinit var movieRepo: MSMovieRepository
+
     lateinit var viewModel: MSMainVm
+
     var disposable: Disposable? = null
 
     override fun inject(activity: MSActivity) {
@@ -22,7 +27,7 @@ class MSMainActivity : MSActivity() {
 
         viewModel = ViewModelProviders.of(
                 this,
-                MSMainVmFactory(app)
+                MSMainVmFactory(app, movieRepo)
         ).get(MSMainVm::class.java)
 
         ms_mainScreen_title.text = ctx.resources.getString(R.string.app_name)
@@ -32,6 +37,26 @@ class MSMainActivity : MSActivity() {
         super.onResume()
 
 
+        /*movieApi.searchMovie("blade")
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        {
+
+                            it.body()?.let {
+                                Timber.d("-------- movie search results ${it}")
+                            }
+
+                            it.errorBody()?.let { body ->
+                                val errorResponse: MSMovieResult = Gson()
+                                        .fromJson(body.string(), MSMovieResult::class.java)
+                                Timber.d("-------- movie search result error $errorResponse")
+                            }
+                        },
+                        {
+                            Timber.e(it, "-------- Something went wrong")
+                        }
+                )*/
 
     }
 
