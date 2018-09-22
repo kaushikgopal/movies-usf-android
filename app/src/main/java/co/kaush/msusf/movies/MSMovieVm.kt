@@ -75,7 +75,7 @@ class MSMainVm(
 
                 else -> throw RuntimeException("Unexpected result LCE state")
             }
-        }
+        }.doOnNext { viewState = it }
     }
 
     private fun results(events: Observable<out MSMovieEvent>): Observable<Lce<out MSMovieResult>> {
