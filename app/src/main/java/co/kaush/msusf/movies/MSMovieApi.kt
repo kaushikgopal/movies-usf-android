@@ -18,13 +18,15 @@ interface MSMovieApi {
 
 data class MSMovie(
     @SerializedName("Result") val result: Boolean,
-    @SerializedName("Error") val errorMessage: String = "",
+    @SerializedName("Error") val errorMessage: String? = null,
     @SerializedName("Title") val title: String = "",
     @SerializedName("Poster") val posterUrl: String = "",
     @SerializedName("Ratings") val ratings: List<MSRating> = emptyList()
 ) {
     val ratingSummary: String
-        get() = ratings.fold("") { summary, msRating -> "$summary\n${msRating.summary}" }
+        get() {
+            return ratings.fold("") { summary, msRating -> "$summary\n${msRating.summary}" }
+        }
 }
 
 data class MSRating(

@@ -59,6 +59,7 @@ class MSMainVm(
 
                         is SearchMovieResult -> {
                             val movie: MSMovie = result.packet.movie
+
                             state.copy(
                                 searchedMovieTitle = movie.title,
                                 searchedMovieRating = movie.ratingSummary,
@@ -82,12 +83,22 @@ class MSMainVm(
                 is Lce.Loading -> {
                     state.copy(
                         searchBoxText = null,
-                        searchedMovieTitle = "Searching Movie",
-                        searchedMovieRating = ""
+                        searchedMovieTitle = "Searching Movie...",
+                        searchedMovieRating = "",
+                        searchedMoviePoster = "",
+                        searchedMovieReference = null
                     )
                 }
 
-                else -> throw RuntimeException("Unexpected result LCE state")
+                is Lce.Error -> {
+                    when (result.packet) {
+                        is SearchMovieResult -> {
+                            val movie: MSMovie = result.packet.movie
+                            state.copy(searchedMovieTitle = movie.errorMessage!!)
+                        }
+                        else -> throw RuntimeException("Unexpected result LCE state")
+                    }
+                }
             }
         }
             .doOnNext { viewState = it }
@@ -107,7 +118,13 @@ class MSMainVm(
             upstream.switchMap { searchMovieEvent ->
                 movieRepo.searchMovie(searchMovieEvent.searchedMovieTitle)
                     .subscribeOn(Schedulers.io())
-                    .map { Lce.Content(SearchMovieResult(it)) as Lce<SearchMovieResult> }
+                    .map {
+                        if (it.errorMessage?.isNullOrBlank() == false) {
+                            Lce.Error(SearchMovieResult(it))
+                        } else {
+                            Lce.Content(SearchMovieResult(it))
+                        }
+                    }
                     .startWith(Lce.Loading())
             }
         }
@@ -141,7 +158,7 @@ class MSMainVm(
 sealed class Lce<T> {
     class Loading<T> : Lce<T>()
     data class Content<T>(val packet: T) : Lce<T>()
-    data class Error<T>(val packet: T? = null) : Lce<T>()
+    data class Error<T>(val packet: T) : Lce<T>()
 }
 
 // -----------------------------------------------------------------------------------

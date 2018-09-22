@@ -12,9 +12,7 @@ class MSMovieRepository @Inject constructor(
         return movieApi.searchMovie(movieName)
             .doOnError { Timber.w("search Movie fail", it) }
             .map { response ->
-                response.body()?.let {
-                    return@map it
-                }
+                response.body()?.let { return@map it }
 
                 response.errorBody()?.let { body ->
                     val errorResponse: MSMovie = Gson().fromJson(
@@ -22,7 +20,7 @@ class MSMovieRepository @Inject constructor(
                         MSMovie::class.java
                     )
 
-                    errorResponse
+                    return@map errorResponse
                 }
             }
     }
