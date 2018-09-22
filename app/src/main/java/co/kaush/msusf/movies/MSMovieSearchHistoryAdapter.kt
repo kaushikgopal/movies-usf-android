@@ -51,9 +51,7 @@ class MSMovieSearchVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
     @SuppressLint("SetTextI18n")
     fun bind(item: MSMovie) {
 
-        (item.ratings.first()).let {
-            ratingView.text = "${it.source} : ${it.rating}"
-        }
+        (item.ratings.first()).let { ratingView.text = it.summary }
 
         item.posterUrl
             .takeIf { it.isNotBlank() }

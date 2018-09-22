@@ -3,6 +3,8 @@ package co.kaush.msusf.movies
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.widget.CircularProgressDrawable
+import android.support.v7.widget.LinearLayoutCompat.HORIZONTAL
+import android.support.v7.widget.LinearLayoutManager
 import co.kaush.msusf.MSActivity
 import co.kaush.msusf.R
 import co.kaush.msusf.movies.MSMovieEvent.ScreenLoadEvent
@@ -22,8 +24,9 @@ class MSMovieActivity : MSActivity() {
     lateinit var movieRepo: MSMovieRepository
 
     lateinit var viewModel: MSMainVm
+    lateinit var listAdapter: MSMovieSearchHistoryAdapter
 
-    var disposable: Disposable? = null
+    private var disposable: Disposable? = null
 
     private val spinner: CircularProgressDrawable by lazy {
         val circularProgressDrawable = CircularProgressDrawable(this)
@@ -40,6 +43,8 @@ class MSMovieActivity : MSActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        setupListView()
 
         viewModel = ViewModelProviders.of(
             this,
@@ -73,6 +78,8 @@ class MSMovieActivity : MSActivity() {
                         } ?: run {
                         ms_mainScreen_poster.setImageResource(0)
                     }
+
+                    listAdapter.submitList(vs.adapterList)
                 },
                 { Timber.w("something went terribly wrong", it) }
             )
@@ -82,5 +89,13 @@ class MSMovieActivity : MSActivity() {
         super.onPause()
 
         disposable?.dispose()
+    }
+
+    private fun setupListView() {
+        val layoutManager = LinearLayoutManager(this, HORIZONTAL, false)
+        ms_mainScreen_searchHistory.layoutManager = layoutManager
+
+        listAdapter = MSMovieSearchHistoryAdapter()
+        ms_mainScreen_searchHistory.adapter = listAdapter
     }
 }

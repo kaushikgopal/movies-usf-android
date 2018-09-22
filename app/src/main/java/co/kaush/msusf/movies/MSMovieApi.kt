@@ -17,15 +17,29 @@ interface MSMovieApi {
 }
 
 data class MSMovie(
-        @SerializedName("Result") val result: Boolean,
-        @SerializedName("Error") val errorMessage: String = "",
-        @SerializedName("Title") val title: String = "",
-        @SerializedName("Poster") val posterUrl: String = "",
-        @SerializedName("imdbRating") val rating: Float? = null,
-        @SerializedName("Ratings") val ratings: List<MSRating> = emptyList()
-)
+    @SerializedName("Result") val result: Boolean,
+    @SerializedName("Error") val errorMessage: String = "",
+    @SerializedName("Title") val title: String = "",
+    @SerializedName("Poster") val posterUrl: String = "",
+    @SerializedName("Ratings") val ratings: List<MSRating> = emptyList()
+) {
+    val ratingSummary: String
+        get() = ratings.fold("") { summary, msRating -> "$summary\n${msRating.summary}" }
+}
 
 data class MSRating(
-        @SerializedName("Source") val source: String,
-        @SerializedName("Value") val rating: String
-)
+    @SerializedName("Source") val source: String,
+    @SerializedName("Value") val rating: String
+) {
+
+    val summary: String get() = "$rating (${sourceShortName(source)})"
+
+    private fun sourceShortName(ratingSource: String): String {
+        return when {
+            ratingSource.contains("Internet Movie Database") -> "IMDB"
+            ratingSource.contains("Rotten Tomatoes") -> "RT"
+            ratingSource.contains("Metacritic") -> "Metac"
+            else -> ratingSource
+        }
+    }
+}

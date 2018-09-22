@@ -49,7 +49,7 @@ class MSMainVm(
                             state.copy(
                                 searchBoxText = "",
                                 searchedMovieTitle = movie.title,
-                                searchedMovieRating = movie.ratings.first().rating,
+                                searchedMovieRating = movie.ratingSummary,
                                 searchedMoviePoster = movie.posterUrl
                             )
                         }
