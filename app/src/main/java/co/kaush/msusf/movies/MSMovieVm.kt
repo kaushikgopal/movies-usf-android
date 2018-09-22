@@ -4,8 +4,10 @@ import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import co.kaush.msusf.MSApp
+import co.kaush.msusf.movies.MSMovieEvent.ClickMovieEvent
 import co.kaush.msusf.movies.MSMovieEvent.ScreenLoadEvent
 import co.kaush.msusf.movies.MSMovieEvent.SearchMovieEvent
+import co.kaush.msusf.movies.MSMovieResult.ClickMovieResult
 import co.kaush.msusf.movies.MSMovieResult.ScreenLoadResult
 import co.kaush.msusf.movies.MSMovieResult.SearchMovieResult
 import io.reactivex.Observable
@@ -50,8 +52,16 @@ class MSMainVm(
                                 searchBoxText = "",
                                 searchedMovieTitle = movie.title,
                                 searchedMovieRating = movie.ratingSummary,
-                                searchedMoviePoster = movie.posterUrl
+                                searchedMoviePoster = movie.posterUrl,
+                                searchedMovieReference = movie
                             )
+                        }
+
+                        is ClickMovieResult -> {
+                            val adapterList: MutableList<MSMovie> =
+                                mutableListOf(*state.adapterList.toTypedArray())
+                            adapterList.add(result.packet.clickedMovie)
+                            state.copy(adapterList = adapterList)
                         }
                     }
                 }
@@ -72,7 +82,8 @@ class MSMainVm(
         return events.publish { o ->
             Observable.merge(
                 o.ofType(ScreenLoadEvent::class.java).compose(onScreenLoad()),
-                o.ofType(SearchMovieEvent::class.java).compose(onMovieSearch())
+                o.ofType(SearchMovieEvent::class.java).compose(onMovieSearch()),
+                o.ofType(ClickMovieEvent::class.java).compose(onMovieSelect())
             )
         }
     }
@@ -94,6 +105,12 @@ class MSMainVm(
                     .map { Lce.Content(SearchMovieResult(it)) as Lce<SearchMovieResult> }
                     .startWith(Lce.Loading())
             }
+        }
+    }
+
+    private fun onMovieSelect(): ObservableTransformer<ClickMovieEvent, Lce<ClickMovieResult>> {
+        return ObservableTransformer { upstream ->
+            upstream.map { Lce.Content(ClickMovieResult(viewState.searchedMovieReference!!)) }
         }
     }
 }

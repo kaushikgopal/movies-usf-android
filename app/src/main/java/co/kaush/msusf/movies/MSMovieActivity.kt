@@ -7,6 +7,7 @@ import android.support.v7.widget.LinearLayoutCompat.HORIZONTAL
 import android.support.v7.widget.LinearLayoutManager
 import co.kaush.msusf.MSActivity
 import co.kaush.msusf.R
+import co.kaush.msusf.movies.MSMovieEvent.ClickMovieEvent
 import co.kaush.msusf.movies.MSMovieEvent.ScreenLoadEvent
 import co.kaush.msusf.movies.MSMovieEvent.SearchMovieEvent
 import com.bumptech.glide.Glide
@@ -56,12 +57,12 @@ class MSMovieActivity : MSActivity() {
         super.onResume()
 
         val screenLoadEvents: Observable<ScreenLoadEvent> = Observable.just(ScreenLoadEvent)
-        val searchMovieEvents: Observable<SearchMovieEvent> =
-            RxView.clicks(ms_mainScreen_searchBtn)
-                .map { SearchMovieEvent(ms_mainScreen_searchText.text.toString()) }
+        val searchMovieEvents: Observable<SearchMovieEvent> = RxView.clicks(ms_mainScreen_searchBtn)
+            .map { SearchMovieEvent(ms_mainScreen_searchText.text.toString()) }
+        val movieSelectEvents: Observable<ClickMovieEvent> = RxView.clicks(ms_mainScreen_poster)
+            .map { ClickMovieEvent }
 
-
-        disposable = viewModel.send(screenLoadEvents, searchMovieEvents)
+        disposable = viewModel.send(screenLoadEvents, searchMovieEvents, movieSelectEvents)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 { vs ->
@@ -82,7 +83,7 @@ class MSMovieActivity : MSActivity() {
 
                     listAdapter.submitList(vs.adapterList)
                 },
-                { Timber.w("something went terribly wrong", it) }
+                { Timber.w(it, "something went terribly wrong") }
             )
     }
 
