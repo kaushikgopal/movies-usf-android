@@ -14,7 +14,9 @@ import android.widget.TextView
 import co.kaush.msusf.R
 import com.bumptech.glide.Glide
 
-class MSMovieSearchHistoryAdapter : ListAdapter<MSMovie, MSMovieSearchVH>(
+class MSMovieSearchHistoryAdapter(
+    private val historyClickListener: (MSMovie) -> Unit
+) : ListAdapter<MSMovie, MSMovieSearchVH>(
     MSMovieSearchDiffCallback()
 ) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MSMovieSearchVH {
@@ -22,7 +24,7 @@ class MSMovieSearchHistoryAdapter : ListAdapter<MSMovie, MSMovieSearchVH>(
     }
 
     override fun onBindViewHolder(holder: MSMovieSearchVH, position: Int) {
-        holder.bind(getItem(position))
+        holder.bind(getItem(position), historyClickListener)
     }
 }
 
@@ -49,7 +51,7 @@ class MSMovieSearchVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
     }
 
     @SuppressLint("SetTextI18n")
-    fun bind(item: MSMovie) {
+    fun bind(item: MSMovie, historyClickListener: (MSMovie) -> Unit) {
 
         (item.ratings.first()).let { ratingView.text = it.summary }
 
@@ -63,6 +65,8 @@ class MSMovieSearchVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
             } ?: run {
             posterView.setImageResource(0)
         }
+
+        itemView.setOnClickListener { historyClickListener.invoke(item) }
     }
 }
 

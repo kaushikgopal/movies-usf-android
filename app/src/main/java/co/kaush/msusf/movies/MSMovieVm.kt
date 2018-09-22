@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import co.kaush.msusf.MSApp
 import co.kaush.msusf.movies.MSMovieEvent.ClickMovieEvent
+import co.kaush.msusf.movies.MSMovieEvent.ClickMovieFromHistoryEvent
 import co.kaush.msusf.movies.MSMovieEvent.ScreenLoadEvent
 import co.kaush.msusf.movies.MSMovieEvent.SearchMovieEvent
 import co.kaush.msusf.movies.MSMovieResult.ClickMovieResult
@@ -88,7 +89,8 @@ class MSMainVm(
             Observable.merge(
                 o.ofType(ScreenLoadEvent::class.java).compose(onScreenLoad()),
                 o.ofType(SearchMovieEvent::class.java).compose(onMovieSearch()),
-                o.ofType(ClickMovieEvent::class.java).compose(onMovieSelect())
+                o.ofType(ClickMovieEvent::class.java).compose(onMovieSelect()),
+                o.ofType(ClickMovieFromHistoryEvent::class.java).compose(onMovieFromHistorySelect())
             )
         }
     }
@@ -124,6 +126,13 @@ class MSMainVm(
                     Lce.Content(ClickMovieResult(null))
                 }
             }
+        }
+    }
+
+    private fun onMovieFromHistorySelect(): ObservableTransformer<ClickMovieFromHistoryEvent,
+        Lce<SearchMovieResult>> {
+        return ObservableTransformer { upstream ->
+            upstream.map { Lce.Content(SearchMovieResult(it.movieFromHistory)) }
         }
     }
 }

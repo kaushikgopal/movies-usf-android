@@ -13,6 +13,7 @@ sealed class MSMovieEvent {
     object ScreenLoadEvent : MSMovieEvent()
     data class SearchMovieEvent(val searchedMovieTitle: String = "") : MSMovieEvent()
     object ClickMovieEvent : MSMovieEvent()
+    data class ClickMovieFromHistoryEvent(val movieFromHistory: MSMovie) : MSMovieEvent()
 }
 
 sealed class MSMovieResult {

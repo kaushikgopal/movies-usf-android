@@ -10,6 +10,7 @@ import android.support.v7.widget.LinearLayoutManager
 import co.kaush.msusf.MSActivity
 import co.kaush.msusf.R
 import co.kaush.msusf.movies.MSMovieEvent.ClickMovieEvent
+import co.kaush.msusf.movies.MSMovieEvent.ClickMovieFromHistoryEvent
 import co.kaush.msusf.movies.MSMovieEvent.ScreenLoadEvent
 import co.kaush.msusf.movies.MSMovieEvent.SearchMovieEvent
 import com.bumptech.glide.Glide
@@ -17,6 +18,7 @@ import com.jakewharton.rxbinding2.view.RxView
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
+import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.activity_main.*
 import timber.log.Timber
 import javax.inject.Inject
@@ -30,6 +32,7 @@ class MSMovieActivity : MSActivity() {
     lateinit var listAdapter: MSMovieSearchHistoryAdapter
 
     private var disposable: Disposable? = null
+    private val historyItemClick: PublishSubject<MSMovie> = PublishSubject.create()
 
     private val spinner: CircularProgressDrawable by lazy {
         val circularProgressDrawable = CircularProgressDrawable(this)
@@ -63,8 +66,15 @@ class MSMovieActivity : MSActivity() {
             .map { SearchMovieEvent(ms_mainScreen_searchText.text.toString()) }
         val movieSelectEvents: Observable<ClickMovieEvent> = RxView.clicks(ms_mainScreen_poster)
             .map { ClickMovieEvent }
+        val movieHistoryClickEvents: Observable<ClickMovieFromHistoryEvent> = historyItemClick
+            .map { ClickMovieFromHistoryEvent(it) }
 
-        disposable = viewModel.send(screenLoadEvents, searchMovieEvents, movieSelectEvents)
+        disposable = viewModel.send(
+            screenLoadEvents,
+            searchMovieEvents,
+            movieSelectEvents,
+            movieHistoryClickEvents
+        )
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 { vs ->
@@ -105,7 +115,7 @@ class MSMovieActivity : MSActivity() {
         )
         ms_mainScreen_searchHistory.addItemDecoration(dividerItemDecoration)
 
-        listAdapter = MSMovieSearchHistoryAdapter()
+        listAdapter = MSMovieSearchHistoryAdapter { historyItemClick.onNext(it) }
         ms_mainScreen_searchHistory.adapter = listAdapter
     }
 }
