@@ -80,7 +80,6 @@ class MSMainVm(
                 else -> throw RuntimeException("Unexpected result LCE state")
             }
         }
-            .distinct()
             .doOnNext { viewState = it }
     }
 
