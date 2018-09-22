@@ -38,6 +38,17 @@ class MSMainVm(
     // -----------------------------------------------------------------------------------
     // Internal helpers
 
+    private fun results(events: Observable<out MSMovieEvent>): Observable<Lce<out MSMovieResult>> {
+        return events.publish { o ->
+            Observable.merge(
+                o.ofType(ScreenLoadEvent::class.java).compose(onScreenLoad()),
+                o.ofType(SearchMovieEvent::class.java).compose(onMovieSearch()),
+                o.ofType(ClickMovieEvent::class.java).compose(onMovieSelect()),
+                o.ofType(ClickMovieFromHistoryEvent::class.java).compose(onMovieFromHistorySelect())
+            )
+        }
+    }
+
     private fun render(results: Observable<Lce<out MSMovieResult>>): Observable<MSMovieVs> {
         return results.scan(viewState) { state, result ->
             when (result) {
@@ -80,17 +91,6 @@ class MSMainVm(
             }
         }
             .doOnNext { viewState = it }
-    }
-
-    private fun results(events: Observable<out MSMovieEvent>): Observable<Lce<out MSMovieResult>> {
-        return events.publish { o ->
-            Observable.merge(
-                o.ofType(ScreenLoadEvent::class.java).compose(onScreenLoad()),
-                o.ofType(SearchMovieEvent::class.java).compose(onMovieSearch()),
-                o.ofType(ClickMovieEvent::class.java).compose(onMovieSelect()),
-                o.ofType(ClickMovieFromHistoryEvent::class.java).compose(onMovieFromHistorySelect())
-            )
-        }
     }
 
     // -----------------------------------------------------------------------------------
