@@ -1,5 +1,6 @@
 package co.kaush.msusf.movies
 
+import co.kaush.msusf.BuildConfig
 import com.google.gson.annotations.SerializedName
 import io.reactivex.Observable
 import retrofit2.Response
@@ -11,7 +12,7 @@ interface MSMovieApi {
     @GET("/")
     fun searchMovie(
             @Query("t") movieName: String,
-            @Query("apiKey") apiKey: String = "238a5740"
+            @Query("apiKey") apiKey: String = BuildConfig.OMDB_API_KEY
     ): Observable<Response<MSMovieResult>>
 }
 
