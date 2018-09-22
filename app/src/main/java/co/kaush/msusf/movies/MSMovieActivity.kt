@@ -60,6 +60,7 @@ class MSMovieActivity : MSActivity() {
             RxView.clicks(ms_mainScreen_searchBtn)
                 .map { SearchMovieEvent(ms_mainScreen_searchText.text.toString()) }
 
+
         disposable = viewModel.send(screenLoadEvents, searchMovieEvents)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
