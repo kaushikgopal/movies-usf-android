@@ -28,8 +28,8 @@ class MSMovieActivity : MSActivity() {
     @Inject
     lateinit var movieRepo: MSMovieRepository
 
-    lateinit var viewModel: MSMainVm
-    lateinit var listAdapter: MSMovieSearchHistoryAdapter
+    private lateinit var viewModel: MSMainVm
+    private lateinit var listAdapter: MSMovieSearchHistoryAdapter
 
     private var disposable: Disposable? = null
     private val historyItemClick: PublishSubject<MSMovie> = PublishSubject.create()
