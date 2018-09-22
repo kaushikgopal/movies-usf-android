@@ -2,6 +2,7 @@ package co.kaush.msusf.movies
 
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
+import android.support.v4.content.ContextCompat
 import android.support.v4.widget.CircularProgressDrawable
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutCompat.HORIZONTAL
@@ -98,8 +99,10 @@ class MSMovieActivity : MSActivity() {
         val layoutManager = LinearLayoutManager(this, HORIZONTAL, false)
         ms_mainScreen_searchHistory.layoutManager = layoutManager
 
-        val dividerItemDecoration = DividerItemDecoration(
-            ms_mainScreen_searchHistory.context, layoutManager.orientation)
+        val dividerItemDecoration = DividerItemDecoration(this, HORIZONTAL)
+        dividerItemDecoration.setDrawable(
+            ContextCompat.getDrawable(this, R.drawable.ms_list_divider_space)!!
+        )
         ms_mainScreen_searchHistory.addItemDecoration(dividerItemDecoration)
 
         listAdapter = MSMovieSearchHistoryAdapter()
