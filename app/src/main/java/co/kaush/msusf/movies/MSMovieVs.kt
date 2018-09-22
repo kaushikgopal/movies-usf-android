@@ -1,7 +1,7 @@
 package co.kaush.msusf.movies
 
 data class MSMovieVs(
-    val searchBoxText: String = "",
+    val searchBoxText: String? = null,
     val searchedMovieTitle: String = "",
     val searchedMovieRating: String = "",
     val searchedMoviePoster: String = "",

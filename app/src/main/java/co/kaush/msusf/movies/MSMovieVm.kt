@@ -48,9 +48,7 @@ class MSMainVm(
 
                         is SearchMovieResult -> {
                             val movie: MSMovie = result.packet.movie
-
                             state.copy(
-                                searchBoxText = "",
                                 searchedMovieTitle = movie.title,
                                 searchedMovieRating = movie.ratingSummary,
                                 searchedMoviePoster = movie.posterUrl,
@@ -72,6 +70,7 @@ class MSMainVm(
 
                 is Lce.Loading -> {
                     state.copy(
+                        searchBoxText = null,
                         searchedMovieTitle = "Searching Movie",
                         searchedMovieRating = ""
                     )

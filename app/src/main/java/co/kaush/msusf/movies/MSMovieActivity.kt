@@ -29,8 +29,6 @@ import kotlinx.android.synthetic.main.activity_main.*
 import timber.log.Timber
 import javax.inject.Inject
 
-
-
 class MSMovieActivity : MSActivity() {
 
     @Inject
@@ -89,7 +87,9 @@ class MSMovieActivity : MSActivity() {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 { vs ->
-                    ms_mainScreen_searchText.setText(vs.searchBoxText)
+                    vs.searchBoxText?.let {
+                        ms_mainScreen_searchText.setText(it)
+                    }
                     ms_mainScreen_title.text = vs.searchedMovieTitle
                     ms_mainScreen_rating.text = vs.searchedMovieRating
 
