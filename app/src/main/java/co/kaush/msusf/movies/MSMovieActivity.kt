@@ -1,8 +1,5 @@
 package co.kaush.msusf.movies
 
-import android.animation.AnimatorSet
-import android.animation.ObjectAnimator.ofPropertyValuesHolder
-import android.animation.PropertyValuesHolder.ofFloat
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
@@ -10,9 +7,6 @@ import android.support.v4.widget.CircularProgressDrawable
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutCompat.HORIZONTAL
 import android.support.v7.widget.LinearLayoutManager
-import android.view.View
-import android.view.animation.OvershootInterpolator
-import android.widget.ImageView
 import co.kaush.msusf.MSActivity
 import co.kaush.msusf.R
 import co.kaush.msusf.movies.MSMovieEvent.ClickMovieEvent
@@ -128,22 +122,5 @@ class MSMovieActivity : MSActivity() {
 
         listAdapter = MSMovieSearchHistoryAdapter { historyItemClick.onNext(it) }
         ms_mainScreen_searchHistory.adapter = listAdapter
-    }
-
-    private fun ImageView.growShrink() {
-        val expansionFactor: Float = 0.2F
-        val growX = ofFloat(View.SCALE_X, 1f + expansionFactor)
-        val growY = ofFloat(View.SCALE_Y, 1f + expansionFactor)
-        val growAnimation = ofPropertyValuesHolder(this, growX, growY)
-        growAnimation.interpolator = OvershootInterpolator()
-
-        val shrinkX = ofFloat(View.SCALE_X, 1f)
-        val shrinkY = ofFloat(View.SCALE_Y, 1f)
-        val shrinkAnimation = ofPropertyValuesHolder(this, shrinkX, shrinkY)
-        shrinkAnimation.interpolator = OvershootInterpolator()
-
-        val animSetXY = AnimatorSet()
-        animSetXY.playSequentially(growAnimation, shrinkAnimation)
-        animSetXY.start()
     }
 }

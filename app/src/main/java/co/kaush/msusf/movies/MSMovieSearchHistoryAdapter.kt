@@ -66,7 +66,10 @@ class MSMovieSearchVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
             posterView.setImageResource(0)
         }
 
-        itemView.setOnClickListener { historyClickListener.invoke(item) }
+        itemView.setOnClickListener {
+            historyClickListener.invoke(item)
+            posterView.growShrink()
+        }
     }
 }
 
