@@ -58,10 +58,13 @@ class MSMainVm(
                         }
 
                         is ClickMovieResult -> {
-                            val adapterList: MutableList<MSMovie> =
-                                mutableListOf(*state.adapterList.toTypedArray())
-                            adapterList.add(result.packet.clickedMovie)
-                            state.copy(adapterList = adapterList)
+                            (result.packet.clickedMovie)
+                                ?.let {
+                                    val adapterList: MutableList<MSMovie> =
+                                        mutableListOf(*state.adapterList.toTypedArray())
+                                    adapterList.add(it)
+                                    state.copy(adapterList = adapterList)
+                                } ?: state.copy()
                         }
                     }
                 }
@@ -110,7 +113,15 @@ class MSMainVm(
 
     private fun onMovieSelect(): ObservableTransformer<ClickMovieEvent, Lce<ClickMovieResult>> {
         return ObservableTransformer { upstream ->
-            upstream.map { Lce.Content(ClickMovieResult(viewState.searchedMovieReference!!)) }
+            upstream.map {
+                val movieResult: MSMovie = viewState.searchedMovieReference!!
+
+                if (!viewState.adapterList.contains(movieResult)) {
+                    Lce.Content(ClickMovieResult(movieResult))
+                } else {
+                    Lce.Content(ClickMovieResult(null))
+                }
+            }
         }
     }
 }

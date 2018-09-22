@@ -18,5 +18,5 @@ sealed class MSMovieEvent {
 sealed class MSMovieResult {
     object ScreenLoadResult : MSMovieResult()
     data class SearchMovieResult(val movie: MSMovie) : MSMovieResult()
-    data class ClickMovieResult(val clickedMovie: MSMovie) : MSMovieResult()
+    data class ClickMovieResult(val clickedMovie: MSMovie?) : MSMovieResult()
 }
