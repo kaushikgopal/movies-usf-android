@@ -1,4 +1,4 @@
-# Movie search using a Unidirectional state flow
+# Movie search using a unidirectional state flow pattern
 
 This is an attempt at coming up with a unidirectional state flow pattern that uses the concepts
 of patterns like Redux, Cycle.js, MVI etc.
