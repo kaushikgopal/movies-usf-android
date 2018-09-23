@@ -78,7 +78,7 @@ class MSMainVmTest {
     }
 
     @Test
-    fun onClickiMovieSearchResult_shouldPopulateHistoryList() {
+    fun onClickingMovieSearchResult_shouldPopulateHistoryList() {
 
         val mockMovieRepo: MSMovieRepository = mock(MSMovieRepository::class.java)
         whenever(mockMovieRepo.searchMovie("blade runner 2049"))
