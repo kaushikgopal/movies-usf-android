@@ -21,16 +21,19 @@ class MSMainVm(
     private val movieRepo: MSMovieRepository
 ) : AndroidViewModel(app) {
 
-    private var viewState: MSMovieVs = MSMovieVs()
+    private var viewState: MSMovieViewState = MSMovieViewState()
 
-    fun send(vararg es: Observable<out MSMovieEvent>): Observable<MSMovieVs> {
+    fun send(vararg es: Observable<out MSMovieEvent>): Observable<MSMovieViewState> {
 
+        // gather events
         val events: Observable<out MSMovieEvent> = Observable.mergeArray(*es)
             .doOnNext { Timber.d("----- event ${it.javaClass.simpleName}") }
 
+        // events -> results (use cases)
         val results: Observable<Lce<out MSMovieResult>> = results(events)
             .doOnNext { Timber.d("----- result $it") }
 
+        // results -> view state
         return render(results)
             .doOnNext { Timber.d("----- viewState $it") }
     }
@@ -49,7 +52,7 @@ class MSMainVm(
         }
     }
 
-    private fun render(results: Observable<Lce<out MSMovieResult>>): Observable<MSMovieVs> {
+    private fun render(results: Observable<Lce<out MSMovieResult>>): Observable<MSMovieViewState> {
         return results.scan(viewState) { state, result ->
             when (result) {
 
