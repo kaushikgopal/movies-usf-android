@@ -16,6 +16,12 @@ import io.reactivex.ObservableTransformer
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 
+/**
+ * For this example, a simple ViewModel would have sufficed,
+ * but in most real world examples we would use an AndroidViewModel
+ *
+ * Our Unit tests should still be able to run given this
+ */
 class MSMainVm(
     app: MSApp,
     private val movieRepo: MSMovieRepository
