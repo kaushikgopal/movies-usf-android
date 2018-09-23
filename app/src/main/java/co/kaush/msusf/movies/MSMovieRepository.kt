@@ -5,6 +5,7 @@ import io.reactivex.Observable
 import timber.log.Timber
 import javax.inject.Inject
 
+@OpenClassOnDebug
 class MSMovieRepository @Inject constructor(
     val movieApi: MSMovieApi
 ) {
