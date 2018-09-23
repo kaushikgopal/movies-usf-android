@@ -27,4 +27,4 @@ echo "omdb_apikey=\"<API_KEY_GOES_HERE>\"" >> $HOME/.gradle/gradle.properties
 You can read [this post for instructions](https://medium.com/code-better/hiding-api-keys-from-your-android-repository-b23f5598b906) on this private api
 setting up process.
 
-For great movie recommendations, ping me [@kaushikgopal](https://twitter.com/kaushikgopal) (seriously, I watch a love of movies).
+For great movie recommendations, ping me [@kaushikgopal](https://twitter.com/kaushikgopal) (seriously, I watch a lot of movies).
