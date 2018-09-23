@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit
 
 class MSMainVmTest {
 
-    lateinit var viewModel: MSMainVm
+    private lateinit var viewModel: MSMainVm
 
     @Test
     fun onSubscribing_shouldReceiveStartingViewState() {
@@ -58,7 +58,7 @@ class MSMainVmTest {
 
         eventTester.onNext(SearchMovieEvent("blade runner 2049"))
 
-        viewModelTester.awaitTerminalEvent(10L, TimeUnit.MILLISECONDS)
+        viewModelTester.awaitTerminalEvent(20L, TimeUnit.MILLISECONDS)
 
         assertThat(viewModelTester.valueCount()).isEqualTo(3)
 
@@ -73,6 +73,38 @@ class MSMainVmTest {
                 .isEqualTo("https://m.media-amazon.com/images/M/MV5BNzA1Njg4NzYxOV5BMl5BanBnXkFtZTgwODk5NjU3MzI@._V1_SX300.jpg")
             assertThat(it.searchedMovieRating).isEqualTo("\n8.1/10 (IMDB)\n87% (RT)")
 
+            true
+        }
+    }
+
+    @Test
+    fun onClickiMovieSearchResult_shouldPopulateHistoryList() {
+
+        val mockMovieRepo: MSMovieRepository = mock(MSMovieRepository::class.java)
+        whenever(mockMovieRepo.searchMovie("blade runner 2049"))
+            .thenReturn(Observable.just(bladeRunner2049))
+
+        viewModel = MSMainVm(mockApp, mockMovieRepo)
+
+        val eventTester = PublishSubject.create<MSMovieEvent>()
+        val viewModelTester = viewModel.send(eventTester).test()
+
+        eventTester.onNext(SearchMovieEvent("blade runner 2049"))
+
+        viewModelTester.awaitTerminalEvent(20L, TimeUnit.MILLISECONDS)
+
+        assertThat(viewModelTester.valueCount()).isEqualTo(3)
+
+        eventTester.onNext(MSMovieEvent.ClickMovieEvent)
+
+        viewModelTester.awaitTerminalEvent(20L, TimeUnit.MILLISECONDS)
+
+        assertThat(viewModelTester.valueCount()).isEqualTo(4)
+
+        viewModelTester.assertValueAt(3) {
+            assertThat(it.searchBoxText).isEqualTo(null) // prevents search box from reset
+            assertThat(it.adapterList).hasSize(1)
+            assertThat(it.adapterList.get(0)).isEqualTo(bladeRunner2049)
             true
         }
     }
