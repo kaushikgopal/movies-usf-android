@@ -110,6 +110,7 @@ class MSMainVm(
                 }
             }
         }
+            .distinctUntilChanged()
             .doOnNext { viewState = it }
     }
 
