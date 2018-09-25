@@ -1,8 +1,8 @@
 package co.kaush.msusf.movies
 
 import co.kaush.msusf.MSApp
-import co.kaush.msusf.movies.MSMovieEvent.ClickMovieEvent
-import co.kaush.msusf.movies.MSMovieEvent.ClickMovieFromHistoryEvent
+import co.kaush.msusf.movies.MSMovieEvent.AddToHistoryEvent
+import co.kaush.msusf.movies.MSMovieEvent.RestoreFromHistoryEvent
 import co.kaush.msusf.movies.MSMovieEvent.ScreenLoadEvent
 import co.kaush.msusf.movies.MSMovieEvent.SearchMovieEvent
 import com.google.common.truth.Truth.assertThat
@@ -83,7 +83,7 @@ class MSMainVmTest {
 
         assertThat(viewModelTester.valueCount()).isEqualTo(3)
 
-        eventTester.onNext(ClickMovieEvent)
+        eventTester.onNext(AddToHistoryEvent)
 
         viewModelTester.awaitTerminalEvent(20L, TimeUnit.MILLISECONDS)
 
@@ -107,10 +107,10 @@ class MSMainVmTest {
         // populate history
         eventTester.onNext(SearchMovieEvent("blade runner 2049"))
         viewModelTester.awaitTerminalEvent(20L, TimeUnit.MILLISECONDS)
-        eventTester.onNext(ClickMovieEvent)
+        eventTester.onNext(AddToHistoryEvent)
         eventTester.onNext(SearchMovieEvent("blade"))
         viewModelTester.awaitTerminalEvent(20L, TimeUnit.MILLISECONDS)
-        eventTester.onNext(ClickMovieEvent)
+        eventTester.onNext(AddToHistoryEvent)
 
         // check that the result is showing Blade
         viewModelTester.assertValueAt(viewModelTester.valueCount() - 1) {
@@ -119,7 +119,7 @@ class MSMainVmTest {
         }
 
         // click blade runner 2049 from history
-        eventTester.onNext(ClickMovieFromHistoryEvent(bladeRunner2049))
+        eventTester.onNext(RestoreFromHistoryEvent(bladeRunner2049))
         viewModelTester.assertValueAt(viewModelTester.valueCount() - 1) {
             assertThat(it.searchedMovieTitle).isEqualTo("Blade Runner 2049")
             assertThat(it.searchedMovieRating).isEqualTo(bladeRunner2049.ratingSummary)
@@ -127,7 +127,7 @@ class MSMainVmTest {
         }
 
         // click blade again
-        eventTester.onNext(ClickMovieFromHistoryEvent(blade))
+        eventTester.onNext(RestoreFromHistoryEvent(blade))
         viewModelTester.assertValueAt(viewModelTester.valueCount() - 1) {
             assertThat(it.searchedMovieTitle).isEqualTo("Blade")
             assertThat(it.searchedMovieRating).isEqualTo(blade.ratingSummary)

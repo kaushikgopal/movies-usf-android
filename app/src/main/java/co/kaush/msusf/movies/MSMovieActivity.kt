@@ -9,8 +9,8 @@ import android.support.v7.widget.LinearLayoutCompat.HORIZONTAL
 import android.support.v7.widget.LinearLayoutManager
 import co.kaush.msusf.MSActivity
 import co.kaush.msusf.R
-import co.kaush.msusf.movies.MSMovieEvent.ClickMovieEvent
-import co.kaush.msusf.movies.MSMovieEvent.ClickMovieFromHistoryEvent
+import co.kaush.msusf.movies.MSMovieEvent.AddToHistoryEvent
+import co.kaush.msusf.movies.MSMovieEvent.RestoreFromHistoryEvent
 import co.kaush.msusf.movies.MSMovieEvent.ScreenLoadEvent
 import co.kaush.msusf.movies.MSMovieEvent.SearchMovieEvent
 import com.bumptech.glide.Glide
@@ -64,19 +64,19 @@ class MSMovieActivity : MSActivity() {
         val screenLoadEvents: Observable<ScreenLoadEvent> = Observable.just(ScreenLoadEvent)
         val searchMovieEvents: Observable<SearchMovieEvent> = RxView.clicks(ms_mainScreen_searchBtn)
             .map { SearchMovieEvent(ms_mainScreen_searchText.text.toString()) }
-        val movieSelectEvents: Observable<ClickMovieEvent> = RxView.clicks(ms_mainScreen_poster)
+        val addToHistoryEvents: Observable<AddToHistoryEvent> = RxView.clicks(ms_mainScreen_poster)
             .map {
                 ms_mainScreen_poster.growShrink()
-                ClickMovieEvent
+                AddToHistoryEvent
             }
-        val movieHistoryClickEvents: Observable<ClickMovieFromHistoryEvent> = historyItemClick
-            .map { ClickMovieFromHistoryEvent(it) }
+        val restoreFromHistoryEvents: Observable<RestoreFromHistoryEvent> = historyItemClick
+            .map { RestoreFromHistoryEvent(it) }
 
         disposable = viewModel.render(
             screenLoadEvents,
             searchMovieEvents,
-            movieSelectEvents,
-            movieHistoryClickEvents
+            addToHistoryEvents,
+            restoreFromHistoryEvents
         )
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(

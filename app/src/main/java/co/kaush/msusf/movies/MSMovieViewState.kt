@@ -12,12 +12,12 @@ data class MSMovieViewState(
 sealed class MSMovieEvent {
     object ScreenLoadEvent : MSMovieEvent()
     data class SearchMovieEvent(val searchedMovieTitle: String = "") : MSMovieEvent()
-    object ClickMovieEvent : MSMovieEvent()
-    data class ClickMovieFromHistoryEvent(val movieFromHistory: MSMovie) : MSMovieEvent()
+    object AddToHistoryEvent : MSMovieEvent()
+    data class RestoreFromHistoryEvent(val movieFromHistory: MSMovie) : MSMovieEvent()
 }
 
 sealed class MSMovieResult {
     object ScreenLoadResult : MSMovieResult()
     data class SearchMovieResult(val movie: MSMovie) : MSMovieResult()
-    data class ClickMovieResult(val clickedMovie: MSMovie?) : MSMovieResult()
+    data class SearchHistoryResult(val movieHistory: MSMovie?) : MSMovieResult()
 }

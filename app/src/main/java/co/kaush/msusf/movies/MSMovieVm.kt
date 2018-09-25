@@ -4,12 +4,12 @@ import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import co.kaush.msusf.MSApp
-import co.kaush.msusf.movies.MSMovieEvent.ClickMovieEvent
-import co.kaush.msusf.movies.MSMovieEvent.ClickMovieFromHistoryEvent
+import co.kaush.msusf.movies.MSMovieEvent.AddToHistoryEvent
+import co.kaush.msusf.movies.MSMovieEvent.RestoreFromHistoryEvent
 import co.kaush.msusf.movies.MSMovieEvent.ScreenLoadEvent
 import co.kaush.msusf.movies.MSMovieEvent.SearchMovieEvent
-import co.kaush.msusf.movies.MSMovieResult.ClickMovieResult
 import co.kaush.msusf.movies.MSMovieResult.ScreenLoadResult
+import co.kaush.msusf.movies.MSMovieResult.SearchHistoryResult
 import co.kaush.msusf.movies.MSMovieResult.SearchMovieResult
 import io.reactivex.Observable
 import io.reactivex.ObservableTransformer
@@ -49,18 +49,22 @@ class MSMainVm(
     // -----------------------------------------------------------------------------------
     // Internal helpers
 
-    private fun eventsToResults(events: Observable<out MSMovieEvent>): Observable<Lce<out MSMovieResult>> {
+    private fun eventsToResults(
+        events: Observable<out MSMovieEvent>
+    ): Observable<Lce<out MSMovieResult>> {
         return events.publish { o ->
             Observable.merge(
                 o.ofType(ScreenLoadEvent::class.java).compose(onScreenLoad()),
-                o.ofType(SearchMovieEvent::class.java).compose(onMovieSearch()),
-                o.ofType(ClickMovieEvent::class.java).compose(onMovieSelect()),
-                o.ofType(ClickMovieFromHistoryEvent::class.java).compose(onMovieFromHistorySelect())
+                o.ofType(SearchMovieEvent::class.java).compose(onSearchMovie()),
+                o.ofType(AddToHistoryEvent::class.java).compose(onAddToHistory()),
+                o.ofType(RestoreFromHistoryEvent::class.java).compose(onRestoreFromHistory())
             )
         }
     }
 
-    private fun resultsToViewState(results: Observable<Lce<out MSMovieResult>>): Observable<MSMovieViewState> {
+    private fun resultsToViewState(
+        results: Observable<Lce<out MSMovieResult>>
+    ): Observable<MSMovieViewState> {
         return results.scan(viewState) { state, result ->
             when (result) {
 
@@ -79,8 +83,8 @@ class MSMainVm(
                             )
                         }
 
-                        is ClickMovieResult -> {
-                            (result.packet.clickedMovie)
+                        is SearchHistoryResult -> {
+                            (result.packet.movieHistory)
                                 ?.let {
                                     val adapterList: MutableList<MSMovie> =
                                         mutableListOf(*state.adapterList.toTypedArray())
@@ -125,7 +129,7 @@ class MSMainVm(
         }
     }
 
-    private fun onMovieSearch(): ObservableTransformer<SearchMovieEvent, Lce<SearchMovieResult>> {
+    private fun onSearchMovie(): ObservableTransformer<SearchMovieEvent, Lce<SearchMovieResult>> {
         return ObservableTransformer { upstream ->
             upstream.switchMap { searchMovieEvent ->
                 movieRepo.searchMovie(searchMovieEvent.searchedMovieTitle)
@@ -142,21 +146,21 @@ class MSMainVm(
         }
     }
 
-    private fun onMovieSelect(): ObservableTransformer<ClickMovieEvent, Lce<ClickMovieResult>> {
+    private fun onAddToHistory(): ObservableTransformer<AddToHistoryEvent, Lce<SearchHistoryResult>> {
         return ObservableTransformer { upstream ->
             upstream.map {
                 val movieResult: MSMovie = viewState.searchedMovieReference!!
 
                 if (!viewState.adapterList.contains(movieResult)) {
-                    Lce.Content(ClickMovieResult(movieResult))
+                    Lce.Content(SearchHistoryResult(movieResult))
                 } else {
-                    Lce.Content(ClickMovieResult(null))
+                    Lce.Content(SearchHistoryResult(null))
                 }
             }
         }
     }
 
-    private fun onMovieFromHistorySelect(): ObservableTransformer<ClickMovieFromHistoryEvent,
+    private fun onRestoreFromHistory(): ObservableTransformer<RestoreFromHistoryEvent,
         Lce<SearchMovieResult>> {
         return ObservableTransformer { upstream ->
             upstream.map { Lce.Content(SearchMovieResult(it.movieFromHistory)) }
