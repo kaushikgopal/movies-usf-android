@@ -72,7 +72,7 @@ class MSMovieActivity : MSActivity() {
         val movieHistoryClickEvents: Observable<ClickMovieFromHistoryEvent> = historyItemClick
             .map { ClickMovieFromHistoryEvent(it) }
 
-        disposable = viewModel.send(
+        disposable = viewModel.render(
             screenLoadEvents,
             searchMovieEvents,
             movieSelectEvents,

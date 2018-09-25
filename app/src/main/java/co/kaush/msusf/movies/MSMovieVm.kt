@@ -29,25 +29,27 @@ class MSMainVm(
 
     private var viewState: MSMovieViewState = MSMovieViewState()
 
-    fun send(vararg es: Observable<out MSMovieEvent>): Observable<MSMovieViewState> {
+    fun render(vararg es: Observable<out MSMovieEvent>): Observable<MSMovieViewState> {
 
         // gather events
-        val events: Observable<out MSMovieEvent> = Observable.mergeArray(*es)
-            .doOnNext { Timber.d("----- event ${it.javaClass.simpleName}") }
+        val events: Observable<out MSMovieEvent> =
+            Observable.mergeArray(*es)
+                .doOnNext { Timber.d("----- event ${it.javaClass.simpleName}") }
 
         // events -> results (use cases)
-        val results: Observable<Lce<out MSMovieResult>> = results(events)
-            .doOnNext { Timber.d("----- result $it") }
+        val results: Observable<Lce<out MSMovieResult>> =
+            eventsToResults(events)
+                .doOnNext { Timber.d("----- result $it") }
 
-        // results -> view state
-        return render(results)
+        // results -> view state (reducer)
+        return resultsToViewState(results)
             .doOnNext { Timber.d("----- viewState $it") }
     }
 
     // -----------------------------------------------------------------------------------
     // Internal helpers
 
-    private fun results(events: Observable<out MSMovieEvent>): Observable<Lce<out MSMovieResult>> {
+    private fun eventsToResults(events: Observable<out MSMovieEvent>): Observable<Lce<out MSMovieResult>> {
         return events.publish { o ->
             Observable.merge(
                 o.ofType(ScreenLoadEvent::class.java).compose(onScreenLoad()),
@@ -58,7 +60,7 @@ class MSMainVm(
         }
     }
 
-    private fun render(results: Observable<Lce<out MSMovieResult>>): Observable<MSMovieViewState> {
+    private fun resultsToViewState(results: Observable<Lce<out MSMovieResult>>): Observable<MSMovieViewState> {
         return results.scan(viewState) { state, result ->
             when (result) {
 

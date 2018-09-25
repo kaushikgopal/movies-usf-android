@@ -22,7 +22,7 @@ class MSMainVmTest {
         viewModel = MSMainVm(mockApp, mockMovieRepo)
 
         val eventTester = PublishSubject.create<MSMovieEvent>()
-        val viewModelTester = viewModel.send(eventTester).test()
+        val viewModelTester = viewModel.render(eventTester).test()
 
         viewModelTester.assertValueCount(1)
     }
@@ -32,7 +32,7 @@ class MSMainVmTest {
         viewModel = MSMainVm(mockApp, mockMovieRepo)
 
         val eventTester = PublishSubject.create<MSMovieEvent>()
-        val viewModelTester = viewModel.send(eventTester).test()
+        val viewModelTester = viewModel.render(eventTester).test()
 
         eventTester.onNext(ScreenLoadEvent)
 
@@ -47,7 +47,7 @@ class MSMainVmTest {
         viewModel = MSMainVm(mockApp, mockMovieRepo)
 
         val eventTester = PublishSubject.create<MSMovieEvent>()
-        val viewModelTester = viewModel.send(eventTester).test()
+        val viewModelTester = viewModel.render(eventTester).test()
 
         eventTester.onNext(SearchMovieEvent("blade runner 2049"))
 
@@ -75,7 +75,7 @@ class MSMainVmTest {
         viewModel = MSMainVm(mockApp, mockMovieRepo)
 
         val eventTester = PublishSubject.create<MSMovieEvent>()
-        val viewModelTester = viewModel.send(eventTester).test()
+        val viewModelTester = viewModel.render(eventTester).test()
 
         eventTester.onNext(SearchMovieEvent("blade runner 2049"))
 
@@ -102,7 +102,7 @@ class MSMainVmTest {
         viewModel = MSMainVm(mockApp, mockMovieRepo)
 
         val eventTester = PublishSubject.create<MSMovieEvent>()
-        val viewModelTester = viewModel.send(eventTester).test()
+        val viewModelTester = viewModel.render(eventTester).test()
 
         // populate history
         eventTester.onNext(SearchMovieEvent("blade runner 2049"))
