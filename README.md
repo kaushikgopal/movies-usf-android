@@ -37,5 +37,5 @@ setting up process.
 
 For great movie recommendations, ping me [@kaushikgopal](https://twitter.com/kaushikgopal) (seriously, I watch a lot of movies).
 
-I'm going to be speaking at [MBLT}Dev 2018](https://twitter.com/mbltdev) on this topic, so stay tuned fore a more descriptive info.
+I gave a talk at [MBLT}Dev 2018](https://twitter.com/mbltdev) on how I went about building this app. [Slides can be found here](https://speakerdeck.com/kaushikgopal/unidirectional-state-flow-patterns-a-refactoring-story).
 
