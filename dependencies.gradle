@@ -19,6 +19,7 @@ versions.lifecycle = "2.0.0"
 
 versions.android_crop = "1.0.0"
 versions.apache_commons = "2.5"
+versions.appcompat = "1.0.2"
 versions.assertj = "2.8.0"
 versions.atsl_runner = "1.1.1"
 versions.atsl_ext = "1.1.0"
@@ -105,11 +106,11 @@ versions.lint = "26.2.1" /* AGP version + 23 */
 
 def deps = [:]
 
-// support
+// androidx
 
 def androidx = [:]
 androidx.annotations = "androidx.annotation:annotation:$versions.androidx"
-androidx.app_compat = "androidx.appcompat:appcompat:$versions.androidx"
+androidx.app_compat = "androidx.appcompat:appcompat:$versions.appcompat"
 androidx.cardview = "androidx.cardview:cardview:$versions.androidx"
 androidx.compat = "androidx.core:core:$versions.androidx"
 androidx.core_utils = "androidx.legacy:legacy-support-core-utils:$versions.androidx"
@@ -126,7 +127,6 @@ androidx.vector_drawable_animated = "androidx.vectordrawable:vectordrawable-anim
 deps.androidx = androidx
 
 // 3rd party
-
 
 def arch_core = [:]
 arch_core.testing = "androidx.arch.core:core-testing:$versions.arch_core"
@@ -255,8 +255,8 @@ deps.mockito = mockito
 
 deps.android_crop = "com.soundcloud.android:android-crop:${versions.android_crop}@aar"
 deps.android_gradle_plugin = "com.android.tools.build:gradle:$versions.android_gradle_plugin"
-deps.constraint_layout = "com.android.support.constraint:constraint-layout:$versions.constraint_layout"
 deps.cardio = "io.card:android-sdk:$versions.cardio"
+deps.constraint_layout = "androidx.constraintlayout:constraintlayout:$versions.constraint_layout"
 deps.crashlytics = "com.crashlytics.sdk.android:crashlytics:${versions.crashlytics}@aar"
 deps.crashlytics_ndk = "com.crashlytics.sdk.android:crashlytics-ndk:${versions.crashlytics_ndk}@aar"
 deps.dexcount = "com.getkeepsafe.dexcount:dexcount-gradle-plugin:$versions.dexcount"
