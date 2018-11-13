@@ -31,7 +31,7 @@ class MSAppModule(private val app: MSApp) {
         val okHttpClient: OkHttpClient = OkHttpClient.Builder().addInterceptor(interceptor).build()
 
         return Retrofit.Builder()
-                .baseUrl("http://www.omdbapi.com")
+                .baseUrl("https://www.omdbapi.com")
                 .client(okHttpClient)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())

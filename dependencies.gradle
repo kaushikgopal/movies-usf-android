@@ -10,7 +10,7 @@ versions.min_sdk = 21
 versions.target_sdk = 28
 // Preferably keep this in sync
 versions.build_sdk = 28
-versions.support = "27.1.0"
+versions.support = "28.0.0"
 versions.androidx = "1.0.0"
 
 versions.arch_core = "2.0.0"
