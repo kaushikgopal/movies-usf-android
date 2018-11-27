@@ -80,25 +80,26 @@ class MSMovieActivity : MSActivity() {
         )
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
-                { vs ->
-                    vs.searchBoxText?.let {
+                { change ->
+
+                    change.vs.searchBoxText?.let {
                         ms_mainScreen_searchText.setText(it)
                     }
-                    ms_mainScreen_title.text = vs.searchedMovieTitle
-                    ms_mainScreen_rating.text = vs.searchedMovieRating
+                    ms_mainScreen_title.text = change.vs.searchedMovieTitle
+                    ms_mainScreen_rating.text = change.vs.searchedMovieRating
 
-                    vs.searchedMoviePoster
+                    change.vs.searchedMoviePoster
                         .takeIf { it.isNotBlank() }
                         ?.let {
                             Glide.with(ctx)
-                                .load(vs.searchedMoviePoster)
+                                .load(change.vs.searchedMoviePoster)
                                 .placeholder(spinner)
                                 .into(ms_mainScreen_poster)
                         } ?: run {
                         ms_mainScreen_poster.setImageResource(0)
                     }
 
-                    listAdapter.submitList(vs.adapterList)
+                    listAdapter.submitList(change.vs.adapterList)
                 },
                 { Timber.w(it, "something went terribly wrong") }
             )
