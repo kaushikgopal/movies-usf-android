@@ -7,6 +7,7 @@ import android.support.v4.widget.CircularProgressDrawable
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutCompat.HORIZONTAL
 import android.support.v7.widget.LinearLayoutManager
+import android.widget.Toast
 import co.kaush.msusf.MSActivity
 import co.kaush.msusf.R
 import co.kaush.msusf.movies.MSMovieEvent.AddToHistoryEvent
@@ -82,24 +83,35 @@ class MSMovieActivity : MSActivity() {
             .subscribe(
                 { change ->
 
-                    change.vs.searchBoxText?.let {
-                        ms_mainScreen_searchText.setText(it)
-                    }
-                    ms_mainScreen_title.text = change.vs.searchedMovieTitle
-                    ms_mainScreen_rating.text = change.vs.searchedMovieRating
+                    change.vs.let { vs ->
+                        vs.searchBoxText?.let {
+                            ms_mainScreen_searchText.setText(it)
+                        }
+                        ms_mainScreen_title.text = vs.searchedMovieTitle
+                        ms_mainScreen_rating.text = vs.searchedMovieRating
 
-                    change.vs.searchedMoviePoster
-                        .takeIf { it.isNotBlank() }
-                        ?.let {
-                            Glide.with(ctx)
-                                .load(change.vs.searchedMoviePoster)
-                                .placeholder(spinner)
-                                .into(ms_mainScreen_poster)
-                        } ?: run {
-                        ms_mainScreen_poster.setImageResource(0)
+                        vs.searchedMoviePoster
+                            .takeIf { it.isNotBlank() }
+                            ?.let {
+                                Glide.with(ctx)
+                                    .load(vs.searchedMoviePoster)
+                                    .placeholder(spinner)
+                                    .into(ms_mainScreen_poster)
+                            } ?: run {
+                            ms_mainScreen_poster.setImageResource(0)
+                        }
+
+                        listAdapter.submitList(vs.adapterList)
                     }
 
-                    listAdapter.submitList(change.vs.adapterList)
+                    change.effects.forEach {
+                        when (it) {
+                            is MSMovieViewEffect.AddedToHistoryToastEffect -> {
+                                Toast.makeText(this, "added to history", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+
                 },
                 { Timber.w(it, "something went terribly wrong") }
             )

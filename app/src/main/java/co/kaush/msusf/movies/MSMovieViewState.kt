@@ -9,7 +9,9 @@ data class MSMovieViewState(
     val adapterList: List<MSMovie> = emptyList()
 )
 
-sealed class MSMovieViewEffect
+sealed class MSMovieViewEffect {
+    object AddedToHistoryToastEffect: MSMovieViewEffect()
+}
 
 data class MSMovieViewChange(val vs: MSMovieViewState, var effects: List<MSMovieViewEffect> = emptyList())
 

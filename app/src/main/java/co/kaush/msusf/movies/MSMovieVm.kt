@@ -11,6 +11,7 @@ import co.kaush.msusf.movies.MSMovieEvent.SearchMovieEvent
 import co.kaush.msusf.movies.MSMovieResult.ScreenLoadResult
 import co.kaush.msusf.movies.MSMovieResult.SearchHistoryResult
 import co.kaush.msusf.movies.MSMovieResult.SearchMovieResult
+import co.kaush.msusf.movies.MSMovieViewEffect.*
 import io.reactivex.Observable
 import io.reactivex.ObservableTransformer
 import io.reactivex.schedulers.Schedulers
@@ -92,7 +93,8 @@ class MSMainVm(
                                         mutableListOf(*change.vs.adapterList.toTypedArray())
                                     adapterList.add(it)
                                     MSMovieViewChange(
-                                        change.vs.copy(adapterList = adapterList)
+                                        change.vs.copy(adapterList = adapterList),
+                                        listOf(AddedToHistoryToastEffect)
                                     )
                                 } ?: MSMovieViewChange(change.vs.copy())
                         }
