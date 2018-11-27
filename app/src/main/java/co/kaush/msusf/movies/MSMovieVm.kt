@@ -30,7 +30,7 @@ class MSMainVm(
 
     private var viewState: MSMovieViewState = MSMovieViewState()
 
-    fun viewChanges(vararg es: Observable<out MSMovieEvent>): Observable<MSMovieViewChange> {
+    fun processInputs(vararg es: Observable<out MSMovieEvent>): Observable<MSMovieViewChange> {
 
         // gather events
         val events: Observable<out MSMovieEvent> =
