@@ -4,11 +4,9 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-allopen'
 
-
 allOpen {
     annotation 'co.kaush.msusf.movies.OpenClass'
 }
-
 
 buildscript {
     repositories {
@@ -52,11 +50,14 @@ dependencies {
     implementation deps.constraint_layout
     implementation deps.dagger.runtime
     kapt deps.dagger.compiler
+    implementation deps.epoxy.core
+    kapt deps.epoxy.compiler
     implementation deps.picasso
     implementation deps.kotlin.stdlib
     implementation deps.lifecycle.extensions
     implementation deps.lifecycle.runtime
     kapt deps.lifecycle.compiler
+    implementation deps.mvrx
     implementation deps.okhttp.logging_interceptor
     implementation deps.retrofit.adapter_rxjava
     implementation deps.retrofit.gson

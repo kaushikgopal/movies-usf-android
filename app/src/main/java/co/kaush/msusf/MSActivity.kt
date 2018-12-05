@@ -2,10 +2,10 @@ package co.kaush.msusf
 
 import android.content.Context
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
+import com.airbnb.mvrx.BaseMvRxActivity
 import javax.inject.Inject
 
-abstract class MSActivity : AppCompatActivity() {
+abstract class MSActivity : BaseMvRxActivity() {
 
     val app: MSApp by lazy { application as MSApp }
 
