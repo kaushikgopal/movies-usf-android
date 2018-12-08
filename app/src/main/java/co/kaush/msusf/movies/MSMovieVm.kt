@@ -11,6 +11,7 @@ import co.kaush.msusf.movies.MSMovieEvent.SearchMovieEvent
 import co.kaush.msusf.movies.MSMovieResult.ScreenLoadResult
 import co.kaush.msusf.movies.MSMovieResult.SearchHistoryResult
 import co.kaush.msusf.movies.MSMovieResult.SearchMovieResult
+import co.kaush.msusf.movies.MSMovieViewEffect.*
 import io.reactivex.Observable
 import io.reactivex.ObservableTransformer
 import io.reactivex.schedulers.Schedulers
@@ -29,7 +30,7 @@ class MSMainVm(
 
     private var viewState: MSMovieViewState = MSMovieViewState()
 
-    fun render(vararg es: Observable<out MSMovieEvent>): Observable<MSMovieViewState> {
+    fun processInputs(vararg es: Observable<out MSMovieEvent>): Observable<MSMovieViewChange> {
 
         // gather events
         val events: Observable<out MSMovieEvent> =
@@ -42,7 +43,7 @@ class MSMainVm(
                 .doOnNext { Timber.d("----- result $it") }
 
         // results -> view state (reducer)
-        return resultsToViewState(results)
+        return resultsToViewChanges(results)
             .doOnNext { Timber.d("----- viewState $it") }
     }
 
@@ -62,24 +63,26 @@ class MSMainVm(
         }
     }
 
-    private fun resultsToViewState(
+    private fun resultsToViewChanges(
         results: Observable<Lce<out MSMovieResult>>
-    ): Observable<MSMovieViewState> {
-        return results.scan(viewState) { state, result ->
-            when (result) {
+    ): Observable<MSMovieViewChange> {
 
+        return results.scan(MSMovieViewChange(viewState)) { change, result ->
+            when (result) {
                 is Lce.Content -> {
                     when (result.packet) {
-                        is ScreenLoadResult -> state.copy(searchBoxText = "")
 
+                        is ScreenLoadResult -> MSMovieViewChange(change.vs.copy(searchBoxText = ""))
                         is SearchMovieResult -> {
                             val movie: MSMovie = result.packet.movie
 
-                            state.copy(
-                                searchedMovieTitle = movie.title,
-                                searchedMovieRating = movie.ratingSummary,
-                                searchedMoviePoster = movie.posterUrl,
-                                searchedMovieReference = movie
+                            MSMovieViewChange(
+                                change.vs.copy(
+                                    searchedMovieTitle = movie.title,
+                                    searchedMovieRating = movie.ratingSummary,
+                                    searchedMoviePoster = movie.posterUrl,
+                                    searchedMovieReference = movie
+                                )
                             )
                         }
 
@@ -87,37 +90,41 @@ class MSMainVm(
                             (result.packet.movieHistory)
                                 ?.let {
                                     val adapterList: MutableList<MSMovie> =
-                                        mutableListOf(*state.adapterList.toTypedArray())
+                                        mutableListOf(*change.vs.adapterList.toTypedArray())
                                     adapterList.add(it)
-                                    state.copy(adapterList = adapterList)
-                                } ?: state.copy()
+                                    MSMovieViewChange(
+                                        change.vs.copy(adapterList = adapterList),
+                                        listOf(AddedToHistoryToastEffect)
+                                    )
+                                } ?: MSMovieViewChange(change.vs.copy(), listOf(AddedToHistoryToastEffect))
                         }
                     }
                 }
 
                 is Lce.Loading -> {
-                    state.copy(
+                    MSMovieViewChange(
+                        change.vs.copy(
                         searchBoxText = null,
                         searchedMovieTitle = "Searching Movie...",
                         searchedMovieRating = "",
                         searchedMoviePoster = "",
                         searchedMovieReference = null
-                    )
+                    ))
                 }
 
                 is Lce.Error -> {
                     when (result.packet) {
                         is SearchMovieResult -> {
                             val movie: MSMovie = result.packet.movie
-                            state.copy(searchedMovieTitle = movie.errorMessage!!)
+                            MSMovieViewChange(
+                                change.vs.copy(searchedMovieTitle = movie.errorMessage!!))
                         }
                         else -> throw RuntimeException("Unexpected result LCE state")
                     }
                 }
             }
         }
-            .distinctUntilChanged()
-            .doOnNext { viewState = it }
+        .doOnNext { viewState = it.vs }
     }
 
     // -----------------------------------------------------------------------------------

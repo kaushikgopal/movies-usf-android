@@ -9,6 +9,12 @@ data class MSMovieViewState(
     val adapterList: List<MSMovie> = emptyList()
 )
 
+sealed class MSMovieViewEffect {
+    object AddedToHistoryToastEffect: MSMovieViewEffect()
+}
+
+data class MSMovieViewChange(val vs: MSMovieViewState, var effects: List<MSMovieViewEffect> = emptyList())
+
 sealed class MSMovieEvent {
     object ScreenLoadEvent : MSMovieEvent()
     data class SearchMovieEvent(val searchedMovieTitle: String = "") : MSMovieEvent()
