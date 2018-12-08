@@ -96,7 +96,7 @@ class MSMainVm(
                                         change.vs.copy(adapterList = adapterList),
                                         listOf(AddedToHistoryToastEffect)
                                     )
-                                } ?: MSMovieViewChange(change.vs.copy())
+                                } ?: MSMovieViewChange(change.vs.copy(), listOf(AddedToHistoryToastEffect))
                         }
                     }
                 }
@@ -124,7 +124,6 @@ class MSMainVm(
                 }
             }
         }
-        .distinctUntilChanged()
         .doOnNext { viewState = it.vs }
     }
 

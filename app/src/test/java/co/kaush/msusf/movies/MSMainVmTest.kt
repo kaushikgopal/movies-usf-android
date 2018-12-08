@@ -51,7 +51,6 @@ class MSMainVmTest {
         val viewModelTester = viewModel.processInputs(eventTester).test()
 
         eventTester.onNext(SearchMovieEvent("blade runner 2049"))
-
         viewModelTester.awaitTerminalEvent(20L, TimeUnit.MILLISECONDS)
 
         assertThat(viewModelTester.valueCount()).isEqualTo(3)
@@ -79,14 +78,11 @@ class MSMainVmTest {
         val viewModelTester = viewModel.processInputs(eventTester).test()
 
         eventTester.onNext(SearchMovieEvent("blade runner 2049"))
-
         viewModelTester.awaitTerminalEvent(20L, TimeUnit.MILLISECONDS)
 
         assertThat(viewModelTester.valueCount()).isEqualTo(3)
 
         eventTester.onNext(AddToHistoryEvent)
-
-        viewModelTester.awaitTerminalEvent(20L, TimeUnit.MILLISECONDS)
 
         assertThat(viewModelTester.valueCount()).isEqualTo(4)
 
@@ -94,6 +90,25 @@ class MSMainVmTest {
             assertThat(it.vs.searchBoxText).isEqualTo(null) // prevents search box from reset
             assertThat(it.vs.adapterList).hasSize(1)
             assertThat(it.vs.adapterList[0]).isEqualTo(bladeRunner2049)
+            assertThat(it.effects.size).isEqualTo(1)
+            assertThat(it.effects[0]).isEqualTo(AddedToHistoryToastEffect)
+            true
+        }
+    }
+
+    @Test
+    fun onClickingMovieSearchResultTwice_shouldShowToastEachTime() {
+        viewModel = MSMainVm(mockApp, mockMovieRepo)
+
+        val eventTester = PublishSubject.create<MSMovieEvent>()
+        val viewModelTester = viewModel.processInputs(eventTester).test()
+
+        eventTester.onNext(SearchMovieEvent("blade runner 2049"))
+        viewModelTester.awaitTerminalEvent(20L, TimeUnit.MILLISECONDS)
+        eventTester.onNext(AddToHistoryEvent)
+        eventTester.onNext(AddToHistoryEvent)
+
+        viewModelTester.assertValueAt(4) {
             assertThat(it.effects.size).isEqualTo(1)
             assertThat(it.effects[0]).isEqualTo(AddedToHistoryToastEffect)
             true
