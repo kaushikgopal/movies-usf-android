@@ -5,6 +5,7 @@ import co.kaush.msusf.movies.MSMovieEvent.AddToHistoryEvent
 import co.kaush.msusf.movies.MSMovieEvent.RestoreFromHistoryEvent
 import co.kaush.msusf.movies.MSMovieEvent.ScreenLoadEvent
 import co.kaush.msusf.movies.MSMovieEvent.SearchMovieEvent
+import co.kaush.msusf.movies.MSMovieViewEffect.*
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockito_kotlin.whenever
 import io.reactivex.Observable
@@ -93,6 +94,8 @@ class MSMainVmTest {
             assertThat(it.vs.searchBoxText).isEqualTo(null) // prevents search box from reset
             assertThat(it.vs.adapterList).hasSize(1)
             assertThat(it.vs.adapterList[0]).isEqualTo(bladeRunner2049)
+            assertThat(it.effects.size).isEqualTo(1)
+            assertThat(it.effects[0]).isEqualTo(AddedToHistoryToastEffect)
             true
         }
     }
