@@ -5,7 +5,7 @@
 ext.deps = [:]
 def versions = [:]
 
-versions.gradle = "4.5"
+versions.gradle = "4.10.2"
 versions.android_gradle_plugin = "3.0.1"
 versions.min_sdk = 21
 versions.target_sdk = 22
@@ -50,7 +50,7 @@ versions.javafmt = "0.1.4"
 versions.jackson = "2.8.9"
 versions.jumio = "2.9.0"
 versions.junit = "4.12"
-versions.kotlin = "1.2.60"
+versions.kotlin = "1.3.11"
 versions.kotterknife = "0.1.0-SNAPSHOT"
 versions.leakcanary = "1.3.1"
 versions.lottie = "2.0.0-beta4"
@@ -168,7 +168,7 @@ deps.jumio = jumio
 
 def kotlin = [:]
 kotlin.allopen = "org.jetbrains.kotlin:kotlin-allopen:$versions.kotlin"
-kotlin.stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jre7:$versions.kotlin"
+kotlin.stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$versions.kotlin"
 kotlin.test = "org.jetbrains.kotlin:kotlin-test-junit:$versions.kotlin"
 kotlin.plugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kotlin"
 deps.kotlin = kotlin
