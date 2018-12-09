@@ -10,6 +10,12 @@ import android.support.v7.widget.LinearLayoutManager
 import android.widget.Toast
 import co.kaush.msusf.MSActivity
 import co.kaush.msusf.R
+import co.kaush.msusf.R.id.ms_mainScreen_poster
+import co.kaush.msusf.R.id.ms_mainScreen_rating
+import co.kaush.msusf.R.id.ms_mainScreen_searchBtn
+import co.kaush.msusf.R.id.ms_mainScreen_searchHistory
+import co.kaush.msusf.R.id.ms_mainScreen_searchText
+import co.kaush.msusf.R.id.ms_mainScreen_title
 import co.kaush.msusf.movies.MSMovieEvent.AddToHistoryEvent
 import co.kaush.msusf.movies.MSMovieEvent.RestoreFromHistoryEvent
 import co.kaush.msusf.movies.MSMovieEvent.ScreenLoadEvent
@@ -18,6 +24,7 @@ import com.bumptech.glide.Glide
 import com.jakewharton.rxbinding2.view.RxView
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.activity_main.*
@@ -32,7 +39,7 @@ class MSMovieActivity : MSActivity() {
     private lateinit var viewModel: MSMainVm
     private lateinit var listAdapter: MSMovieSearchHistoryAdapter
 
-    private var disposable: Disposable? = null
+    private var disposables: CompositeDisposable= CompositeDisposable()
     private val historyItemClick: PublishSubject<MSMovie> = PublishSubject.create()
 
     private val spinner: CircularProgressDrawable by lazy {
@@ -73,17 +80,22 @@ class MSMovieActivity : MSActivity() {
         val restoreFromHistoryEvents: Observable<RestoreFromHistoryEvent> = historyItemClick
             .map { RestoreFromHistoryEvent(it) }
 
-        disposable = viewModel.processInputs(
-            screenLoadEvents,
-            searchMovieEvents,
-            addToHistoryEvents,
-            restoreFromHistoryEvents
+        disposables.add(
+            viewModel.processInputs(
+                screenLoadEvents,
+                searchMovieEvents,
+                addToHistoryEvents,
+                restoreFromHistoryEvents
+            )
         )
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                { change ->
 
-                    change.vs.let { vs ->
+        disposables.add(
+            viewModel
+                .listenToViewState()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                    { vs ->
+
                         vs.searchBoxText?.let {
                             ms_mainScreen_searchText.setText(it)
                         }
@@ -102,25 +114,29 @@ class MSMovieActivity : MSActivity() {
                         }
 
                         listAdapter.submitList(vs.adapterList)
-                    }
+                    },
+                    { Timber.w(it, "something went terribly wrong") }
+                )
+        )
 
-                    change.effects.forEach {
-                        when (it) {
-                            is MSMovieViewEffect.AddedToHistoryToastEffect -> {
-                                Toast.makeText(this, "added to history", Toast.LENGTH_SHORT).show()
-                            }
+        disposables.add(
+            viewModel
+                .listenToViewEffect()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    when (it) {
+                        is MSMovieViewEffect.AddedToHistoryToastEffect -> {
+                            Toast.makeText(this, "added to history", Toast.LENGTH_SHORT).show()
                         }
                     }
-
-                },
-                { Timber.w(it, "something went terribly wrong") }
-            )
+                }
+        )
     }
 
     override fun onPause() {
         super.onPause()
 
-        disposable?.dispose()
+        disposables.clear()
     }
 
     private fun setupListView() {

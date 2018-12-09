@@ -13,9 +13,14 @@ import co.kaush.msusf.movies.MSMovieResult.SearchHistoryResult
 import co.kaush.msusf.movies.MSMovieResult.SearchMovieResult
 import co.kaush.msusf.movies.MSMovieViewEffect.*
 import io.reactivex.Observable
+import io.reactivex.ObservableSource
 import io.reactivex.ObservableTransformer
+import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.BehaviorSubject
+import io.reactivex.subjects.PublishSubject
 import timber.log.Timber
+import java.lang.IllegalStateException
 
 /**
  * For this example, a simple ViewModel would have sufficed,
@@ -28,103 +33,112 @@ class MSMainVm(
     private val movieRepo: MSMovieRepository
 ) : AndroidViewModel(app) {
 
-    private var viewState: MSMovieViewState = MSMovieViewState()
+    private var viewModelDisposable: Disposable? = null
+    private val eventEmitter: PublishSubject<MSMovieEvent> = PublishSubject.create()
+    private val viewState: BehaviorSubject<MSMovieViewState> = BehaviorSubject.create()
+    private val viewEffects: PublishSubject<MSMovieViewEffect> = PublishSubject.create()
 
-    fun processInputs(vararg es: Observable<out MSMovieEvent>): Observable<MSMovieViewChange> {
-
-        // gather events
-        val events: Observable<out MSMovieEvent> =
-            Observable.mergeArray(*es)
-                .doOnNext { Timber.d("----- event ${it.javaClass.simpleName}") }
-
-        // events -> results (use cases)
-        val results: Observable<Lce<out MSMovieResult>> =
-            eventsToResults(events)
-                .doOnNext { Timber.d("----- result $it") }
-
-        // results -> view state (reducer)
-        return resultsToViewChanges(results)
-            .doOnNext { Timber.d("----- viewState $it") }
+    init {
+        eventEmitter
+            .doOnNext { Timber.d("----- event ${it.javaClass.simpleName}") }
+            .compose(eventToResult())
+            .doOnNext { Timber.d("----- result $it") }
+            .compose(resultToViewChange())
+            .publish().autoConnect(0) { viewModelDisposable = it }
     }
+
+    override fun onCleared() {
+        super.onCleared()
+        viewModelDisposable?.dispose()
+    }
+
+    fun processInputs(vararg es: Observable<out MSMovieEvent>): Disposable {
+        return Observable.mergeArray(*es)
+            .doOnNext { Timber.d("----- eventXX ${it.javaClass.simpleName}") }
+            .doOnNext { eventEmitter.onNext(it) }
+            .subscribe()
+    }
+
+    fun listenToViewState(): Observable<MSMovieViewState> = viewState
+
+    fun listenToViewEffect(): Observable<MSMovieViewEffect> = viewEffects
+
 
     // -----------------------------------------------------------------------------------
     // Internal helpers
 
-    private fun eventsToResults(
-        events: Observable<out MSMovieEvent>
-    ): Observable<Lce<out MSMovieResult>> {
-        return events.publish { o ->
-            Observable.merge(
-                o.ofType(ScreenLoadEvent::class.java).compose(onScreenLoad()),
-                o.ofType(SearchMovieEvent::class.java).compose(onSearchMovie()),
-                o.ofType(AddToHistoryEvent::class.java).compose(onAddToHistory()),
-                o.ofType(RestoreFromHistoryEvent::class.java).compose(onRestoreFromHistory())
-            )
+    private fun eventToResult(
+    ): ObservableTransformer<MSMovieEvent, Lce<out MSMovieResult>> {
+        return ObservableTransformer { upstream ->
+            upstream.publish { o ->
+                Observable.merge(
+                    o.ofType(ScreenLoadEvent::class.java).compose(onScreenLoad()),
+                    o.ofType(SearchMovieEvent::class.java).compose(onSearchMovie()),
+                    o.ofType(AddToHistoryEvent::class.java).compose(onAddToHistory()),
+                    o.ofType(RestoreFromHistoryEvent::class.java).compose(onRestoreFromHistory())
+                )
+            }
         }
     }
 
-    private fun resultsToViewChanges(
-        results: Observable<Lce<out MSMovieResult>>
-    ): Observable<MSMovieViewChange> {
-
-        return results.scan(MSMovieViewChange(viewState)) { change, result ->
-            when (result) {
-                is Lce.Content -> {
-                    when (result.packet) {
-
-                        is ScreenLoadResult -> MSMovieViewChange(change.vs.copy(searchBoxText = ""))
-                        is SearchMovieResult -> {
-                            val movie: MSMovie = result.packet.movie
-
-                            MSMovieViewChange(
-                                change.vs.copy(
+    private fun resultToViewChange(): ObservableTransformer<Lce<out MSMovieResult>, Unit> {
+        return ObservableTransformer { upstream ->
+            upstream.scan(viewState.value ?: MSMovieViewState()) { vs, result ->
+                when (result) {
+                    is Lce.Content -> {
+                        when (result.packet) {
+                            is ScreenLoadResult -> {
+                                vs.copy(searchBoxText = "")
+                            }
+                            is SearchMovieResult -> {
+                                val movie: MSMovie = result.packet.movie
+                                vs.copy(
                                     searchedMovieTitle = movie.title,
                                     searchedMovieRating = movie.ratingSummary,
                                     searchedMoviePoster = movie.posterUrl,
                                     searchedMovieReference = movie
                                 )
-                            )
-                        }
+                            }
 
-                        is SearchHistoryResult -> {
-                            (result.packet.movieHistory)
-                                ?.let {
-                                    val adapterList: MutableList<MSMovie> =
-                                        mutableListOf(*change.vs.adapterList.toTypedArray())
-                                    adapterList.add(it)
-                                    MSMovieViewChange(
-                                        change.vs.copy(adapterList = adapterList),
-                                        listOf(AddedToHistoryToastEffect)
-                                    )
-                                } ?: MSMovieViewChange(change.vs.copy(), listOf(AddedToHistoryToastEffect))
+                            is SearchHistoryResult -> {
+                                viewEffects.onNext(AddedToHistoryToastEffect)
+
+                                result.packet.movieHistory
+                                    ?.let {
+                                        val adapterList: MutableList<MSMovie> =
+                                            mutableListOf(*vs.adapterList.toTypedArray())
+                                        adapterList.add(it)
+                                        vs.copy(adapterList = adapterList)
+                                    } ?: vs.copy()
+                            }
                         }
                     }
-                }
 
-                is Lce.Loading -> {
-                    MSMovieViewChange(
-                        change.vs.copy(
-                        searchBoxText = null,
-                        searchedMovieTitle = "Searching Movie...",
-                        searchedMovieRating = "",
-                        searchedMoviePoster = "",
-                        searchedMovieReference = null
-                    ))
-                }
+                    is Lce.Loading -> {
+                        vs.copy(
+                            searchBoxText = null,
+                            searchedMovieTitle = "Searching Movie...",
+                            searchedMovieRating = "",
+                            searchedMoviePoster = "",
+                            searchedMovieReference = null
+                        )
+                    }
 
-                is Lce.Error -> {
-                    when (result.packet) {
-                        is SearchMovieResult -> {
-                            val movie: MSMovie = result.packet.movie
-                            MSMovieViewChange(
-                                change.vs.copy(searchedMovieTitle = movie.errorMessage!!))
+                    is Lce.Error -> {
+                        when (result.packet) {
+                            is SearchMovieResult -> {
+                                val movie: MSMovie = result.packet.movie
+                                vs.copy(searchedMovieTitle = movie.errorMessage!!)
+                            }
+                            else -> throw RuntimeException("Unexpected result LCE state")
                         }
-                        else -> throw RuntimeException("Unexpected result LCE state")
                     }
                 }
             }
+                .distinctUntilChanged()
+                .doOnNext { viewState.onNext(it) }
+                .map { Unit }
         }
-        .doOnNext { viewState = it.vs }
     }
 
     // -----------------------------------------------------------------------------------
@@ -156,9 +170,13 @@ class MSMainVm(
     private fun onAddToHistory(): ObservableTransformer<AddToHistoryEvent, Lce<SearchHistoryResult>> {
         return ObservableTransformer { upstream ->
             upstream.map {
-                val movieResult: MSMovie = viewState.searchedMovieReference!!
+                val movieResult: MSMovie = viewState.value?.searchedMovieReference
+                    ?: throw IllegalStateException("couldn't find searched movie reference")
 
-                if (!viewState.adapterList.contains(movieResult)) {
+                val adapterList: List<MSMovie> = viewState.value?.adapterList
+                    ?: throw IllegalStateException("couldn't find movie history")
+
+                if (!adapterList.contains(movieResult)) {
                     Lce.Content(SearchHistoryResult(movieResult))
                 } else {
                     Lce.Content(SearchHistoryResult(null))
