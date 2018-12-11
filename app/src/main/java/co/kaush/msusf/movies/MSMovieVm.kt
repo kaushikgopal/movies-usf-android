@@ -59,9 +59,9 @@ class MSMainVm(
             .subscribe()
     }
 
-    fun listenToViewState(): Observable<MSMovieViewState> = viewState
+    fun viewState(): Observable<MSMovieViewState> = viewState
 
-    fun listenToViewEffect(): Observable<MSMovieViewEffect> = viewEffects
+    fun viewEffects(): Observable<MSMovieViewEffect> = viewEffects
 
 
     // -----------------------------------------------------------------------------------

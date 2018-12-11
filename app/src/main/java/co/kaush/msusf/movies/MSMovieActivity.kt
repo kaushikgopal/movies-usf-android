@@ -10,12 +10,6 @@ import android.support.v7.widget.LinearLayoutManager
 import android.widget.Toast
 import co.kaush.msusf.MSActivity
 import co.kaush.msusf.R
-import co.kaush.msusf.R.id.ms_mainScreen_poster
-import co.kaush.msusf.R.id.ms_mainScreen_rating
-import co.kaush.msusf.R.id.ms_mainScreen_searchBtn
-import co.kaush.msusf.R.id.ms_mainScreen_searchHistory
-import co.kaush.msusf.R.id.ms_mainScreen_searchText
-import co.kaush.msusf.R.id.ms_mainScreen_title
 import co.kaush.msusf.movies.MSMovieEvent.AddToHistoryEvent
 import co.kaush.msusf.movies.MSMovieEvent.RestoreFromHistoryEvent
 import co.kaush.msusf.movies.MSMovieEvent.ScreenLoadEvent
@@ -25,7 +19,6 @@ import com.jakewharton.rxbinding2.view.RxView
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.activity_main.*
 import timber.log.Timber
@@ -91,7 +84,7 @@ class MSMovieActivity : MSActivity() {
 
         disposables.add(
             viewModel
-                .listenToViewState()
+                .viewState()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                     { vs ->
@@ -121,7 +114,7 @@ class MSMovieActivity : MSActivity() {
 
         disposables.add(
             viewModel
-                .listenToViewEffect()
+                .viewEffects()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     when (it) {
