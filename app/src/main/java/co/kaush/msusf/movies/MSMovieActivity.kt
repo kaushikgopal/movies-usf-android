@@ -32,7 +32,7 @@ class MSMovieActivity : MSActivity() {
     private lateinit var viewModel: MSMainVm
     private lateinit var listAdapter: MSMovieSearchHistoryAdapter
 
-    private var disposables: CompositeDisposable= CompositeDisposable()
+    private var disposables: CompositeDisposable = CompositeDisposable()
     private val historyItemClick: PublishSubject<MSMovie> = PublishSubject.create()
 
     private val spinner: CircularProgressDrawable by lazy {
@@ -73,13 +73,11 @@ class MSMovieActivity : MSActivity() {
         val restoreFromHistoryEvents: Observable<RestoreFromHistoryEvent> = historyItemClick
             .map { RestoreFromHistoryEvent(it) }
 
-        disposables.add(
-            viewModel.processInputs(
-                screenLoadEvents,
-                searchMovieEvents,
-                addToHistoryEvents,
-                restoreFromHistoryEvents
-            )
+        viewModel.processInputs(
+            screenLoadEvents,
+            searchMovieEvents,
+            addToHistoryEvents,
+            restoreFromHistoryEvents
         )
 
         disposables.add(

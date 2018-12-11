@@ -52,11 +52,10 @@ class MSMainVm(
         viewModelDisposable?.dispose()
     }
 
-    fun processInputs(vararg es: Observable<out MSMovieEvent>): Disposable {
+    fun processInputs(vararg es: Observable<out MSMovieEvent>) {
         return Observable.mergeArray(*es)
             .doOnNext { Timber.d("----- eventXX ${it.javaClass.simpleName}") }
-            .doOnNext { eventEmitter.onNext(it) }
-            .subscribe()
+            .subscribe(eventEmitter)
     }
 
     fun viewState(): Observable<MSMovieViewState> = viewState
