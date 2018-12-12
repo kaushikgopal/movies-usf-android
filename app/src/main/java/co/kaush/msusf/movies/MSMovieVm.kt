@@ -39,12 +39,16 @@ class MSMainVm(
     private val viewEffects: PublishSubject<MSMovieViewEffect> = PublishSubject.create()
 
     init {
-        eventEmitter
+        val viewChangeSource = eventEmitter
             .doOnNext { Timber.d("----- event ${it.javaClass.simpleName}") }
             .compose(eventToResult())
             .doOnNext { Timber.d("----- result $it") }
-            .compose(resultToViewChange())
-            .publish().autoConnect(0) { viewModelDisposable = it }
+            .publish()
+
+        viewChangeSource.compose(resultToViewState()).subscribe(viewState)
+        viewChangeSource.compose(resultToViewEffect()).subscribe(viewEffects)
+
+        viewChangeSource.autoConnect(0) { viewModelDisposable = it }
     }
 
     override fun onCleared() {
@@ -53,15 +57,12 @@ class MSMainVm(
     }
 
     fun processInputs(vararg es: Observable<out MSMovieEvent>) {
-        return Observable.mergeArray(*es)
-            .doOnNext { Timber.d("----- eventXX ${it.javaClass.simpleName}") }
-            .subscribe(eventEmitter)
+        return Observable.mergeArray(*es).subscribe(eventEmitter)
     }
 
     fun viewState(): Observable<MSMovieViewState> = viewState
 
     fun viewEffects(): Observable<MSMovieViewEffect> = viewEffects
-
 
     // -----------------------------------------------------------------------------------
     // Internal helpers
@@ -80,7 +81,7 @@ class MSMainVm(
         }
     }
 
-    private fun resultToViewChange(): ObservableTransformer<Lce<out MSMovieResult>, Unit> {
+    private fun resultToViewState(): ObservableTransformer<Lce<out MSMovieResult>, out MSMovieViewState> {
         return ObservableTransformer { upstream ->
             upstream.scan(viewState.value ?: MSMovieViewState()) { vs, result ->
                 when (result) {
@@ -100,8 +101,6 @@ class MSMainVm(
                             }
 
                             is SearchHistoryResult -> {
-                                viewEffects.onNext(AddedToHistoryToastEffect)
-
                                 result.packet.movieHistory
                                     ?.let {
                                         val adapterList: MutableList<MSMovie> =
@@ -135,8 +134,14 @@ class MSMainVm(
                 }
             }
                 .distinctUntilChanged()
-                .doOnNext { viewState.onNext(it) }
-                .map { Unit }
+        }
+    }
+
+    private fun resultToViewEffect(): ObservableTransformer<Lce<out MSMovieResult>, MSMovieViewEffect> {
+        return ObservableTransformer { upstream ->
+            upstream
+                .filter { it is Lce.Content && it.packet is SearchHistoryResult }
+                .map<MSMovieViewEffect> { AddedToHistoryToastEffect }
         }
     }
 
