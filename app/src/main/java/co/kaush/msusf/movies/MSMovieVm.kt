@@ -13,7 +13,6 @@ import co.kaush.msusf.movies.MSMovieResult.SearchHistoryResult
 import co.kaush.msusf.movies.MSMovieResult.SearchMovieResult
 import co.kaush.msusf.movies.MSMovieViewEffect.*
 import io.reactivex.Observable
-import io.reactivex.ObservableSource
 import io.reactivex.ObservableTransformer
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -39,16 +38,16 @@ class MSMainVm(
     private val viewEffects: PublishSubject<MSMovieViewEffect> = PublishSubject.create()
 
     init {
-        val viewChangeSource = eventEmitter
+        val viewChanges = eventEmitter
             .doOnNext { Timber.d("----- event ${it.javaClass.simpleName}") }
             .compose(eventToResult())
             .doOnNext { Timber.d("----- result $it") }
             .publish()
 
-        viewChangeSource.compose(resultToViewState()).subscribe(viewState)
-        viewChangeSource.compose(resultToViewEffect()).subscribe(viewEffects)
+        viewChanges.compose(resultToViewState()).subscribe(viewState)
+        viewChanges.compose(resultToViewEffect()).subscribe(viewEffects)
 
-        viewChangeSource.autoConnect(0) { viewModelDisposable = it }
+        viewChanges.autoConnect(0) { viewModelDisposable = it }
     }
 
     override fun onCleared() {
