@@ -11,7 +11,7 @@ import co.kaush.msusf.movies.MSMovieEvent.SearchMovieEvent
 import co.kaush.msusf.movies.MSMovieResult.ScreenLoadResult
 import co.kaush.msusf.movies.MSMovieResult.SearchHistoryResult
 import co.kaush.msusf.movies.MSMovieResult.SearchMovieResult
-import co.kaush.msusf.movies.MSMovieViewEffect.*
+import co.kaush.msusf.movies.MSMovieViewEffect.AddedToHistoryToastEffect
 import io.reactivex.Observable
 import io.reactivex.ObservableTransformer
 import io.reactivex.disposables.Disposable
@@ -19,7 +19,6 @@ import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
 import timber.log.Timber
-import java.lang.IllegalStateException
 
 /**
  * For this example, a simple ViewModel would have sufficed,
@@ -55,8 +54,12 @@ class MSMainVm(
         viewModelDisposable?.dispose()
     }
 
-    fun processInputs(vararg es: Observable<out MSMovieEvent>) {
-        return Observable.mergeArray(*es).subscribe(eventEmitter)
+    fun processInputs(vararg es: Observable<out MSMovieEvent>): Disposable {
+        return Observable.mergeArray(*es)
+            .subscribe(
+                { eventEmitter.onNext(it) },
+                { Timber.e(it, "something went wrong processing events")}
+            )
     }
 
     fun viewState(): Observable<MSMovieViewState> = viewState
