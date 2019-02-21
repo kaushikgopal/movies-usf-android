@@ -16,7 +16,7 @@ sealed class MSMovieViewEffect {
 sealed class MSMovieEvent {
     object ScreenLoadEvent : MSMovieEvent()
     data class SearchMovieEvent(val searchedMovieTitle: String = "") : MSMovieEvent()
-    object AddToHistoryEvent : MSMovieEvent()
+    data class AddToHistoryEvent(val searchedMovie: MSMovie, val movieHistoryList: List<MSMovie>) : MSMovieEvent()
     data class RestoreFromHistoryEvent(val movieFromHistory: MSMovie) : MSMovieEvent()
 }
 

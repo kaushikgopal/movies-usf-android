@@ -22,7 +22,6 @@ androidExtensions {
 
 android {
     compileSdkVersion build_versions.build_sdk
-    buildToolsVersion build_versions.build_tools
 
     defaultConfig {
         applicationId "co.kaush.msusf"
@@ -65,8 +64,9 @@ dependencies {
     implementation deps.rx.android
     implementation deps.rx.bindings
     implementation deps.rx.java
-    implementation deps.support.app_compat
-    implementation deps.support.recyclerview
+    implementation deps.rx.replaying_share
+    implementation deps.androidx.app_compat
+    implementation deps.androidx.recyclerview
     implementation deps.timber
 
     debugImplementation deps.leakcanary.lib

@@ -1,24 +1,27 @@
 package co.kaush.msusf.movies
 
-import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
-import android.support.v4.widget.CircularProgressDrawable
-import android.support.v7.widget.DividerItemDecoration
-import android.support.v7.widget.LinearLayoutCompat.HORIZONTAL
-import android.support.v7.widget.LinearLayoutManager
 import android.widget.Toast
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import co.kaush.msusf.MSActivity
 import co.kaush.msusf.R
+import co.kaush.msusf.movies.MSMainVm.MSMainVmFactory
 import co.kaush.msusf.movies.MSMovieEvent.AddToHistoryEvent
 import co.kaush.msusf.movies.MSMovieEvent.RestoreFromHistoryEvent
 import co.kaush.msusf.movies.MSMovieEvent.ScreenLoadEvent
 import co.kaush.msusf.movies.MSMovieEvent.SearchMovieEvent
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.jakewharton.rxbinding2.view.RxView
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.activity_main.*
 import timber.log.Timber
@@ -68,23 +71,27 @@ class MSMovieActivity : MSActivity() {
         val addToHistoryEvents: Observable<AddToHistoryEvent> = RxView.clicks(ms_mainScreen_poster)
             .map {
                 ms_mainScreen_poster.growShrink()
-                AddToHistoryEvent
+                AddToHistoryEvent(MSMovie(title = "todo", result = true), emptyList())
             }
         val restoreFromHistoryEvents: Observable<RestoreFromHistoryEvent> = historyItemClick
             .map { RestoreFromHistoryEvent(it) }
 
         disposables.add(
-            viewModel.processInputs(
+            Observable.merge(
                 screenLoadEvents,
                 searchMovieEvents,
                 addToHistoryEvents,
                 restoreFromHistoryEvents
             )
+                .subscribe(
+                    { viewModel.processInput(it) },
+                    { Timber.e(it, "error processing input ")}
+                )
         )
 
         disposables.add(
             viewModel
-                .viewState()
+                .viewState
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                     { vs ->
@@ -100,7 +107,9 @@ class MSMovieActivity : MSActivity() {
                             ?.let {
                                 Glide.with(ctx)
                                     .load(vs.searchedMoviePoster)
-                                    .placeholder(spinner)
+                                    .apply {
+                                        RequestOptions.fitCenterTransform().placeholder(spinner)
+                                    }
                                     .into(ms_mainScreen_poster)
                             } ?: run {
                             ms_mainScreen_poster.setImageResource(0)
@@ -108,21 +117,24 @@ class MSMovieActivity : MSActivity() {
 
                         listAdapter.submitList(vs.adapterList)
                     },
-                    { Timber.w(it, "something went terribly wrong") }
+                    { Timber.w(it, "something went terribly wrong processing view state") }
                 )
         )
 
         disposables.add(
             viewModel
-                .viewEffects()
+                .viewEffects
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    when (it) {
-                        is MSMovieViewEffect.AddedToHistoryToastEffect -> {
-                            Toast.makeText(this, "added to history", Toast.LENGTH_SHORT).show()
+                .subscribe(
+                    {
+                        when (it) {
+                            is MSMovieViewEffect.AddedToHistoryToastEffect -> {
+                                Toast.makeText(this, "added to history", Toast.LENGTH_SHORT).show()
+                            }
                         }
-                    }
-                }
+                    },
+                    { Timber.w(it, "something went terribly wrong processing view effects") }
+                )
         )
     }
 
