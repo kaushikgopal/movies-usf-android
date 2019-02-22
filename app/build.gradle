@@ -52,7 +52,7 @@ dependencies {
     implementation deps.constraint_layout
     implementation deps.dagger.runtime
     kapt deps.dagger.compiler
-    implementation deps.glide
+    implementation deps.picasso
     implementation deps.kotlin.stdlib
     implementation deps.lifecycle.extensions
     implementation deps.lifecycle.runtime

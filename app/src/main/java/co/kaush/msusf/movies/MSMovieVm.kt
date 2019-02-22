@@ -44,10 +44,11 @@ class MSMainVm(
             .doOnNext { Timber.d("----- result $it") }
             .share()
             .also { result ->
+                Timber.d("----- getting a result here")
                 viewState = result
                     .resultToViewState()
-                    .replayingShare()
                     .doOnNext { Timber.d("----- vs $it") }
+                    .replayingShare()
 
                 viewEffects = result
                     .resultToViewEffect()
@@ -93,7 +94,8 @@ class MSMainVm(
                                 searchedMovieTitle = movie.title,
                                 searchedMovieRating = movie.ratingSummary,
                                 searchedMoviePoster = movie.posterUrl,
-                                searchedMovieReference = movie
+                                searchedMovieReference = movie,
+                                adapterList = vs.adapterList.plus(movie)
                             )
                         }
 
@@ -163,16 +165,7 @@ class MSMainVm(
     }
 
     private fun Observable<AddToHistoryEvent>.onAddToHistory(): Observable<Lce<SearchHistoryResult>> {
-        return map {
-            val movieResult: MSMovie = it.searchedMovie
-            val adapterList: List<MSMovie> = it.movieHistoryList
-
-            if (!adapterList.contains(movieResult)) {
-                Lce.Content(SearchHistoryResult(movieResult))
-            } else {
-                Lce.Content(SearchHistoryResult(null))
-            }
-        }
+        return map { Lce.Content(SearchHistoryResult(it.searchedMovie)) }
     }
 
     private fun Observable<RestoreFromHistoryEvent>.onRestoreFromHistory(): Observable<Lce<SearchMovieResult>> {

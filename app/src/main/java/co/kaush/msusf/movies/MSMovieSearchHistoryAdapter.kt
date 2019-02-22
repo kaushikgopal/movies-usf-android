@@ -12,8 +12,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import co.kaush.msusf.R
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
+import com.squareup.picasso.Picasso
 
 class MSMovieSearchHistoryAdapter(
     private val historyClickListener: (MSMovie) -> Unit
@@ -59,11 +58,9 @@ class MSMovieSearchVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
         item.posterUrl
             .takeIf { it.isNotBlank() }
             ?.let {
-                Glide.with(posterView.context)
+                Picasso.get()
                     .load(it)
-                    .apply {
-                        RequestOptions.fitCenterTransform().placeholder(spinner)
-                    }
+                    .placeholder(spinner)
                     .into(posterView)
             } ?: run {
             posterView.setImageResource(0)

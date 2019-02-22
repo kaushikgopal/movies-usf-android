@@ -15,13 +15,11 @@ import co.kaush.msusf.movies.MSMovieEvent.AddToHistoryEvent
 import co.kaush.msusf.movies.MSMovieEvent.RestoreFromHistoryEvent
 import co.kaush.msusf.movies.MSMovieEvent.ScreenLoadEvent
 import co.kaush.msusf.movies.MSMovieEvent.SearchMovieEvent
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
 import com.jakewharton.rxbinding2.view.RxView
+import com.squareup.picasso.Picasso
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.activity_main.*
 import timber.log.Timber
@@ -71,7 +69,7 @@ class MSMovieActivity : MSActivity() {
         val addToHistoryEvents: Observable<AddToHistoryEvent> = RxView.clicks(ms_mainScreen_poster)
             .map {
                 ms_mainScreen_poster.growShrink()
-                AddToHistoryEvent(MSMovie(title = "todo", result = true), emptyList())
+                AddToHistoryEvent(ms_mainScreen_poster.getTag(R.id.TAG_MOVIE_DATA) as MSMovie)
             }
         val restoreFromHistoryEvents: Observable<RestoreFromHistoryEvent> = historyItemClick
             .map { RestoreFromHistoryEvent(it) }
@@ -85,7 +83,7 @@ class MSMovieActivity : MSActivity() {
             )
                 .subscribe(
                     { viewModel.processInput(it) },
-                    { Timber.e(it, "error processing input ")}
+                    { Timber.e(it, "error processing input ") }
                 )
         )
 
@@ -105,15 +103,14 @@ class MSMovieActivity : MSActivity() {
                         vs.searchedMoviePoster
                             .takeIf { it.isNotBlank() }
                             ?.let {
-                                Glide.with(ctx)
+                                Picasso.get()
                                     .load(vs.searchedMoviePoster)
-                                    .apply {
-                                        RequestOptions.fitCenterTransform().placeholder(spinner)
-                                    }
+                                    .placeholder(spinner)
                                     .into(ms_mainScreen_poster)
-                            } ?: run {
-                            ms_mainScreen_poster.setImageResource(0)
-                        }
+
+                                ms_mainScreen_poster.setTag(R.id.TAG_MOVIE_DATA, vs.searchedMovieReference)
+                            }
+                            ?: run { ms_mainScreen_poster.setImageResource(0) }
 
                         listAdapter.submitList(vs.adapterList)
                     },
