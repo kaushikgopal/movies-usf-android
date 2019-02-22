@@ -19,13 +19,10 @@ class MSMainVmTest {
     private lateinit var viewModel: MSMainVm
 
     @Test
-    fun onSubscribing_shouldReceiveStartingViewState() {
+    fun onSubscribing_shouldReceiveStartingviewState() {
         viewModel = MSMainVm(mockApp, mockMovieRepo)
 
-        val eventTester = PublishSubject.create<MSMovieEvent>()
-        viewModel.processInputs(eventTester)
-        val viewStateTester = viewModel.viewState().test()
-
+        val viewStateTester = viewModel.viewState.test()
         viewStateTester.assertValueCount(1)
     }
 
@@ -33,11 +30,9 @@ class MSMainVmTest {
     fun onScreenLoad_searchBoxText_shouldBeCleared() {
         viewModel = MSMainVm(mockApp, mockMovieRepo)
 
-        val eventTester = PublishSubject.create<MSMovieEvent>()
-        viewModel.processInputs(eventTester)
-        val viewStateTester = viewModel.viewState().test()
+        val viewStateTester = viewModel.viewState.test()
 
-        eventTester.onNext(ScreenLoadEvent)
+        viewModel.processInput(ScreenLoadEvent)
 
         viewStateTester.assertValueAt(1) {
             assertThat(it.searchBoxText).isEqualTo("")
@@ -49,14 +44,9 @@ class MSMainVmTest {
     fun onSearchingMovie_shouldSeeSearchResults() {
         viewModel = MSMainVm(mockApp, mockMovieRepo)
 
-        val eventTester = PublishSubject.create<MSMovieEvent>()
-        viewModel.processInputs(eventTester)
-        val viewStateTester = viewModel.viewState().test()
+        val viewStateTester = viewModel.viewState.test()
 
-        eventTester.onNext(SearchMovieEvent("blade runner 2049"))
-        viewStateTester.awaitTerminalEvent(20L, TimeUnit.MILLISECONDS)
-
-        assertThat(viewStateTester.valueCount()).isEqualTo(3)
+        viewModel.processInput(SearchMovieEvent("blade runner 2049"))
 
         viewStateTester.assertValueAt(1) {
             assertThat(it.searchedMovieTitle).isEqualTo("Searching Movie...")
@@ -77,19 +67,11 @@ class MSMainVmTest {
     fun onClickingMovieSearchResult_shouldPopulateHistoryList() {
         viewModel = MSMainVm(mockApp, mockMovieRepo)
 
-        val eventTester = PublishSubject.create<MSMovieEvent>()
-        viewModel.processInputs(eventTester)
-        val viewStateTester = viewModel.viewState().test()
-        val viewEffectTester = viewModel.viewEffects().test()
+        val viewStateTester = viewModel.viewState.test()
+        val viewEffectTester = viewModel.viewEffects.test()
 
-        eventTester.onNext(SearchMovieEvent("blade runner 2049"))
-        viewStateTester.awaitTerminalEvent(20L, TimeUnit.MILLISECONDS)
-
-        assertThat(viewStateTester.valueCount()).isEqualTo(3)
-
-        eventTester.onNext(AddToHistoryEvent)
-
-        assertThat(viewStateTester.valueCount()).isEqualTo(4)
+        viewModel.processInput(SearchMovieEvent("blade runner 2049"))
+        viewModel.processInput(AddToHistoryEvent(bladeRunner2049))
 
         viewStateTester.assertValueAt(3) {
             assertThat(it.searchBoxText).isEqualTo(null) // prevents search box from reset
@@ -98,7 +80,6 @@ class MSMainVmTest {
             true
         }
 
-        viewEffectTester.assertValueCount(1)
         viewEffectTester.assertValueAt(0) { it is AddedToHistoryToastEffect }
     }
 
@@ -106,15 +87,13 @@ class MSMainVmTest {
     fun onClickingMovieSearchResultTwice_shouldShowToastEachTime() {
         viewModel = MSMainVm(mockApp, mockMovieRepo)
 
-        val eventTester = PublishSubject.create<MSMovieEvent>()
-        viewModel.processInputs(eventTester)
-        val viewEffectTester = viewModel.viewEffects().test()
+        val viewEffectTester = viewModel.viewEffects.test()
 
-        eventTester.onNext(SearchMovieEvent("blade runner 2049"))
+        viewModel.processInput(SearchMovieEvent("blade runner 2049"))
         viewEffectTester.awaitTerminalEvent(20L, TimeUnit.MILLISECONDS)
 
-        eventTester.onNext(AddToHistoryEvent)
-        eventTester.onNext(AddToHistoryEvent)
+        viewModel.processInput(AddToHistoryEvent(bladeRunner2049))
+        viewModel.processInput(AddToHistoryEvent(bladeRunner2049))
 
         viewEffectTester.assertValueCount(2)
         viewEffectTester.assertValueAt(0) { it is AddedToHistoryToastEffect }
@@ -125,17 +104,15 @@ class MSMainVmTest {
     fun onClickingMovieHistoryResult_ResultViewIsRepopulatedWithInfo() {
         viewModel = MSMainVm(mockApp, mockMovieRepo)
 
-        val eventTester = PublishSubject.create<MSMovieEvent>()
-        viewModel.processInputs(eventTester)
-        val viewStateTester = viewModel.viewState().test()
+        val viewStateTester = viewModel.viewState.test()
 
         // populate history
-        eventTester.onNext(SearchMovieEvent("blade runner 2049"))
+        viewModel.processInput(SearchMovieEvent("blade runner 2049"))
         viewStateTester.awaitTerminalEvent(20L, TimeUnit.MILLISECONDS)
-        eventTester.onNext(AddToHistoryEvent)
-        eventTester.onNext(SearchMovieEvent("blade"))
+//        viewModel.processInput(AddToHistoryEvent)
+        viewModel.processInput(SearchMovieEvent("blade"))
         viewStateTester.awaitTerminalEvent(20L, TimeUnit.MILLISECONDS)
-        eventTester.onNext(AddToHistoryEvent)
+//        viewModel.processInput(AddToHistoryEvent)
 
         // check that the result is showing Blade
         viewStateTester.assertValueAt(viewStateTester.valueCount() - 1) {
@@ -144,7 +121,7 @@ class MSMainVmTest {
         }
 
         // click blade runner 2049 from history
-        eventTester.onNext(RestoreFromHistoryEvent(bladeRunner2049))
+        viewModel.processInput(RestoreFromHistoryEvent(bladeRunner2049))
         viewStateTester.assertValueAt(viewStateTester.valueCount() - 1) {
             assertThat(it.searchedMovieTitle).isEqualTo("Blade Runner 2049")
             assertThat(it.searchedMovieRating).isEqualTo(bladeRunner2049.ratingSummary)
@@ -152,7 +129,7 @@ class MSMainVmTest {
         }
 
         // click blade again
-        eventTester.onNext(RestoreFromHistoryEvent(blade))
+        viewModel.processInput(RestoreFromHistoryEvent(blade))
         viewStateTester.assertValueAt(viewStateTester.valueCount() - 1) {
             assertThat(it.searchedMovieTitle).isEqualTo("Blade")
             assertThat(it.searchedMovieRating).isEqualTo(blade.ratingSummary)

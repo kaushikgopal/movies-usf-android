@@ -20,6 +20,5 @@ class MSMovieRepository @Inject constructor(
                     )
                 }
             }
-            .timeout(2, TimeUnit.SECONDS)
     }
 }
