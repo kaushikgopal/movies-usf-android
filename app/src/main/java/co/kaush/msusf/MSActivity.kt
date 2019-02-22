@@ -2,7 +2,7 @@ package co.kaush.msusf
 
 import android.content.Context
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import javax.inject.Inject
 
 abstract class MSActivity : AppCompatActivity() {

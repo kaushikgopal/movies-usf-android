@@ -1,18 +1,18 @@
 package co.kaush.msusf.movies
 
 import android.annotation.SuppressLint
-import android.support.annotation.LayoutRes
-import android.support.v4.widget.CircularProgressDrawable
-import android.support.v7.recyclerview.extensions.ListAdapter
-import android.support.v7.util.DiffUtil
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.LayoutRes
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import co.kaush.msusf.R
-import com.bumptech.glide.Glide
+import com.squareup.picasso.Picasso
 
 class MSMovieSearchHistoryAdapter(
     private val historyClickListener: (MSMovie) -> Unit
@@ -30,9 +30,9 @@ class MSMovieSearchHistoryAdapter(
 
 class MSMovieSearchDiffCallback : DiffUtil.ItemCallback<MSMovie>() {
     // only one kind of item
-    override fun areItemsTheSame(oldItem: MSMovie?, newItem: MSMovie?): Boolean = true
+    override fun areItemsTheSame(oldItem: MSMovie, newItem: MSMovie): Boolean = true
 
-    override fun areContentsTheSame(oldItem: MSMovie?, newItem: MSMovie?): Boolean {
+    override fun areContentsTheSame(oldItem: MSMovie, newItem: MSMovie): Boolean {
         // this is just lazy!
         return oldItem?.posterUrl.equals(newItem?.posterUrl, ignoreCase = true)
     }
@@ -58,7 +58,7 @@ class MSMovieSearchVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
         item.posterUrl
             .takeIf { it.isNotBlank() }
             ?.let {
-                Glide.with(posterView.context)
+                Picasso.get()
                     .load(it)
                     .placeholder(spinner)
                     .into(posterView)

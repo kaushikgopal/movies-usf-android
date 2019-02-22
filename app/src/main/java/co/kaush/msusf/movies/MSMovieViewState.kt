@@ -16,12 +16,12 @@ sealed class MSMovieViewEffect {
 sealed class MSMovieEvent {
     object ScreenLoadEvent : MSMovieEvent()
     data class SearchMovieEvent(val searchedMovieTitle: String = "") : MSMovieEvent()
-    object AddToHistoryEvent : MSMovieEvent()
+    data class AddToHistoryEvent(val searchedMovie: MSMovie) : MSMovieEvent()
     data class RestoreFromHistoryEvent(val movieFromHistory: MSMovie) : MSMovieEvent()
 }
 
 sealed class MSMovieResult {
     object ScreenLoadResult : MSMovieResult()
     data class SearchMovieResult(val movie: MSMovie) : MSMovieResult()
-    data class SearchHistoryResult(val movieHistory: MSMovie?) : MSMovieResult()
+    data class AddToHistoryResult(val movie: MSMovie) : MSMovieResult()
 }

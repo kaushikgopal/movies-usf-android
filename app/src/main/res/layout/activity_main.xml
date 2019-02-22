@@ -1,104 +1,104 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                                             xmlns:app="http://schemas.android.com/apk/res-auto"
-                                             xmlns:tools="http://schemas.android.com/tools"
-                                             android:layout_width="match_parent"
-                                             android:layout_height="match_parent"
-                                             tools:context="co.kaush.msusf.movies.MSMovieActivity">
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  tools:context="co.kaush.msusf.movies.MSMovieActivity">
 
-    <android.support.constraint.Guideline
-        android:id="@+id/ms_mainScreen_guideline_1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.15"/>
+  <androidx.constraintlayout.widget.Guideline
+    android:id="@+id/ms_mainScreen_guideline_1"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    app:layout_constraintGuide_percent="0.15"/>
 
-    <android.support.constraint.Guideline
-        android:id="@+id/ms_mainScreen_guideline_2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.50"/>
+  <androidx.constraintlayout.widget.Guideline
+    android:id="@+id/ms_mainScreen_guideline_2"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    app:layout_constraintGuide_percent="0.50"/>
 
-    <ImageView
-        android:id="@+id/ms_mainScreen_poster"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:minHeight="150dp"
-        android:minWidth="100dp"
-        android:clickable="true"
-        app:layout_constraintBottom_toTopOf="@id/ms_mainScreen_guideline_3"
-        app:layout_constraintEnd_toStartOf="@id/ms_mainScreen_guideline_2"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ms_mainScreen_guideline_1"
+  <ImageView
+    android:id="@+id/ms_mainScreen_poster"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    android:focusable="true"
+    android:minHeight="150dp"
+    android:minWidth="100dp"
+    app:layout_constraintBottom_toTopOf="@id/ms_mainScreen_guideline_3"
+    app:layout_constraintEnd_toStartOf="@id/ms_mainScreen_guideline_2"
+    app:layout_constraintStart_toStartOf="parent"
 
-        tools:background="@android:color/holo_blue_bright"
-        tools:ignore="ContentDescription"
-        android:focusable="true"/>
+    app:layout_constraintTop_toBottomOf="@id/ms_mainScreen_guideline_1"
+    tools:background="@android:color/holo_blue_bright"
+    tools:ignore="ContentDescription"/>
 
-    <TextView
-        android:id="@+id/ms_mainScreen_title"
-        android:textStyle="bold"
-        android:layout_width="@dimen/ms_mainSreen_0"
-        android:layout_height="wrap_content"
-        android:textSize="@dimen/ms_mainSreen_titleSize"
+  <TextView
+    android:id="@+id/ms_mainScreen_title"
+    android:textStyle="bold"
+    android:layout_width="@dimen/ms_mainSreen_0"
+    android:layout_height="wrap_content"
+    android:textSize="@dimen/ms_mainSreen_titleSize"
 
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/ms_mainScreen_guideline_2"
-        app:layout_constraintTop_toBottomOf="@id/ms_mainScreen_guideline_1"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toEndOf="@id/ms_mainScreen_guideline_2"
+    app:layout_constraintTop_toBottomOf="@id/ms_mainScreen_guideline_1"
 
-        tools:text="Guardians of the Galaxy- Chapter 2"/>
+    tools:text="Guardians of the Galaxy- Chapter 2"/>
 
-    <TextView
-        android:id="@+id/ms_mainScreen_rating"
-        android:textStyle="bold"
-        android:layout_width="@dimen/ms_mainSreen_0"
-        android:layout_height="wrap_content"
-        android:textColor="@android:color/darker_gray"
-        android:textSize="@dimen/ms_mainSreen_titleSize"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/ms_mainScreen_guideline_2"
-        app:layout_constraintTop_toBottomOf="@id/ms_mainScreen_title"
+  <TextView
+    android:id="@+id/ms_mainScreen_rating"
+    android:textStyle="bold"
+    android:layout_width="@dimen/ms_mainSreen_0"
+    android:layout_height="wrap_content"
+    android:textColor="@android:color/darker_gray"
+    android:textSize="@dimen/ms_mainSreen_titleSize"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toEndOf="@id/ms_mainScreen_guideline_2"
+    app:layout_constraintTop_toBottomOf="@id/ms_mainScreen_title"
 
-        tools:text="9.1/10"/>
+    tools:text="9.1/10"/>
 
-    <Button
-        android:id="@+id/ms_mainScreen_searchBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/ms_spacing"
-        android:layout_marginEnd="@dimen/ms_spacing"
-        android:text="@string/ms_mainScree_searchBtnText"
-        app:layout_constraintBottom_toTopOf="@id/ms_mainScreen_guideline_1"
-        app:layout_constraintEnd_toEndOf="parent"/>
+  <Button
+    android:id="@+id/ms_mainScreen_searchBtn"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/ms_spacing"
+    android:layout_marginEnd="@dimen/ms_spacing"
+    android:text="@string/ms_mainScree_searchBtnText"
+    app:layout_constraintBottom_toTopOf="@id/ms_mainScreen_guideline_1"
+    app:layout_constraintEnd_toEndOf="parent"/>
 
-    <EditText
-        android:id="@+id/ms_mainScreen_searchText"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/ms_spacing"
-        android:layout_marginLeft="@dimen/ms_spacing"
-        android:layout_marginRight="@dimen/ms_spacing"
-        android:inputType="text"
+  <EditText
+    android:id="@+id/ms_mainScreen_searchText"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/ms_spacing"
+    android:layout_marginLeft="@dimen/ms_spacing"
+    android:layout_marginRight="@dimen/ms_spacing"
+    android:inputType="text"
 
-        app:layout_constraintBottom_toTopOf="@id/ms_mainScreen_guideline_1"
-        app:layout_constraintEnd_toStartOf="@id/ms_mainScreen_searchBtn"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:ignore="LabelFor"/>
+    app:layout_constraintBottom_toTopOf="@id/ms_mainScreen_guideline_1"
+    app:layout_constraintEnd_toStartOf="@id/ms_mainScreen_searchBtn"
+    app:layout_constraintStart_toStartOf="parent"
+    tools:ignore="LabelFor"/>
 
-    <android.support.constraint.Guideline
-        android:id="@+id/ms_mainScreen_guideline_3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.55"/>
+  <androidx.constraintlayout.widget.Guideline
+    android:id="@+id/ms_mainScreen_guideline_3"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    app:layout_constraintGuide_percent="0.55"/>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/ms_mainScreen_searchHistory"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ms_mainScreen_guideline_3"/>
+  <androidx.recyclerview.widget.RecyclerView
+    android:id="@+id/ms_mainScreen_searchHistory"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintTop_toBottomOf="@id/ms_mainScreen_guideline_3"/>
 
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
