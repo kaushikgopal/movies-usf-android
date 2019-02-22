@@ -20,6 +20,7 @@ import com.squareup.picasso.Picasso
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.activity_main.*
 import timber.log.Timber
@@ -33,6 +34,7 @@ class MSMovieActivity : MSActivity() {
     private lateinit var viewModel: MSMainVm
     private lateinit var listAdapter: MSMovieSearchHistoryAdapter
 
+    private var uiDisposable: Disposable? = null
     private var disposables: CompositeDisposable = CompositeDisposable()
     private val historyItemClick: PublishSubject<MSMovie> = PublishSubject.create()
 
@@ -58,6 +60,61 @@ class MSMovieActivity : MSActivity() {
             this,
             MSMainVmFactory(app, movieRepo)
         ).get(MSMainVm::class.java)
+
+        disposables.add(
+            viewModel
+                .viewState
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext { Timber.d("----- onNext VS $it") }
+                .subscribe(
+                    ::render
+                ) { Timber.w(it, "something went terribly wrong processing view state") }
+        )
+
+        disposables.add(
+            viewModel
+                .viewEffects
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                    ::trigger
+                ) { Timber.w(it, "something went terribly wrong processing view effects") }
+        )
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        disposables.clear()
+    }
+
+    private fun trigger(effect: MSMovieViewEffect?) {
+        effect ?: return
+        when (effect) {
+            is MSMovieViewEffect.AddedToHistoryToastEffect -> {
+                Toast.makeText(this, "added to history", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun render(vs: MSMovieViewState) {
+        vs.searchBoxText?.let {
+            ms_mainScreen_searchText.setText(it)
+        }
+        ms_mainScreen_title.text = vs.searchedMovieTitle
+        ms_mainScreen_rating.text = vs.searchedMovieRating
+
+        vs.searchedMoviePoster
+            .takeIf { it.isNotBlank() }
+            ?.let {
+                Picasso.get()
+                    .load(vs.searchedMoviePoster)
+                    .placeholder(spinner)
+                    .into(ms_mainScreen_poster)
+
+                ms_mainScreen_poster.setTag(R.id.TAG_MOVIE_DATA, vs.searchedMovieReference)
+            }
+            ?: run { ms_mainScreen_poster.setImageResource(0) }
+
+        listAdapter.submitList(vs.adapterList)
     }
 
     override fun onResume() {
@@ -74,7 +131,7 @@ class MSMovieActivity : MSActivity() {
         val restoreFromHistoryEvents: Observable<RestoreFromHistoryEvent> = historyItemClick
             .map { RestoreFromHistoryEvent(it) }
 
-        disposables.add(
+        uiDisposable =
             Observable.merge(
                 screenLoadEvents,
                 searchMovieEvents,
@@ -85,60 +142,11 @@ class MSMovieActivity : MSActivity() {
                     { viewModel.processInput(it) },
                     { Timber.e(it, "error processing input ") }
                 )
-        )
-
-        disposables.add(
-            viewModel
-                .viewState
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                    { vs ->
-
-                        vs.searchBoxText?.let {
-                            ms_mainScreen_searchText.setText(it)
-                        }
-                        ms_mainScreen_title.text = vs.searchedMovieTitle
-                        ms_mainScreen_rating.text = vs.searchedMovieRating
-
-                        vs.searchedMoviePoster
-                            .takeIf { it.isNotBlank() }
-                            ?.let {
-                                Picasso.get()
-                                    .load(vs.searchedMoviePoster)
-                                    .placeholder(spinner)
-                                    .into(ms_mainScreen_poster)
-
-                                ms_mainScreen_poster.setTag(R.id.TAG_MOVIE_DATA, vs.searchedMovieReference)
-                            }
-                            ?: run { ms_mainScreen_poster.setImageResource(0) }
-
-                        listAdapter.submitList(vs.adapterList)
-                    },
-                    { Timber.w(it, "something went terribly wrong processing view state") }
-                )
-        )
-
-        disposables.add(
-            viewModel
-                .viewEffects
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                    {
-                        when (it) {
-                            is MSMovieViewEffect.AddedToHistoryToastEffect -> {
-                                Toast.makeText(this, "added to history", Toast.LENGTH_SHORT).show()
-                            }
-                        }
-                    },
-                    { Timber.w(it, "something went terribly wrong processing view effects") }
-                )
-        )
     }
 
     override fun onPause() {
         super.onPause()
-
-        disposables.clear()
+        uiDisposable?.dispose()
     }
 
     private fun setupListView() {
