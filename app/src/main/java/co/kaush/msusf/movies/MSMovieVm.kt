@@ -8,8 +8,8 @@ import co.kaush.msusf.movies.MSMovieEvent.AddToHistoryEvent
 import co.kaush.msusf.movies.MSMovieEvent.RestoreFromHistoryEvent
 import co.kaush.msusf.movies.MSMovieEvent.ScreenLoadEvent
 import co.kaush.msusf.movies.MSMovieEvent.SearchMovieEvent
+import co.kaush.msusf.movies.MSMovieResult.AddToHistoryResult
 import co.kaush.msusf.movies.MSMovieResult.ScreenLoadResult
-import co.kaush.msusf.movies.MSMovieResult.SearchHistoryResult
 import co.kaush.msusf.movies.MSMovieResult.SearchMovieResult
 import co.kaush.msusf.movies.MSMovieViewEffect.AddedToHistoryToastEffect
 import com.jakewharton.rx.replayingShare
@@ -44,7 +44,6 @@ class MSMainVm(
             .doOnNext { Timber.d("----- result $it") }
             .share()
             .also { result ->
-                Timber.d("----- getting a result here")
                 viewState = result
                     .resultToViewState()
                     .doOnNext { Timber.d("----- vs $it") }
@@ -94,19 +93,16 @@ class MSMainVm(
                                 searchedMovieTitle = movie.title,
                                 searchedMovieRating = movie.ratingSummary,
                                 searchedMoviePoster = movie.posterUrl,
-                                searchedMovieReference = movie,
-                                adapterList = vs.adapterList.plus(movie)
+                                searchedMovieReference = movie
                             )
                         }
 
-                        is SearchHistoryResult -> {
-                            result.packet.movieHistory
-                                ?.let {
-                                    val adapterList: MutableList<MSMovie> =
-                                        mutableListOf(*vs.adapterList.toTypedArray())
-                                    adapterList.add(it)
-                                    vs.copy(adapterList = adapterList)
-                                } ?: vs.copy()
+                        is AddToHistoryResult -> {
+                            val movieToBeAdded: MSMovie = result.packet.movie
+
+                            if (!vs.adapterList.contains(movieToBeAdded)) {
+                                vs.copy(adapterList = vs.adapterList.plus(movieToBeAdded))
+                            } else vs.copy()
                         }
                     }
                 }
@@ -136,7 +132,7 @@ class MSMainVm(
     }
 
     private fun Observable<Lce<out MSMovieResult>>.resultToViewEffect(): Observable<MSMovieViewEffect> {
-        return filter { it is Lce.Content && it.packet is SearchHistoryResult }
+        return filter { it is Lce.Content && it.packet is AddToHistoryResult }
             .map<MSMovieViewEffect> { AddedToHistoryToastEffect }
     }
 
@@ -164,8 +160,8 @@ class MSMainVm(
         }
     }
 
-    private fun Observable<AddToHistoryEvent>.onAddToHistory(): Observable<Lce<SearchHistoryResult>> {
-        return map { Lce.Content(SearchHistoryResult(it.searchedMovie)) }
+    private fun Observable<AddToHistoryEvent>.onAddToHistory(): Observable<Lce<AddToHistoryResult>> {
+        return map { Lce.Content(AddToHistoryResult(it.searchedMovie)) }
     }
 
     private fun Observable<RestoreFromHistoryEvent>.onRestoreFromHistory(): Observable<Lce<SearchMovieResult>> {

@@ -23,5 +23,5 @@ sealed class MSMovieEvent {
 sealed class MSMovieResult {
     object ScreenLoadResult : MSMovieResult()
     data class SearchMovieResult(val movie: MSMovie) : MSMovieResult()
-    data class SearchHistoryResult(val movieHistory: MSMovie?) : MSMovieResult()
+    data class AddToHistoryResult(val movie: MSMovie) : MSMovieResult()
 }
