@@ -12,9 +12,8 @@ import co.kaush.msusf.movies.MSMovieResult.AddToHistoryResult
 import co.kaush.msusf.movies.MSMovieResult.ScreenLoadResult
 import co.kaush.msusf.movies.MSMovieResult.SearchMovieResult
 import co.kaush.msusf.movies.MSMovieViewEffect.AddedToHistoryToastEffect
-import com.jakewharton.rx.replayingShare
 import io.reactivex.Observable
-import io.reactivex.disposables.Disposable
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import timber.log.Timber
@@ -32,13 +31,14 @@ class MSMainVm(
 
     private val eventEmitter: PublishSubject<MSMovieEvent> = PublishSubject.create()
 
-    private var disposable: Disposable
+    private val disposables: CompositeDisposable = CompositeDisposable()
 
     val viewState: Observable<MSMovieViewState>
     val viewEffects: Observable<MSMovieViewEffect>
 
     init {
-        disposable = eventEmitter
+        disposables.add(
+            eventEmitter
             .doOnNext { Timber.d("----- event $it") }
             .eventToResult()
             .doOnNext { Timber.d("----- result $it") }
@@ -47,18 +47,20 @@ class MSMainVm(
                 viewState = result
                     .resultToViewState()
                     .doOnNext { Timber.d("----- vs $it") }
-                    .replayingShare()
+                    .replay(1)
+                    .autoConnect(1) { disposables.add(it) }
 
                 viewEffects = result
                     .resultToViewEffect()
                     .doOnNext { Timber.d("----- ve $it") }
             }
             .subscribe()
+        )
     }
 
     override fun onCleared() {
         super.onCleared()
-        disposable.dispose()
+        disposables.clear()
     }
 
     fun processInput(event: MSMovieEvent) {
