@@ -3,32 +3,20 @@ package co.kaush.msusf.movies
 import com.airbnb.mvrx.Loading
 import com.airbnb.mvrx.Success
 import com.airbnb.mvrx.Uninitialized
+import com.airbnb.mvrx.test.MvRxTestRule
 import com.airbnb.mvrx.withState
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
 import io.reactivex.Observable
-import io.reactivex.android.plugins.RxAndroidPlugins
-import io.reactivex.plugins.RxJavaPlugins
-import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
-import org.junit.Before
+import org.junit.ClassRule
 import org.junit.Test
 import org.mockito.Mockito.mock
 
 class MSMainVmTest {
 
     private lateinit var viewModel: MSMainVm
-
-    @Before
-    fun setup() {
-        val trampolineScheduler = Schedulers.trampoline()
-        RxAndroidPlugins.setInitMainThreadSchedulerHandler { trampolineScheduler }
-        RxJavaPlugins.setIoSchedulerHandler { trampolineScheduler }
-        RxJavaPlugins.setNewThreadSchedulerHandler { trampolineScheduler }
-        RxJavaPlugins.setComputationSchedulerHandler { trampolineScheduler }
-        RxJavaPlugins.setSingleSchedulerHandler { trampolineScheduler }
-    }
 
     @Test
     fun onSubscribing_shouldReceiveStartingViewState() {
@@ -212,5 +200,11 @@ class MSMainVmTest {
             ratings = listOf(ratingImdb, ratingRottenTomatoes),
             posterUrl = "https://m.media-amazon.com/images/M/MV5BMTQ4MzkzNjcxNV5BMl5BanBnXkFtZTcwNzk4NTU0Mg@@._V1_SX300.jpg"
         )
+    }
+
+    companion object {
+        @JvmField
+        @ClassRule
+        val mvrxTestRule = MvRxTestRule()
     }
 }

@@ -50,7 +50,7 @@ class MsMovieFragment : BaseMvRxFragment() {
 
         setupListView { viewModel.restoreFromHistory(it) }
 
-        viewModel.selectSubscribe(MSMovieViewState::addedToHistory, uniqueOnly = true) { showToast ->
+        viewModel.selectSubscribe(MSMovieViewState::addedToHistory, deliveryMode = uniqueOnly()) { showToast ->
             if (showToast) {
                 Toast.makeText(requireContext(), "added to history", Toast.LENGTH_SHORT).show()
             }

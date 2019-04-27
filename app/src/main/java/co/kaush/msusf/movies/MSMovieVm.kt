@@ -1,10 +1,10 @@
 package co.kaush.msusf.movies
 
-import androidx.fragment.app.FragmentActivity
 import co.kaush.msusf.BuildConfig
 import com.airbnb.mvrx.BaseMvRxViewModel
 import com.airbnb.mvrx.MvRxViewModelFactory
 import com.airbnb.mvrx.Success
+import com.airbnb.mvrx.ViewModelContext
 import io.reactivex.schedulers.Schedulers
 
 /**
@@ -62,13 +62,12 @@ class MSMainVm(
         }
     }
 
-    companion object : MvRxViewModelFactory<MSMovieViewState> {
-        @JvmStatic
+    companion object : MvRxViewModelFactory<MSMainVm, MSMovieViewState> {
         override fun create(
-            activity: FragmentActivity,
+            viewModelContext: ViewModelContext,
             state: MSMovieViewState
-        ): BaseMvRxViewModel<MSMovieViewState> {
-            return MSMainVm(state, (activity as MSMovieActivity).movieRepo)
+        ): MSMainVm? {
+            return MSMainVm(state, (viewModelContext.activity as MSMovieActivity).movieRepo)
         }
     }
 }

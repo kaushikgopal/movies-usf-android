@@ -57,7 +57,7 @@ dependencies {
     implementation deps.lifecycle.extensions
     implementation deps.lifecycle.runtime
     kapt deps.lifecycle.compiler
-    implementation deps.mvrx
+    implementation deps.mvrx.core
     implementation deps.okhttp.logging_interceptor
     implementation deps.retrofit.adapter_rxjava
     implementation deps.retrofit.gson
@@ -77,6 +77,7 @@ dependencies {
     testImplementation deps.junit
     testImplementation deps.mockito.core
     testImplementation deps.mockito.kotlin
+    testImplementation deps.mvrx.testing
 
     androidTestImplementation deps.atsl.runner
     androidTestImplementation deps.espresso.core
