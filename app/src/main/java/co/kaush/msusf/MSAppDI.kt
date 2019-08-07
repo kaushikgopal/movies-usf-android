@@ -1,6 +1,8 @@
 package co.kaush.msusf
 
 import android.content.Context
+import co.kaush.msusf.genres.MSGenre
+import co.kaush.msusf.genres.MSGenreRepository
 import co.kaush.msusf.movies.MSMovieActivity
 import co.kaush.msusf.movies.MSMovieApi
 import dagger.Component
@@ -43,6 +45,9 @@ class MSAppModule(private val app: MSApp) {
     fun provideMovieApi(retrofit: Retrofit): MSMovieApi {
         return retrofit.create(MSMovieApi::class.java)
     }
+
+    @Provides
+    fun provideGenreRepo(): MSGenreRepository = MSGenreRepository()
 }
 
 @Singleton
