@@ -12,9 +12,7 @@ import co.kaush.msusf.movies.MSMovieResult.AddToHistoryResult
 import co.kaush.msusf.movies.MSMovieResult.ScreenLoadResult
 import co.kaush.msusf.movies.MSMovieResult.SearchMovieResult
 import co.kaush.msusf.movies.MSMovieViewEffect.AddedToHistoryToastEffect
-import com.jakewharton.rx.replayingShare
 import io.reactivex.Observable
-import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
@@ -39,7 +37,7 @@ class MSMainVm(
     val viewEffects: Observable<MSMovieViewEffect>
 
     init {
-            eventEmitter
+        eventEmitter
             .doOnNext { Timber.d("----- event $it") }
             .eventToResult()
             .doOnNext { Timber.d("----- result $it") }
