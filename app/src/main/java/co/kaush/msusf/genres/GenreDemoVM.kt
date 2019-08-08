@@ -63,6 +63,7 @@ class DemoGenreVM(
         ) { vs: GenreViewState, result: GenreResult ->
             when (result) {
                 is GenreResult.GenreLoadResult ->
+
                     vs.copy(
                             pageTitle = R.string.genreScreen_pageTitle,
                             pageDescription = R.string.genreScreen_pageDescription
@@ -94,6 +95,7 @@ class DemoGenreVM(
 
 sealed class GenreEvent {
     object GenreLoadEvent : GenreEvent()
+    data class GenreToggleEvent(private val genre: MSGenre) : GenreEvent()
 }
 
 sealed class GenreResult {
@@ -107,10 +109,10 @@ sealed class GenreViewEffect {
 data class GenreViewState(
         @StringRes val pageTitle: Int = -1,
         @StringRes val pageDescription: Int = -1,
-        val checkboxListViewState: List<GenreCheckboxViewState> = emptyList()
+        val checkboxListViewState: List<GenreCheckBoxViewState> = emptyList()
 )
 
-data class GenreCheckboxViewState(
+data class GenreCheckBoxViewState(
         val checkboxName: String,
         val isChecked: Boolean
 )

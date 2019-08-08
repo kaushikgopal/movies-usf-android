@@ -5,14 +5,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import co.kaush.msusf.Lce
 import co.kaush.msusf.MSApp
-import co.kaush.msusf.movies.MSMovieEvent.AddToHistoryEvent
-import co.kaush.msusf.movies.MSMovieEvent.RestoreFromHistoryEvent
-import co.kaush.msusf.movies.MSMovieEvent.ScreenLoadEvent
-import co.kaush.msusf.movies.MSMovieEvent.SearchMovieEvent
-import co.kaush.msusf.movies.MSMovieResult.AddToHistoryResult
-import co.kaush.msusf.movies.MSMovieResult.ScreenLoadResult
-import co.kaush.msusf.movies.MSMovieResult.SearchMovieResult
-import co.kaush.msusf.movies.MSMovieViewEffect.AddedToHistoryToastEffect
+import co.kaush.msusf.movies.MovieSearchEvent.AddToHistoryEvent
+import co.kaush.msusf.movies.MovieSearchEvent.RestoreFromHistoryEvent
+import co.kaush.msusf.movies.MovieSearchEvent.ScreenLoadEvent
+import co.kaush.msusf.movies.MovieSearchEvent.SearchMovieEvent
+import co.kaush.msusf.movies.MovieSearchResult.AddToHistoryResult
+import co.kaush.msusf.movies.MovieSearchResult.ScreenLoadResult
+import co.kaush.msusf.movies.MovieSearchResult.SearchMovieResult
+import co.kaush.msusf.movies.MovieSearchViewEffect.AddedToHistoryToastEffect
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -25,17 +25,17 @@ import timber.log.Timber
  *
  * Our Unit tests should still be able to run given this
  */
-class MSDemoMovieVM(
+class MovieSearchVM(
     app: MSApp,
-    private val movieRepo: MSMovieRepository
+    private val movieRepo: MovieRepository
 ) : AndroidViewModel(app) {
 
-    private val eventEmitter: PublishSubject<MSMovieEvent> = PublishSubject.create()
+    private val eventEmitter: PublishSubject<MovieSearchEvent> = PublishSubject.create()
 
     private lateinit var disposable: Disposable
 
-    val viewState: Observable<MSMovieViewState>
-    val viewEffects: Observable<MSMovieViewEffect>
+    val viewState: Observable<MovieSearchViewState>
+    val viewEffects: Observable<MovieSearchViewEffect>
 
     init {
         eventEmitter
@@ -61,12 +61,12 @@ class MSDemoMovieVM(
         disposable.dispose()
     }
 
-    fun processInput(event: MSMovieEvent) = eventEmitter.onNext(event)
+    fun processInput(event: MovieSearchEvent) = eventEmitter.onNext(event)
 
     // -----------------------------------------------------------------------------------
     // Internal helpers
 
-    private fun Observable<MSMovieEvent>.eventToResult(): Observable<Lce<out MSMovieResult>> {
+    private fun Observable<MovieSearchEvent>.eventToResult(): Observable<Lce<out MovieSearchResult>> {
         return publish { o ->
             Observable.merge(
                 o.ofType(ScreenLoadEvent::class.java).onScreenLoad(),
@@ -77,8 +77,8 @@ class MSDemoMovieVM(
         }
     }
 
-    private fun Observable<Lce<out MSMovieResult>>.resultToViewState(): Observable<MSMovieViewState> {
-        return scan(MSMovieViewState()) { vs, result ->
+    private fun Observable<Lce<out MovieSearchResult>>.resultToViewState(): Observable<MovieSearchViewState> {
+        return scan(MovieSearchViewState()) { vs, result ->
             when (result) {
                 is Lce.Content -> {
                     when (result.packet) {
@@ -129,9 +129,9 @@ class MSDemoMovieVM(
             .distinctUntilChanged()
     }
 
-    private fun Observable<Lce<out MSMovieResult>>.resultToViewEffect(): Observable<MSMovieViewEffect> {
+    private fun Observable<Lce<out MovieSearchResult>>.resultToViewEffect(): Observable<MovieSearchViewEffect> {
         return filter { it is Lce.Content && it.packet is AddToHistoryResult }
-            .map<MSMovieViewEffect> { AddedToHistoryToastEffect }
+            .map<MovieSearchViewEffect> { AddedToHistoryToastEffect }
     }
 
     // -----------------------------------------------------------------------------------
@@ -170,12 +170,12 @@ class MSDemoMovieVM(
 
     class MSMainVmFactory(
         private val app: MSApp,
-        private val movieRepo: MSMovieRepository
+        private val movieRepo: MovieRepository
     ) : ViewModelProvider.Factory {
 
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return MSDemoMovieVM(app, movieRepo) as T
+            return MovieSearchVM(app, movieRepo) as T
         }
     }
 }

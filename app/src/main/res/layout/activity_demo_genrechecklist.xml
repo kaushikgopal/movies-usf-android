@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="co.kaush.msusf.genres.MSDemoGenreChecklistActivity"
+    tools:context="co.kaush.msusf.genres.GenreChecklistDemoActivity"
     tools:ignore="MissingDefaultResource">
 
     <TextView
@@ -21,6 +21,15 @@
         android:layout_height="wrap_content"
         android:textSize="@dimen/ms_description"
         tools:text="Genre Screen Description" />
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/ms_genreScreen_checklist"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorAccent"
+        tools:background="@color/colorAccent"
+        />
 
 
 </LinearLayout>

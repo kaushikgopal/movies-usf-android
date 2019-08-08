@@ -12,23 +12,23 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import co.kaush.msusf.R
+import co.kaush.msusf.growShrink
 import com.squareup.picasso.Picasso
 
-class MSMovieSearchHistoryAdapter(
-    private val historyClickListener: (MSMovie) -> Unit
-) : ListAdapter<MSMovie, MSMovieSearchVH>(
-    MSMovieSearchDiffCallback()
-) {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MSMovieSearchVH {
-        return MSMovieSearchVH(parent.inflate(R.layout.view_movie))
+class MovieSearchHistoryAdapter(
+        private val historyClickListener: (MSMovie) -> Unit
+) : ListAdapter<MSMovie, MovieSearchVH>(MovieSearchDiffCallback()) {
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieSearchVH {
+        return MovieSearchVH(parent.inflate(R.layout.view_movie))
     }
 
-    override fun onBindViewHolder(holder: MSMovieSearchVH, position: Int) {
+    override fun onBindViewHolder(holder: MovieSearchVH, position: Int) {
         holder.bind(getItem(position), historyClickListener)
     }
 }
 
-class MSMovieSearchDiffCallback : DiffUtil.ItemCallback<MSMovie>() {
+class MovieSearchDiffCallback : DiffUtil.ItemCallback<MSMovie>() {
     // only one kind of item
     override fun areItemsTheSame(oldItem: MSMovie, newItem: MSMovie): Boolean = true
 
@@ -38,7 +38,7 @@ class MSMovieSearchDiffCallback : DiffUtil.ItemCallback<MSMovie>() {
     }
 }
 
-class MSMovieSearchVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
+class MovieSearchVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     private val posterView: ImageView = itemView.findViewById(R.id.ms_result_poster)
     private val ratingView: TextView = itemView.findViewById(R.id.ms_result_rating)
@@ -56,13 +56,13 @@ class MSMovieSearchVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
         (item.ratings.first()).let { ratingView.text = it.summary }
 
         item.posterUrl
-            .takeIf { it.isNotBlank() }
-            ?.let {
-                Picasso.get()
-                    .load(it)
-                    .placeholder(spinner)
-                    .into(posterView)
-            } ?: run {
+                .takeIf { it.isNotBlank() }
+                ?.let {
+                    Picasso.get()
+                            .load(it)
+                            .placeholder(spinner)
+                            .into(posterView)
+                } ?: run {
             posterView.setImageResource(0)
         }
 
@@ -81,7 +81,7 @@ class MSMovieSearchVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
  *      `val view = container?.inflate(R.layout.activity)`
  *      `inflater?.inflate(R.layout.fragment_dialog_standard, c)!!`
  */
-private fun ViewGroup.inflate(
-    @LayoutRes layoutRes: Int,
-    attachToRoot: Boolean = false
+fun ViewGroup.inflate(
+        @LayoutRes layoutRes: Int,
+        attachToRoot: Boolean = false
 ): View = LayoutInflater.from(context).inflate(layoutRes, this, attachToRoot)

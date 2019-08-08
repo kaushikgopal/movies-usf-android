@@ -17,13 +17,13 @@
     tools:ignore="GoogleAppIndexingWarning">
 
     <activity
-      android:name="co.kaush.msusf.movies.MSDemoMovieActivity"
+      android:name="co.kaush.msusf.movies.MovieSearchDemoActivity"
       android:windowSoftInputMode="adjustPan">
 
     </activity>
 
     <activity
-      android:name="co.kaush.msusf.genres.MSDemoGenreChecklistActivity"
+      android:name="co.kaush.msusf.genres.GenreChecklistDemoActivity"
       android:windowSoftInputMode="adjustPan">
 
       <intent-filter>

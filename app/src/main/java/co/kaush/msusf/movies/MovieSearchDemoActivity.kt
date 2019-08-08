@@ -10,11 +10,12 @@ import androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import co.kaush.msusf.MSActivity
 import co.kaush.msusf.R
-import co.kaush.msusf.movies.MSDemoMovieVM.MSMainVmFactory
-import co.kaush.msusf.movies.MSMovieEvent.AddToHistoryEvent
-import co.kaush.msusf.movies.MSMovieEvent.RestoreFromHistoryEvent
-import co.kaush.msusf.movies.MSMovieEvent.ScreenLoadEvent
-import co.kaush.msusf.movies.MSMovieEvent.SearchMovieEvent
+import co.kaush.msusf.growShrink
+import co.kaush.msusf.movies.MovieSearchVM.MSMainVmFactory
+import co.kaush.msusf.movies.MovieSearchEvent.AddToHistoryEvent
+import co.kaush.msusf.movies.MovieSearchEvent.RestoreFromHistoryEvent
+import co.kaush.msusf.movies.MovieSearchEvent.ScreenLoadEvent
+import co.kaush.msusf.movies.MovieSearchEvent.SearchMovieEvent
 import com.jakewharton.rxbinding2.view.RxView
 import com.squareup.picasso.Picasso
 import io.reactivex.Observable
@@ -26,12 +27,12 @@ import kotlinx.android.synthetic.main.activity_demo_movie.*
 import timber.log.Timber
 import javax.inject.Inject
 
-class MSDemoMovieActivity : MSActivity() {
+class MovieSearchDemoActivity : MSActivity() {
 
-    @Inject lateinit var movieRepo: MSMovieRepository
+    @Inject lateinit var movieRepo: MovieRepository
 
-    private lateinit var viewModel: MSDemoMovieVM
-    private lateinit var listAdapter: MSMovieSearchHistoryAdapter
+    private lateinit var viewModel: MovieSearchVM
+    private lateinit var listAdapter: MovieSearchHistoryAdapter
 
     private var uiDisposable: Disposable? = null
     private var disposables: CompositeDisposable = CompositeDisposable()
@@ -56,7 +57,7 @@ class MSDemoMovieActivity : MSActivity() {
         viewModel = ViewModelProviders.of(
             this,
             MSMainVmFactory(app, movieRepo)
-        ).get(MSDemoMovieVM::class.java)
+        ).get(MovieSearchVM::class.java)
 
         disposables.add(
             viewModel
@@ -83,16 +84,16 @@ class MSDemoMovieActivity : MSActivity() {
         disposables.clear()
     }
 
-    private fun trigger(effect: MSMovieViewEffect?) {
+    private fun trigger(effect: MovieSearchViewEffect?) {
         effect ?: return
         when (effect) {
-            is MSMovieViewEffect.AddedToHistoryToastEffect -> {
+            is MovieSearchViewEffect.AddedToHistoryToastEffect -> {
                 Toast.makeText(this, "added to history", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-    private fun render(vs: MSMovieViewState) {
+    private fun render(vs: MovieSearchViewState) {
         vs.searchBoxText?.let {
             ms_mainScreen_searchText.setText(it)
         }
@@ -156,7 +157,7 @@ class MSDemoMovieActivity : MSActivity() {
         )
         ms_mainScreen_searchHistory.addItemDecoration(dividerItemDecoration)
 
-        listAdapter = MSMovieSearchHistoryAdapter { historyItemClick.onNext(it) }
+        listAdapter = MovieSearchHistoryAdapter { historyItemClick.onNext(it) }
         ms_mainScreen_searchHistory.adapter = listAdapter
     }
 }

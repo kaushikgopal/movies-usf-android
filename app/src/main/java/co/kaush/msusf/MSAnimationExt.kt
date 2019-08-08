@@ -1,4 +1,4 @@
-package co.kaush.msusf.movies
+package co.kaush.msusf
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator

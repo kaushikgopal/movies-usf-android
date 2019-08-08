@@ -1,10 +1,10 @@
 package co.kaush.msusf
 
 import android.content.Context
-import co.kaush.msusf.genres.MSDemoGenreChecklistActivity
+import co.kaush.msusf.genres.GenreChecklistDemoActivity
 import co.kaush.msusf.genres.GenreRepository
-import co.kaush.msusf.movies.MSDemoMovieActivity
-import co.kaush.msusf.movies.MSMovieApi
+import co.kaush.msusf.movies.MovieSearchDemoActivity
+import co.kaush.msusf.movies.MovieSearchApi
 import dagger.Component
 import dagger.Module
 import dagger.Provides
@@ -42,8 +42,8 @@ class MSAppModule(private val app: MSApp) {
 
     @Provides
     @Singleton
-    fun provideMovieApi(retrofit: Retrofit): MSMovieApi {
-        return retrofit.create(MSMovieApi::class.java)
+    fun provideMovieApi(retrofit: Retrofit): MovieSearchApi {
+        return retrofit.create(MovieSearchApi::class.java)
     }
 
     @Provides
@@ -53,6 +53,6 @@ class MSAppModule(private val app: MSApp) {
 @Singleton
 @Component(modules = [MSAppModule::class])
 interface MSAppComponent {
-    fun inject(activity: MSDemoMovieActivity)
-    fun inject(activity: MSDemoGenreChecklistActivity)
+    fun inject(activity: MovieSearchDemoActivity)
+    fun inject(activity: GenreChecklistDemoActivity)
 }

@@ -1,9 +1,9 @@
 package co.kaush.msusf.genres
 
 import io.reactivex.Observable
+import io.reactivex.functions.BiFunction
 import io.reactivex.subjects.PublishSubject
 import javax.inject.Inject
-import javax.inject.Singleton
 
 class GenreRepository @Inject constructor() {
 
@@ -19,9 +19,8 @@ class GenreRepository @Inject constructor() {
      *  starter list of selected Genres
      *  Really this field exists in lieu of a proper database like SQLDelight or Room
      */
-    val selectedGenres: MutableSet<MSGenre> = mutableSetOf(MSGenre.Comedy, MSGenre.Romance)
+    private val selectedGenres: MutableSet<MSGenre> = mutableSetOf(MSGenre.Comedy, MSGenre.Romance)
 
-    fun allGenres(): Observable<List<MSGenre>> = Observable.just(MSGenre.values().asList())
 
     fun toggleGenreSelection(genre: MSGenre) {
         if (genre in selectedGenres) {
@@ -33,7 +32,17 @@ class GenreRepository @Inject constructor() {
         genreUpdates.onNext(Unit)
     }
 
-    fun selectedGenres(): Observable<List<MSGenre>> = genreUpdates.hide().map { selectedGenres.toList() }
+    fun genresWithSelection(): Observable<List<Pair<MSGenre, Boolean>>> {
+        return genreUpdates.withLatestFrom(
+                Observable.just(MSGenre.values().asList()),
+                BiFunction { _: Unit, fullGenreList: List<MSGenre> ->
+                    fullGenreList.map { Pair(it, (it in selectedGenres)) }
+                }
+        )
+
+    }
+
+
 }
 
 enum class MSGenre(val title: String) {
