@@ -1,9 +1,9 @@
 package co.kaush.msusf
 
 import android.content.Context
-import co.kaush.msusf.genres.MSGenre
-import co.kaush.msusf.genres.MSGenreRepository
-import co.kaush.msusf.movies.MSMovieActivity
+import co.kaush.msusf.genres.MSDemoGenreChecklistActivity
+import co.kaush.msusf.genres.GenreRepository
+import co.kaush.msusf.movies.MSDemoMovieActivity
 import co.kaush.msusf.movies.MSMovieApi
 import dagger.Component
 import dagger.Module
@@ -47,11 +47,12 @@ class MSAppModule(private val app: MSApp) {
     }
 
     @Provides
-    fun provideGenreRepo(): MSGenreRepository = MSGenreRepository()
+    fun provideGenreRepo(): GenreRepository = GenreRepository()
 }
 
 @Singleton
 @Component(modules = [MSAppModule::class])
 interface MSAppComponent {
-    fun inject(activity: MSMovieActivity)
+    fun inject(activity: MSDemoMovieActivity)
+    fun inject(activity: MSDemoGenreChecklistActivity)
 }

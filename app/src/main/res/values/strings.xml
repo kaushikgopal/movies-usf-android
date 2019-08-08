@@ -1,4 +1,9 @@
 <resources>
-  <string name="app_name">Movie Searching through USF</string>
+  <string name="app_name">Unidirectional State Flow Demos</string>
   <string name="ms_mainScree_searchBtnText">Search</string>
+
+  <string name="loading">Loading</string>
+
+  <string name="genreScreen_pageTitle">Genre checklist demo</string>
+  <string name="genreScreen_pageDescription">Genre checklist demo</string>
 </resources>

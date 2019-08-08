@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import co.kaush.msusf.MSActivity
 import co.kaush.msusf.R
-import co.kaush.msusf.movies.MSMainVm.MSMainVmFactory
+import co.kaush.msusf.movies.MSDemoMovieVM.MSMainVmFactory
 import co.kaush.msusf.movies.MSMovieEvent.AddToHistoryEvent
 import co.kaush.msusf.movies.MSMovieEvent.RestoreFromHistoryEvent
 import co.kaush.msusf.movies.MSMovieEvent.ScreenLoadEvent
@@ -22,16 +22,15 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.subjects.PublishSubject
-import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_demo_movie.*
 import timber.log.Timber
 import javax.inject.Inject
 
-class MSMovieActivity : MSActivity() {
+class MSDemoMovieActivity : MSActivity() {
 
-    @Inject
-    lateinit var movieRepo: MSMovieRepository
+    @Inject lateinit var movieRepo: MSMovieRepository
 
-    private lateinit var viewModel: MSMainVm
+    private lateinit var viewModel: MSDemoMovieVM
     private lateinit var listAdapter: MSMovieSearchHistoryAdapter
 
     private var uiDisposable: Disposable? = null
@@ -46,20 +45,18 @@ class MSMovieActivity : MSActivity() {
         circularProgressDrawable
     }
 
-    override fun inject(activity: MSActivity) {
-        app.appComponent.inject(this)
-    }
+    override fun inject(activity: MSActivity) = app.appComponent.inject(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_demo_movie)
 
         setupListView()
 
         viewModel = ViewModelProviders.of(
             this,
             MSMainVmFactory(app, movieRepo)
-        ).get(MSMainVm::class.java)
+        ).get(MSDemoMovieVM::class.java)
 
         disposables.add(
             viewModel

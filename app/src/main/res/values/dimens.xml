@@ -3,6 +3,7 @@
   <dimen name="ms_spacing">12dp</dimen>
   <dimen name="ms_spacing_list">10dp</dimen>
   <dimen name="ms_mainSreen_0">0dp</dimen>
-  <dimen name="ms_mainSreen_titleSize">20sp</dimen>
-  <dimen name="ms_search_titleSize">30sp</dimen>
+  <dimen name="ms_titleSize">30sp</dimen>
+  <dimen name="ms_title2Size">20sp</dimen>
+  <dimen name="ms_description">16sp</dimen>
 </resources>

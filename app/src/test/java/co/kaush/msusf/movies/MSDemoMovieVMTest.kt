@@ -9,18 +9,17 @@ import co.kaush.msusf.movies.MSMovieViewEffect.*
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockito_kotlin.whenever
 import io.reactivex.Observable
-import io.reactivex.subjects.PublishSubject
 import org.junit.Test
 import org.mockito.Mockito.mock
 import java.util.concurrent.TimeUnit
 
-class MSMainVmTest {
+class MSDemoMovieVMTest {
 
-    private lateinit var viewModel: MSMainVm
+    private lateinit var viewModel: MSDemoMovieVM
 
     @Test
     fun onSubscribing_shouldReceiveStartingviewState() {
-        viewModel = MSMainVm(mockApp, mockMovieRepo)
+        viewModel = MSDemoMovieVM(mockApp, mockMovieRepo)
 
         val viewStateTester = viewModel.viewState.test()
         viewStateTester.assertValueCount(1)
@@ -28,7 +27,7 @@ class MSMainVmTest {
 
     @Test
     fun onScreenLoad_searchBoxText_shouldBeCleared() {
-        viewModel = MSMainVm(mockApp, mockMovieRepo)
+        viewModel = MSDemoMovieVM(mockApp, mockMovieRepo)
 
         val viewStateTester = viewModel.viewState.test()
 
@@ -42,7 +41,7 @@ class MSMainVmTest {
 
     @Test
     fun onSearchingMovie_shouldSeeSearchResults() {
-        viewModel = MSMainVm(mockApp, mockMovieRepo)
+        viewModel = MSDemoMovieVM(mockApp, mockMovieRepo)
 
         val viewStateTester = viewModel.viewState.test()
 
@@ -65,7 +64,7 @@ class MSMainVmTest {
 
     @Test
     fun onClickingMovieSearchResult_shouldPopulateHistoryList() {
-        viewModel = MSMainVm(mockApp, mockMovieRepo)
+        viewModel = MSDemoMovieVM(mockApp, mockMovieRepo)
 
         val viewStateTester = viewModel.viewState.test()
         val viewEffectTester = viewModel.viewEffects.test()
@@ -85,7 +84,7 @@ class MSMainVmTest {
 
     @Test
     fun onClickingMovieSearchResultTwice_shouldShowToastEachTime() {
-        viewModel = MSMainVm(mockApp, mockMovieRepo)
+        viewModel = MSDemoMovieVM(mockApp, mockMovieRepo)
 
         val viewEffectTester = viewModel.viewEffects.test()
 
@@ -102,7 +101,7 @@ class MSMainVmTest {
 
     @Test
     fun onClickingMovieHistoryResult_ResultViewIsRepopulatedWithInfo() {
-        viewModel = MSMainVm(mockApp, mockMovieRepo)
+        viewModel = MSDemoMovieVM(mockApp, mockMovieRepo)
 
         val viewStateTester = viewModel.viewState.test()
 

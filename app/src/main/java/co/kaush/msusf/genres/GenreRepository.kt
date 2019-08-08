@@ -5,7 +5,7 @@ import io.reactivex.subjects.PublishSubject
 import javax.inject.Inject
 import javax.inject.Singleton
 
-class MSGenreRepository @Inject constructor() {
+class GenreRepository @Inject constructor() {
 
     /**
      * This is literally a subject that's used to listen and publish updates

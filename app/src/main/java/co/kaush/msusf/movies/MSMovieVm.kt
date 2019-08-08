@@ -3,6 +3,7 @@ package co.kaush.msusf.movies
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import co.kaush.msusf.Lce
 import co.kaush.msusf.MSApp
 import co.kaush.msusf.movies.MSMovieEvent.AddToHistoryEvent
 import co.kaush.msusf.movies.MSMovieEvent.RestoreFromHistoryEvent
@@ -24,7 +25,7 @@ import timber.log.Timber
  *
  * Our Unit tests should still be able to run given this
  */
-class MSMainVm(
+class MSDemoMovieVM(
     app: MSApp,
     private val movieRepo: MSMovieRepository
 ) : AndroidViewModel(app) {
@@ -60,9 +61,7 @@ class MSMainVm(
         disposable.dispose()
     }
 
-    fun processInput(event: MSMovieEvent) {
-        eventEmitter.onNext(event)
-    }
+    fun processInput(event: MSMovieEvent) = eventEmitter.onNext(event)
 
     // -----------------------------------------------------------------------------------
     // Internal helpers
@@ -168,15 +167,6 @@ class MSMainVm(
     }
 
 // -----------------------------------------------------------------------------------
-// LCE
-
-    sealed class Lce<T> {
-        class Loading<T> : Lce<T>()
-        data class Content<T>(val packet: T) : Lce<T>()
-        data class Error<T>(val packet: T) : Lce<T>()
-    }
-
-// -----------------------------------------------------------------------------------
 
     class MSMainVmFactory(
         private val app: MSApp,
@@ -185,7 +175,7 @@ class MSMainVm(
 
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return MSMainVm(app, movieRepo) as T
+            return MSDemoMovieVM(app, movieRepo) as T
         }
     }
 }
