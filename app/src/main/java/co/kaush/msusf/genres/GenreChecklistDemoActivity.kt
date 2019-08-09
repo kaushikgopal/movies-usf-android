@@ -48,7 +48,6 @@ class GenreChecklistDemoActivity : MSActivity() {
         viewModel.processInput(GenreEvent.GenreLoadEvent)
     }
 
-
     override fun onDestroy() {
         super.onDestroy()
         disposables.clear()
@@ -64,7 +63,7 @@ class GenreChecklistDemoActivity : MSActivity() {
         val layoutManager = LinearLayoutManager(this, VERTICAL, false)
         ms_genreScreen_checklist.layoutManager = layoutManager
 
-        listAdapter = GenreChecklistAdapter { genre: MSGenre ->
+        listAdapter = GenreChecklistAdapter(genreRepo) { genre: MSGenre ->
             viewModel.processInput(GenreEvent.GenreToggleEvent(genre))
         }
 

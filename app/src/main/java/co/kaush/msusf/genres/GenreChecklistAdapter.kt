@@ -10,6 +10,7 @@ import co.kaush.msusf.R
 import co.kaush.msusf.movies.inflate
 
 class GenreChecklistAdapter(
+        private val genreRepo: GenreRepository,
         private val genreToggleListener: (MSGenre) -> Unit
 ) : ListAdapter<GenreCheckBoxViewState, GenreCheckVH>(GenreCheckDiffCallback()) {
 
@@ -19,7 +20,7 @@ class GenreChecklistAdapter(
 
     override fun onBindViewHolder(holder: GenreCheckVH, position: Int) {
         val vs: GenreCheckBoxViewState = getItem(position)
-        holder.bind(vs, genreToggleListener)
+        holder.bind(genreRepo, vs, genreToggleListener)
     }
 }
 
@@ -39,12 +40,16 @@ class GenreCheckVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     private val checkBox: CheckBox = itemView.findViewById(R.id.genre_checkbox)
 
-    fun bind(vs: GenreCheckBoxViewState, genreToggleListener: (MSGenre) -> Unit) {
+    fun bind(
+            genreRepo: GenreRepository,
+            vs: GenreCheckBoxViewState,
+            genreToggleListener: (MSGenre) -> Unit
+    ) {
         checkBox.text = vs.checkboxName
         checkBox.isChecked = vs.isChecked
 
         checkBox.setOnCheckedChangeListener { _, _ ->
-            val genreToggled = MSGenre.valueOf(vs.checkboxName)
+            val genreToggled = genreRepo.findGenre(vs.checkboxName)
             genreToggleListener.invoke(genreToggled)
         }
     }

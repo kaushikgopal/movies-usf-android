@@ -52,7 +52,8 @@ class DemoGenreVM(
         return publish { o ->
             Observable.merge(
                     o.ofType(GenreEvent.GenreLoadEvent::class.java).onScreenLoad(),
-                    o.ofType(GenreEvent.GenreLoadEvent::class.java).onScreenLoad()
+                    o.ofType(GenreEvent.GenreLoadEvent::class.java).onScreenLoad(),
+                    o.ofType(GenreEvent.GenreToggleEvent::class.java).onGenreToggled()
             )
         }
     }
@@ -63,18 +64,21 @@ class DemoGenreVM(
         ) { vs: GenreViewState, result: GenreResult ->
             when (result) {
                 is GenreResult.GenreLoadResult ->
-                vs.copy(
-                        pageTitle = R.string.genreScreen_pageTitle,
-                        pageDescription = R.string.genreScreen_pageDescription,
-                        checkboxListViewState = result.list
-                )
+                    vs.copy(
+                            pageTitle = R.string.genreScreen_pageTitle,
+                            pageDescription = R.string.genreScreen_pageDescription,
+                            checkboxListViewState = result.list
+                    )
+                is GenreResult.GenreToggleResult -> vs
             }
-        }
+        }.distinctUntilChanged()
     }
 
+    // -------------------------------------------------------------------------
+    // use cases
 
     private fun Observable<GenreEvent.GenreLoadEvent>.onScreenLoad()
-            : Observable<GenreResult> {
+            : Observable<GenreResult.GenreLoadResult> {
         return flatMap {
             genreRepo
                     .genresWithSelection()
@@ -83,6 +87,17 @@ class DemoGenreVM(
                     }
                     .map { GenreResult.GenreLoadResult(it) }
         }
+    }
+
+    private fun Observable<GenreEvent.GenreToggleEvent>.onGenreToggled()
+            : Observable<GenreResult.GenreToggleResult> {
+
+        if (1 == 1) {
+            return Observable.empty()
+        }
+        return map { it.genre }
+                .map { genreRepo.toggleGenreSelection(it) }
+                .map { GenreResult.GenreToggleResult }
     }
 
     // ------------------------------------------------------------------------
@@ -102,11 +117,12 @@ class DemoGenreVM(
 
 sealed class GenreEvent {
     object GenreLoadEvent : GenreEvent()
-    data class GenreToggleEvent(private val genre: MSGenre) : GenreEvent()
+    data class GenreToggleEvent(val genre: MSGenre) : GenreEvent()
 }
 
 sealed class GenreResult {
     data class GenreLoadResult(val list: List<GenreCheckBoxViewState>) : GenreResult()
+    object GenreToggleResult : GenreResult()
 }
 
 sealed class GenreViewEffect {

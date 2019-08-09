@@ -46,6 +46,7 @@ class GenreRepository @Inject constructor() {
 
     }
 
+    fun findGenre(checkboxName: String): MSGenre = MSGenre.valueOf(checkboxName)
 
 }
 
