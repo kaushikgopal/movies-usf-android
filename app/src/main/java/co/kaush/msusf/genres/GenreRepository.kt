@@ -22,12 +22,8 @@ class GenreRepository @Inject constructor() {
      */
     private val selectedGenres: MutableSet<MSGenre> = mutableSetOf(MSGenre.Comedy, MSGenre.Romance)
 
-
     fun toggleGenreSelection(genre: MSGenre): Boolean {
         if (genre in selectedGenres) {
-
-            if (selectedGenres.size == 1) return false
-
             selectedGenres.remove(genre)
         } else {
             selectedGenres.add(genre)
@@ -35,7 +31,7 @@ class GenreRepository @Inject constructor() {
 
         genreUpdates.onNext(Unit)
 
-        return true
+        return selectedGenres.isNotEmpty()
     }
 
     fun genresWithSelection(): Observable<List<Pair<MSGenre, Boolean>>> {
@@ -44,7 +40,9 @@ class GenreRepository @Inject constructor() {
                 .withLatestFrom(
                         Observable.just(MSGenre.values().asList()),
                         BiFunction { _: Unit, fullGenreList: List<MSGenre> ->
-                            fullGenreList.map { Pair(it, (it in selectedGenres)) }
+                            fullGenreList
+                                    .map { Pair(it, (it in selectedGenres)) }
+                                    .sortedBy { it.first.title }
                         }
                 )
                 .doOnComplete { Timber.d(" -- ⚠️ this shouldn't be completing ") }
