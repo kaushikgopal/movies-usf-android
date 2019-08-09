@@ -63,11 +63,11 @@ class DemoGenreVM(
         ) { vs: GenreViewState, result: GenreResult ->
             when (result) {
                 is GenreResult.GenreLoadResult ->
-
-                    vs.copy(
-                            pageTitle = R.string.genreScreen_pageTitle,
-                            pageDescription = R.string.genreScreen_pageDescription
-                    )
+                vs.copy(
+                        pageTitle = R.string.genreScreen_pageTitle,
+                        pageDescription = R.string.genreScreen_pageDescription,
+                        checkboxListViewState = result.list
+                )
             }
         }
     }
@@ -75,7 +75,14 @@ class DemoGenreVM(
 
     private fun Observable<GenreEvent.GenreLoadEvent>.onScreenLoad()
             : Observable<GenreResult> {
-        return map { GenreResult.GenreLoadResult }
+        return flatMap {
+            genreRepo
+                    .genresWithSelection()
+                    .map { list ->
+                        list.map { GenreCheckBoxViewState(it.first.title, it.second) }
+                    }
+                    .map { GenreResult.GenreLoadResult(it) }
+        }
     }
 
     // ------------------------------------------------------------------------
@@ -99,7 +106,7 @@ sealed class GenreEvent {
 }
 
 sealed class GenreResult {
-    object GenreLoadResult : GenreResult()
+    data class GenreLoadResult(val list: List<GenreCheckBoxViewState>) : GenreResult()
 }
 
 sealed class GenreViewEffect {

@@ -3,6 +3,7 @@ package co.kaush.msusf.genres
 import io.reactivex.Observable
 import io.reactivex.functions.BiFunction
 import io.reactivex.subjects.PublishSubject
+import timber.log.Timber
 import javax.inject.Inject
 
 class GenreRepository @Inject constructor() {
@@ -33,12 +34,15 @@ class GenreRepository @Inject constructor() {
     }
 
     fun genresWithSelection(): Observable<List<Pair<MSGenre, Boolean>>> {
-        return genreUpdates.withLatestFrom(
-                Observable.just(MSGenre.values().asList()),
-                BiFunction { _: Unit, fullGenreList: List<MSGenre> ->
-                    fullGenreList.map { Pair(it, (it in selectedGenres)) }
-                }
-        )
+        genreUpdates.onNext(Unit)
+        return genreUpdates
+                .withLatestFrom(
+                        Observable.just(MSGenre.values().asList()),
+                        BiFunction { _: Unit, fullGenreList: List<MSGenre> ->
+                            fullGenreList.map { Pair(it, (it in selectedGenres)) }
+                        }
+                )
+                .doOnComplete { Timber.d(" -- ⚠️ this shouldn't be completing ") }
 
     }
 

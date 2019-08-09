@@ -40,7 +40,6 @@ class GenreChecklistDemoActivity : MSActivity() {
                 viewModel
                         .viewState
                         .observeOn(AndroidSchedulers.mainThread())
-                        .doOnNext { Timber.d("----- onNext VS $it") }
                         .subscribe(
                                 ::render
                         ) { Timber.w(it, "something went terribly wrong processing view state") }
@@ -68,6 +67,8 @@ class GenreChecklistDemoActivity : MSActivity() {
         listAdapter = GenreChecklistAdapter { genre: MSGenre ->
             viewModel.processInput(GenreEvent.GenreToggleEvent(genre))
         }
+
+        ms_genreScreen_checklist.adapter = listAdapter
     }
 
 }
