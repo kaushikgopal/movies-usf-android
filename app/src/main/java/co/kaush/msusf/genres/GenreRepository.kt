@@ -34,8 +34,8 @@ class GenreRepository @Inject constructor() {
     }
 
     fun genresWithSelection(): Observable<List<Pair<MSGenre, Boolean>>> {
-        genreUpdates.onNext(Unit)
         return genreUpdates
+                .startWith(Unit)
                 .withLatestFrom(
                         Observable.just(MSGenre.values().asList()),
                         BiFunction { _: Unit, fullGenreList: List<MSGenre> ->

@@ -52,7 +52,6 @@ class DemoGenreVM(
         return publish { o ->
             Observable.merge(
                     o.ofType(GenreEvent.GenreLoadEvent::class.java).onScreenLoad(),
-                    o.ofType(GenreEvent.GenreLoadEvent::class.java).onScreenLoad(),
                     o.ofType(GenreEvent.GenreToggleEvent::class.java).onGenreToggled()
             )
         }
