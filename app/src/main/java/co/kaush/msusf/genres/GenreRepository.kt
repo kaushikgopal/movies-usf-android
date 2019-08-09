@@ -23,14 +23,19 @@ class GenreRepository @Inject constructor() {
     private val selectedGenres: MutableSet<MSGenre> = mutableSetOf(MSGenre.Comedy, MSGenre.Romance)
 
 
-    fun toggleGenreSelection(genre: MSGenre) {
+    fun toggleGenreSelection(genre: MSGenre): Boolean {
         if (genre in selectedGenres) {
+
+            if (selectedGenres.size == 1) return false
+
             selectedGenres.remove(genre)
         } else {
             selectedGenres.add(genre)
         }
 
         genreUpdates.onNext(Unit)
+
+        return true
     }
 
     fun genresWithSelection(): Observable<List<Pair<MSGenre, Boolean>>> {

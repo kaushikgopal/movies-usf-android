@@ -1,6 +1,7 @@
 package co.kaush.msusf.genres
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.VERTICAL
@@ -36,14 +37,21 @@ class GenreChecklistDemoActivity : MSActivity() {
                 GenreVmFactory(app, genreRepo)
         ).get(DemoGenreVM::class.java)
 
-        disposables.add(
+        disposables.addAll(
                 viewModel
                         .viewState
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(
-                                ::render
-                        ) { Timber.w(it, "something went terribly wrong processing view state") }
+                        .subscribe(::render) {
+                            Timber.e(it, "something went terribly wrong processing view state")
+                        },
+                viewModel
+                        .viewEffects
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(::trigger) {
+                            Timber.e(it, "something went terrible wrong processing view effects")
+                        }
         )
+
 
         viewModel.processInput(GenreEvent.GenreLoadEvent)
     }
@@ -57,6 +65,13 @@ class GenreChecklistDemoActivity : MSActivity() {
         ms_genreScreen_title.text = getString(vs.pageTitle)
         ms_genreScreen_description.text = getString(vs.pageDescription)
         listAdapter.submitList(vs.checkboxListViewState)
+    }
+
+    private fun trigger(effect: GenreViewEffect) {
+        when (effect) {
+            is GenreViewEffect.ToastError ->
+                Toast.makeText(this, effect.errMsg, Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun setupListView() {
