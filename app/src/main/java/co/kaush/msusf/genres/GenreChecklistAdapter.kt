@@ -31,7 +31,7 @@ class GenreCheckDiffCallback : DiffUtil.ItemCallback<GenreCheckBoxViewState>() {
     ): Boolean = true
 
     override fun areContentsTheSame(oldItem: GenreCheckBoxViewState, newItem: GenreCheckBoxViewState): Boolean {
-        return oldItem.checkboxName == newItem.checkboxName
+        return oldItem.checkboxName == newItem.checkboxName && oldItem.isChecked == newItem.isChecked
     }
 
 }
@@ -48,9 +48,9 @@ class GenreCheckVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
         checkBox.text = vs.checkboxName
         checkBox.isChecked = vs.isChecked
 
-        checkBox.setOnCheckedChangeListener { _, _ ->
+        checkBox.setOnClickListener {
             val genreToggled = genreRepo.findGenre(vs.checkboxName)
             genreToggleListener.invoke(genreToggled)
         }
-    }
+   }
 }
