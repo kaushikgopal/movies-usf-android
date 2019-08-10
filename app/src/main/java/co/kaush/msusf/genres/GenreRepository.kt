@@ -22,6 +22,10 @@ class GenreRepository @Inject constructor() {
      */
     private val selectedGenres: MutableSet<MSGenre> = mutableSetOf(MSGenre.Comedy, MSGenre.Romance)
 
+    /**
+     * toggle the genre
+     * return true if we have at least one genre selected
+     */
     fun toggleGenreSelection(genre: MSGenre): Boolean {
         if (genre in selectedGenres) {
             selectedGenres.remove(genre)

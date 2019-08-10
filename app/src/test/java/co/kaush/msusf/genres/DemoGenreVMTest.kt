@@ -41,7 +41,7 @@ class DemoGenreVMTest {
                     it.checkboxListViewState
                             .find { it.checkboxName == "Action" }!!
                             .isChecked
-            ).isTrue()
+            ).isEqualTo(true)
             true
         }
     }
@@ -61,10 +61,39 @@ class DemoGenreVMTest {
                     it.checkboxListViewState
                             .find { it.checkboxName == "Comedy" }!!
                             .isChecked
-            ).isFalse()
+            ).isEqualTo(false)
             true
         }
     }
+
+    @Test
+    fun `when all genres are unselected, toast error should be thrown`() {
+        genreRepository = GenreRepository()
+
+        viewModel = DemoGenreVM(mockApp, genreRepository)
+        val vsTester = viewModel.viewState.test()
+        val veTester = viewModel.viewEffects.test()
+
+        viewModel.processInput(GenreEvent.GenreLoadEvent)
+        viewModel.processInput(GenreEvent.GenreToggleEvent(MSGenre.Comedy))
+        viewModel.processInput(GenreEvent.GenreToggleEvent(MSGenre.Romance))
+
+        vsTester.assertValueAt(3) {
+            assertThat(
+                    it.checkboxListViewState
+                            .filter { it.isChecked }
+                            .size
+            ).isEqualTo(0)
+            true
+        }
+
+        veTester.assertValueCount(1)
+
+        veTester.assertValueAt(0) {
+            assertThat(it is GenreViewEffect.ToastError).isEqualTo(true)
+            true
+        }
+   }
 
     private val mockApp: MSApp by lazy { Mockito.mock(MSApp::class.java) }
 }

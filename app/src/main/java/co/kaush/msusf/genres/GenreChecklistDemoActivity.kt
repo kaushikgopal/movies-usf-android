@@ -69,8 +69,10 @@ class GenreChecklistDemoActivity : MSActivity() {
 
     private fun trigger(effect: GenreViewEffect) {
         when (effect) {
-            is GenreViewEffect.ToastError ->
+            is GenreViewEffect.ToastError -> {
                 Toast.makeText(this, effect.errMsg, Toast.LENGTH_SHORT).show()
+                viewModel.processInput(GenreEvent.GenreToggleEvent(effect.toggledGenre))
+            }
         }
     }
 

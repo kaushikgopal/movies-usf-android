@@ -62,15 +62,15 @@ class DemoGenreVM(
         return map { result ->
             when (result) {
                 is GenreResult.GenreToggleResult -> {
-                    if (!result.wasToggled) {
-                        GenreViewEffect.ToastError("You need atleast one genre toggled")
+                    if (!result.atLeast1GenreSelected) {
+                        GenreViewEffect.ToastError("You need at least one genre toggled", result.toggledGenre)
                     } else {
                         GenreViewEffect.NoEffect
                     }
                 }
                 else -> GenreViewEffect.NoEffect
             }
-        }
+        }.filter { it !is GenreViewEffect.NoEffect }
     }
 
     private fun Observable<out GenreResult>.resultToViewState(): Observable<GenreViewState> {
@@ -86,24 +86,7 @@ class DemoGenreVM(
                             checkboxListViewState = result.list
                     )
 
-                is GenreResult.GenreToggleResult -> {
-                    if (result.wasToggled) {
-                        return@scan vs.copy()
-                    }
-
-                    // genre wasn't toggled
-
-                    // we'll have to toggle it back on for the UI
-                    val newCheckboxListViewState: ArrayList<GenreCheckBoxViewState> =
-                            ArrayList(vs.checkboxListViewState)
-                    val checkboxVS = GenreCheckBoxViewState(result.toggledGenre.title, true)
-                    newCheckboxListViewState.add(checkboxVS)
-
-                    // send an error toast
-
-
-                    vs.copy(checkboxListViewState = newCheckboxListViewState)
-                }
+                is GenreResult.GenreToggleResult -> vs.copy()
 
                 else -> throw IllegalStateException()
             }
@@ -130,8 +113,8 @@ class DemoGenreVM(
             : Observable<GenreResult.GenreToggleResult> {
 
         return map { it.genre }.map { genre ->
-            val wasToggled = genreRepo.toggleGenreSelection(genre)
-            GenreResult.GenreToggleResult(wasToggled, genre)
+            val atLeast1GenreSelected = genreRepo.toggleGenreSelection(genre)
+            GenreResult.GenreToggleResult(atLeast1GenreSelected, genre)
         }
     }
 
@@ -158,15 +141,14 @@ sealed class GenreEvent {
 interface GenreResult {
     data class GenreLoadResult(val list: List<GenreCheckBoxViewState>) : GenreResult
     data class GenreToggleResult(
-            val wasToggled: Boolean,
+            val atLeast1GenreSelected: Boolean,
             val toggledGenre: MSGenre
-
     ) : GenreResult
 }
 
 interface GenreViewEffect {
     object NoEffect : GenreViewEffect
-    data class ToastError(val errMsg: String) : GenreViewEffect
+    data class ToastError(val errMsg: String, val toggledGenre: MSGenre) : GenreViewEffect
 }
 
 data class GenreViewState(
