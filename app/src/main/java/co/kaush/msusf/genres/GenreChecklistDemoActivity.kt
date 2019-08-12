@@ -65,6 +65,7 @@ class GenreChecklistDemoActivity : MSActivity() {
         ms_genreScreen_title.text = getString(vs.pageTitle)
         ms_genreScreen_description.text = getString(vs.pageDescription)
         listAdapter.submitList(vs.checkboxListViewState)
+        ms_genreScreen_saveBtn.isEnabled = vs.saveBtnEnabled
     }
 
     private fun trigger(effect: GenreViewEffect) {

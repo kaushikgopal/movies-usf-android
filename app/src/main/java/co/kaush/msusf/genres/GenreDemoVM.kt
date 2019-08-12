@@ -86,7 +86,8 @@ class DemoGenreVM(
                             checkboxListViewState = result.list
                     )
 
-                is GenreResult.GenreToggleResult -> vs.copy()
+                is GenreResult.GenreToggleResult ->
+                    vs.copy(saveBtnEnabled = result.userHasSelectedDifferentGenres)
 
                 else -> throw IllegalStateException()
             }
@@ -114,7 +115,11 @@ class DemoGenreVM(
 
         return map { it.genre }.map { genre ->
             val atLeast1GenreSelected = genreRepo.toggleGenreSelection(genre)
-            GenreResult.GenreToggleResult(atLeast1GenreSelected, genre)
+            GenreResult.GenreToggleResult(
+                    atLeast1GenreSelected,
+                    genre,
+                    genreRepo.userHasSelectedDifferentGenres()
+            )
         }
     }
 
@@ -142,7 +147,8 @@ interface GenreResult {
     data class GenreLoadResult(val list: List<GenreCheckBoxViewState>) : GenreResult
     data class GenreToggleResult(
             val atLeast1GenreSelected: Boolean,
-            val toggledGenre: MSGenre
+            val toggledGenre: MSGenre,
+            val userHasSelectedDifferentGenres: Boolean
     ) : GenreResult
 }
 
@@ -154,7 +160,8 @@ interface GenreViewEffect {
 data class GenreViewState(
         @StringRes val pageTitle: Int = -1,
         @StringRes val pageDescription: Int = -1,
-        val checkboxListViewState: List<GenreCheckBoxViewState> = emptyList()
+        val checkboxListViewState: List<GenreCheckBoxViewState> = emptyList(),
+        val saveBtnEnabled: Boolean = false
 )
 
 data class GenreCheckBoxViewState(

@@ -1,6 +1,7 @@
 package co.kaush.msusf.genres
 
 import co.kaush.msusf.MSApp
+import co.kaush.msusf.assertLastValue
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.mockito.Mockito
@@ -19,7 +20,7 @@ class DemoGenreVMTest {
 
         viewModel.processInput(GenreEvent.GenreLoadEvent)
 
-        vsTester.assertValueAt(1) {
+        vsTester.assertLastValue {
             assertThat(it.checkboxListViewState.size).isEqualTo(13)
             assertThat(it.checkboxListViewState.filter { it.isChecked }.size).isEqualTo(2)
             true
@@ -36,7 +37,7 @@ class DemoGenreVMTest {
         viewModel.processInput(GenreEvent.GenreLoadEvent)
         viewModel.processInput(GenreEvent.GenreToggleEvent(MSGenre.Action))
 
-        vsTester.assertValueAt(2) {
+        vsTester.assertLastValue {
             assertThat(
                     it.checkboxListViewState
                             .find { it.checkboxName == "Action" }!!
@@ -56,7 +57,7 @@ class DemoGenreVMTest {
         viewModel.processInput(GenreEvent.GenreLoadEvent)
         viewModel.processInput(GenreEvent.GenreToggleEvent(MSGenre.Comedy))
 
-        vsTester.assertValueAt(2) {
+        vsTester.assertLastValue {
             assertThat(
                     it.checkboxListViewState
                             .find { it.checkboxName == "Comedy" }!!
@@ -78,7 +79,7 @@ class DemoGenreVMTest {
         viewModel.processInput(GenreEvent.GenreToggleEvent(MSGenre.Comedy))
         viewModel.processInput(GenreEvent.GenreToggleEvent(MSGenre.Romance))
 
-        vsTester.assertValueAt(3) {
+        vsTester.assertLastValue {
             assertThat(
                     it.checkboxListViewState
                             .filter { it.isChecked }
@@ -89,11 +90,69 @@ class DemoGenreVMTest {
 
         veTester.assertValueCount(1)
 
-        veTester.assertValueAt(0) {
+        veTester.assertLastValue {
             assertThat(it is GenreViewEffect.ToastError).isEqualTo(true)
             true
         }
-   }
+    }
+
+    @Test
+    fun `when user has selected less genres, save btn is enabled`() {
+        genreRepository = GenreRepository()
+
+        viewModel = DemoGenreVM(mockApp, genreRepository)
+        val vsTester = viewModel.viewState.test()
+
+        viewModel.processInput(GenreEvent.GenreLoadEvent)
+        // Comedy is already selected
+        viewModel.processInput(GenreEvent.GenreToggleEvent(MSGenre.Comedy))
+
+        vsTester.assertLastValue { vs ->
+            assertThat(vs.saveBtnEnabled).isEqualTo(true)
+            true
+        }
+
+    }
+
+    @Test
+    fun `when user has selected more genres, save btn is enabled`() {
+        genreRepository = GenreRepository()
+
+        viewModel = DemoGenreVM(mockApp, genreRepository)
+        val vsTester = viewModel.viewState.test()
+
+        viewModel.processInput(GenreEvent.GenreLoadEvent)
+        // Action hasn't been selected before
+        viewModel.processInput(GenreEvent.GenreToggleEvent(MSGenre.Action))
+
+        vsTester.assertLastValue { vs ->
+            assertThat(vs.saveBtnEnabled).isEqualTo(true)
+            true
+        }
+    }
+
+    @Test
+    fun `when user has toggles genres but lands up with same selection, save btn is disabled`() {
+        genreRepository = GenreRepository()
+
+        viewModel = DemoGenreVM(mockApp, genreRepository)
+        val vsTester = viewModel.viewState.test()
+
+        viewModel.processInput(GenreEvent.GenreLoadEvent)
+
+        // action wasn't selected before
+        viewModel.processInput(GenreEvent.GenreToggleEvent(MSGenre.Action))
+        // comedy is already selected
+        viewModel.processInput(GenreEvent.GenreToggleEvent(MSGenre.Comedy))
+        viewModel.processInput(GenreEvent.GenreToggleEvent(MSGenre.Action))
+        viewModel.processInput(GenreEvent.GenreToggleEvent(MSGenre.Comedy))
+
+
+        vsTester.assertLastValue { vs ->
+            assertThat(vs.saveBtnEnabled).isEqualTo(false)
+            true
+        }
+    }
 
     private val mockApp: MSApp by lazy { Mockito.mock(MSApp::class.java) }
 }

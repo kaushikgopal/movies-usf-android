@@ -18,24 +18,28 @@ class GenreRepository @Inject constructor() {
 
     /**
      *  starter list of selected Genres
+     */
+    private val userSelectedGenres: MutableSet<MSGenre> = mutableSetOf(MSGenre.Comedy, MSGenre.Romance)
+
+    /**
      *  Really this field exists in lieu of a proper database like SQLDelight or Room
      */
-    private val selectedGenres: MutableSet<MSGenre> = mutableSetOf(MSGenre.Comedy, MSGenre.Romance)
+    private val persistedSelectedGenres: MutableSet<MSGenre> = mutableSetOf(*(userSelectedGenres.toTypedArray()))
 
     /**
      * toggle the genre
      * return true if we have at least one genre selected
      */
     fun toggleGenreSelection(genre: MSGenre): Boolean {
-        if (genre in selectedGenres) {
-            selectedGenres.remove(genre)
+        if (genre in userSelectedGenres) {
+            userSelectedGenres.remove(genre)
         } else {
-            selectedGenres.add(genre)
+            userSelectedGenres.add(genre)
         }
 
         genreUpdates.onNext(Unit)
 
-        return selectedGenres.isNotEmpty()
+        return userSelectedGenres.isNotEmpty()
     }
 
     fun genresWithSelection(): Observable<List<Pair<MSGenre, Boolean>>> {
@@ -45,13 +49,15 @@ class GenreRepository @Inject constructor() {
                         Observable.just(MSGenre.values().asList()),
                         BiFunction { _: Unit, fullGenreList: List<MSGenre> ->
                             fullGenreList
-                                    .map { Pair(it, (it in selectedGenres)) }
+                                    .map { Pair(it, (it in userSelectedGenres)) }
                                     .sortedBy { it.first.title }
                         }
                 )
                 .doOnComplete { Timber.d(" -- ⚠️ this shouldn't be completing ") }
 
     }
+
+    fun userHasSelectedDifferentGenres(): Boolean = persistedSelectedGenres != userSelectedGenres
 
     fun findGenre(checkboxName: String): MSGenre = MSGenre.valueOf(checkboxName)
 
