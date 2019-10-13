@@ -5,7 +5,7 @@
 ext.deps = [:]
 def versions = [:]
 
-versions.android_gradle_plugin = '3.2.0'
+versions.android_gradle_plugin = '3.5.1'
 versions.min_sdk = 21
 versions.target_sdk = 28
 // Preferably keep this in sync
