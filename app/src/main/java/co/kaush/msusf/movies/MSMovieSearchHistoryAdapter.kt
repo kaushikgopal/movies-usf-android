@@ -19,6 +19,7 @@ class MSMovieSearchHistoryAdapter(
 ) : ListAdapter<MSMovie, MSMovieSearchVH>(
     MSMovieSearchDiffCallback()
 ) {
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MSMovieSearchVH {
         return MSMovieSearchVH(parent.inflate(R.layout.view_movie))
     }

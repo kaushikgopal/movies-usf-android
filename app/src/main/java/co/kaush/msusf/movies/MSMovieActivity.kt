@@ -11,10 +11,7 @@ import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import co.kaush.msusf.MSActivity
 import co.kaush.msusf.R
 import co.kaush.msusf.movies.MSMainVm.MSMainVmFactory
-import co.kaush.msusf.movies.MSMovieEvent.AddToHistoryEvent
-import co.kaush.msusf.movies.MSMovieEvent.RestoreFromHistoryEvent
-import co.kaush.msusf.movies.MSMovieEvent.ScreenLoadEvent
-import co.kaush.msusf.movies.MSMovieEvent.SearchMovieEvent
+import co.kaush.msusf.movies.MSMovieEvent.*
 import com.jakewharton.rxbinding2.view.RxView
 import com.squareup.picasso.Picasso
 import io.reactivex.Observable

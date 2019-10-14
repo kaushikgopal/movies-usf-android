@@ -65,6 +65,7 @@ dependencies {
     implementation deps.rx.bindings
     implementation deps.rx.java
     implementation deps.rx.replaying_share
+    implementation deps.androidx.design
     implementation deps.androidx.app_compat
     implementation deps.androidx.recyclerview
     implementation deps.timber
