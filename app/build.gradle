@@ -49,6 +49,7 @@ android {
 
 dependencies {
 
+    implementation deps.androidx.design
     implementation deps.constraint_layout
     implementation deps.dagger.runtime
     kapt deps.dagger.compiler
