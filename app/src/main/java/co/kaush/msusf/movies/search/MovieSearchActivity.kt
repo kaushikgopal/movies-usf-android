@@ -1,4 +1,4 @@
-package co.kaush.msusf.movies
+package co.kaush.msusf.movies.search
 
 import android.os.Bundle
 import android.widget.Toast
@@ -10,11 +10,9 @@ import androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import co.kaush.msusf.MSActivity
 import co.kaush.msusf.R
-import co.kaush.msusf.movies.MSMainVm.MSMainVmFactory
-import co.kaush.msusf.movies.MSMovieEvent.AddToHistoryEvent
-import co.kaush.msusf.movies.MSMovieEvent.RestoreFromHistoryEvent
-import co.kaush.msusf.movies.MSMovieEvent.ScreenLoadEvent
-import co.kaush.msusf.movies.MSMovieEvent.SearchMovieEvent
+import co.kaush.msusf.movies.*
+import co.kaush.msusf.movies.search.MSMovieEvent.*
+import co.kaush.msusf.movies.search.MovieSearchVM.MSMainVmFactory
 import com.jakewharton.rxbinding2.view.RxView
 import com.squareup.picasso.Picasso
 import io.reactivex.Observable
@@ -26,17 +24,17 @@ import kotlinx.android.synthetic.main.activity_main.*
 import timber.log.Timber
 import javax.inject.Inject
 
-class MSMovieActivity : MSActivity() {
+class MovieSearchActivity : MSActivity() {
 
     @Inject
-    lateinit var movieRepo: MSMovieRepository
+    lateinit var movieRepo: MovieRepository
 
-    private lateinit var viewModel: MSMainVm
+    private lateinit var viewModel: MovieSearchVM
     private lateinit var listAdapter: MSMovieSearchHistoryAdapter
 
     private var uiDisposable: Disposable? = null
     private var disposables: CompositeDisposable = CompositeDisposable()
-    private val historyItemClick: PublishSubject<MSMovie> = PublishSubject.create()
+    private val historyItemClick: PublishSubject<MovieSearchResult> = PublishSubject.create()
 
     private val spinner: CircularProgressDrawable by lazy {
         val circularProgressDrawable = CircularProgressDrawable(this)
@@ -59,7 +57,7 @@ class MSMovieActivity : MSActivity() {
         viewModel = ViewModelProviders.of(
             this,
             MSMainVmFactory(app, movieRepo)
-        ).get(MSMainVm::class.java)
+        ).get(MovieSearchVM::class.java)
 
         disposables.add(
             viewModel
@@ -126,7 +124,7 @@ class MSMovieActivity : MSActivity() {
         val addToHistoryEvents: Observable<AddToHistoryEvent> = RxView.clicks(ms_mainScreen_poster)
             .map {
                 ms_mainScreen_poster.growShrink()
-                AddToHistoryEvent(ms_mainScreen_poster.getTag(R.id.TAG_MOVIE_DATA) as MSMovie)
+                AddToHistoryEvent(ms_mainScreen_poster.getTag(R.id.TAG_MOVIE_DATA) as MovieSearchResult)
             }
         val restoreFromHistoryEvents: Observable<RestoreFromHistoryEvent> = historyItemClick
             .map { RestoreFromHistoryEvent(it) }

@@ -4,7 +4,7 @@
   xmlns:tools="http://schemas.android.com/tools"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
-  tools:context="co.kaush.msusf.movies.MSMovieActivity">
+  tools:context="co.kaush.msusf.movies.search.MovieSearchActivity">
 
   <androidx.constraintlayout.widget.Guideline
     android:id="@+id/ms_mainScreen_guideline_1"

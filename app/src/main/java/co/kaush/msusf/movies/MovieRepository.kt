@@ -2,21 +2,20 @@ package co.kaush.msusf.movies
 
 import com.google.gson.Gson
 import io.reactivex.Observable
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @OpenClassOnDebug
-class MSMovieRepository @Inject constructor(
-    val movieApi: MSMovieApi
+class MovieRepository @Inject constructor(
+    val searchService: MovieSearchService
 ) {
-    fun searchMovie(movieName: String): Observable<MSMovie?> {
-        return movieApi.searchMovie(movieName)
+    fun movieOnce(title: String): Observable<MovieSearchResult?> {
+        return searchService.searchMovie(title)
             .map { response ->
                 response.body()?.let { return@map it }
                 response.errorBody()?.let { body ->
                     return@map Gson().fromJson(
                         body.string(),
-                        MSMovie::class.java
+                        MovieSearchResult::class.java
                     )
                 }
             }

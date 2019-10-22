@@ -7,16 +7,16 @@ import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-interface MSMovieApi {
+interface MovieSearchService {
 
     @GET("/")
     fun searchMovie(
             @Query("t") movieName: String,
             @Query("apiKey") apiKey: String = BuildConfig.OMDB_API_KEY
-    ): Observable<Response<MSMovie>>
+    ): Observable<Response<MovieSearchResult>>
 }
 
-data class MSMovie(
+data class MovieSearchResult(
     @SerializedName("Result") val result: Boolean,
     @SerializedName("Error") val errorMessage: String? = null,
     @SerializedName("Title") val title: String = "",

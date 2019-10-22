@@ -1,8 +1,8 @@
 package co.kaush.msusf
 
 import android.content.Context
-import co.kaush.msusf.movies.MSMovieActivity
-import co.kaush.msusf.movies.MSMovieApi
+import co.kaush.msusf.movies.MovieSearchService
+import co.kaush.msusf.movies.search.MovieSearchActivity
 import dagger.Component
 import dagger.Module
 import dagger.Provides
@@ -40,13 +40,13 @@ class MSAppModule(private val app: MSApp) {
 
     @Provides
     @Singleton
-    fun provideMovieApi(retrofit: Retrofit): MSMovieApi {
-        return retrofit.create(MSMovieApi::class.java)
+    fun provideMovieApi(retrofit: Retrofit): MovieSearchService {
+        return retrofit.create(MovieSearchService::class.java)
     }
 }
 
 @Singleton
 @Component(modules = [MSAppModule::class])
 interface MSAppComponent {
-    fun inject(activity: MSMovieActivity)
+    fun inject(activity: MovieSearchActivity)
 }

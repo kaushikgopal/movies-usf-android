@@ -1,20 +1,15 @@
-package co.kaush.msusf.movies
+package co.kaush.msusf.movies.search
 
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import co.kaush.msusf.MSApp
-import co.kaush.msusf.movies.MSMovieEvent.AddToHistoryEvent
-import co.kaush.msusf.movies.MSMovieEvent.RestoreFromHistoryEvent
-import co.kaush.msusf.movies.MSMovieEvent.ScreenLoadEvent
-import co.kaush.msusf.movies.MSMovieEvent.SearchMovieEvent
-import co.kaush.msusf.movies.MSMovieResult.AddToHistoryResult
-import co.kaush.msusf.movies.MSMovieResult.ScreenLoadResult
-import co.kaush.msusf.movies.MSMovieResult.SearchMovieResult
-import co.kaush.msusf.movies.MSMovieViewEffect.AddedToHistoryToastEffect
-import com.jakewharton.rx.replayingShare
+import co.kaush.msusf.movies.MovieRepository
+import co.kaush.msusf.movies.MovieSearchResult
+import co.kaush.msusf.movies.search.MSMovieEvent.*
+import co.kaush.msusf.movies.search.MSMovieResult.*
+import co.kaush.msusf.movies.search.MSMovieViewEffect.AddedToHistoryToastEffect
 import io.reactivex.Observable
-import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
@@ -26,9 +21,9 @@ import timber.log.Timber
  *
  * Our Unit tests should still be able to run given this
  */
-class MSMainVm(
+class MovieSearchVM(
     app: MSApp,
-    private val movieRepo: MSMovieRepository
+    private val movieRepo: MovieRepository
 ) : AndroidViewModel(app) {
 
     private val eventEmitter: PublishSubject<MSMovieEvent> = PublishSubject.create()
@@ -89,7 +84,7 @@ class MSMainVm(
                             vs.copy(searchBoxText = "")
                         }
                         is SearchMovieResult -> {
-                            val movie: MSMovie = result.packet.movie
+                            val movie: MovieSearchResult = result.packet.movie
                             vs.copy(
                                 searchedMovieTitle = movie.title,
                                 searchedMovieRating = movie.ratingSummary,
@@ -99,7 +94,7 @@ class MSMainVm(
                         }
 
                         is AddToHistoryResult -> {
-                            val movieToBeAdded: MSMovie = result.packet.movie
+                            val movieToBeAdded: MovieSearchResult = result.packet.movie
 
                             if (!vs.adapterList.contains(movieToBeAdded)) {
                                 vs.copy(adapterList = vs.adapterList.plus(movieToBeAdded))
@@ -121,7 +116,7 @@ class MSMainVm(
                 is Lce.Error -> {
                     when (result.packet) {
                         is SearchMovieResult -> {
-                            val movie: MSMovie = result.packet.movie
+                            val movie: MovieSearchResult = result.packet.movie
                             vs.copy(searchedMovieTitle = movie.errorMessage!!)
                         }
                         else -> throw RuntimeException("Unexpected result LCE state")
@@ -139,13 +134,14 @@ class MSMainVm(
 
     // -----------------------------------------------------------------------------------
     // use cases
+
     private fun Observable<ScreenLoadEvent>.onScreenLoad(): Observable<Lce<ScreenLoadResult>> {
         return map { Lce.Content(ScreenLoadResult) }
     }
 
     private fun Observable<SearchMovieEvent>.onSearchMovie(): Observable<Lce<SearchMovieResult>> {
         return switchMap { searchMovieEvent ->
-            movieRepo.searchMovie(searchMovieEvent.searchedMovieTitle)
+            movieRepo.movieOnce(searchMovieEvent.searchedMovieTitle)
                 .subscribeOn(Schedulers.io())
                 .map {
                     if (it.errorMessage?.isNullOrBlank() == false) {
@@ -155,7 +151,7 @@ class MSMainVm(
                     }
                 }
                 .onErrorReturn {
-                    Lce.Error(SearchMovieResult(MSMovie(result = false, errorMessage = it.localizedMessage)))
+                    Lce.Error(SearchMovieResult(MovieSearchResult(result = false, errorMessage = it.localizedMessage)))
                 }
                 .startWith(Lce.Loading())
         }
@@ -182,12 +178,41 @@ class MSMainVm(
 
     class MSMainVmFactory(
         private val app: MSApp,
-        private val movieRepo: MSMovieRepository
+        private val movieRepo: MovieRepository
     ) : ViewModelProvider.Factory {
 
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return MSMainVm(app, movieRepo) as T
+            return MovieSearchVM(app, movieRepo) as T
         }
     }
+
+
+
+}
+
+data class MSMovieViewState(
+        val searchBoxText: String? = null,
+        val searchedMovieTitle: String = "",
+        val searchedMovieRating: String = "",
+        val searchedMoviePoster: String = "",
+        val searchedMovieReference: MovieSearchResult? = null,
+        val adapterList: List<MovieSearchResult> = emptyList()
+)
+
+sealed class MSMovieViewEffect {
+    object AddedToHistoryToastEffect: MSMovieViewEffect()
+}
+
+sealed class MSMovieEvent {
+    object ScreenLoadEvent : MSMovieEvent()
+    data class SearchMovieEvent(val searchedMovieTitle: String = "") : MSMovieEvent()
+    data class AddToHistoryEvent(val searchedMovie: MovieSearchResult) : MSMovieEvent()
+    data class RestoreFromHistoryEvent(val movieFromHistory: MovieSearchResult) : MSMovieEvent()
+}
+
+sealed class MSMovieResult {
+    object ScreenLoadResult : MSMovieResult()
+    data class SearchMovieResult(val movie: MovieSearchResult) : MSMovieResult()
+    data class AddToHistoryResult(val movie: MovieSearchResult) : MSMovieResult()
 }

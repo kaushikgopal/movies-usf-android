@@ -1,26 +1,23 @@
 package co.kaush.msusf.movies
 
 import co.kaush.msusf.MSApp
-import co.kaush.msusf.movies.MSMovieEvent.AddToHistoryEvent
-import co.kaush.msusf.movies.MSMovieEvent.RestoreFromHistoryEvent
-import co.kaush.msusf.movies.MSMovieEvent.ScreenLoadEvent
-import co.kaush.msusf.movies.MSMovieEvent.SearchMovieEvent
-import co.kaush.msusf.movies.MSMovieViewEffect.*
+import co.kaush.msusf.movies.search.MSMovieEvent.*
+import co.kaush.msusf.movies.search.MSMovieViewEffect.AddedToHistoryToastEffect
+import co.kaush.msusf.movies.search.MovieSearchVM
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockito_kotlin.whenever
 import io.reactivex.Observable
-import io.reactivex.subjects.PublishSubject
 import org.junit.Test
 import org.mockito.Mockito.mock
 import java.util.concurrent.TimeUnit
 
-class MSMainVmTest {
+class MovieSearchVMTest {
 
-    private lateinit var viewModel: MSMainVm
+    private lateinit var viewModel: MovieSearchVM
 
     @Test
     fun onSubscribing_shouldReceiveStartingviewState() {
-        viewModel = MSMainVm(mockApp, mockMovieRepo)
+        viewModel = MovieSearchVM(mockApp, mockMovieRepo)
 
         val viewStateTester = viewModel.viewState.test()
         viewStateTester.assertValueCount(1)
@@ -28,7 +25,7 @@ class MSMainVmTest {
 
     @Test
     fun onScreenLoad_searchBoxText_shouldBeCleared() {
-        viewModel = MSMainVm(mockApp, mockMovieRepo)
+        viewModel = MovieSearchVM(mockApp, mockMovieRepo)
 
         val viewStateTester = viewModel.viewState.test()
 
@@ -42,7 +39,7 @@ class MSMainVmTest {
 
     @Test
     fun onSearchingMovie_shouldSeeSearchResults() {
-        viewModel = MSMainVm(mockApp, mockMovieRepo)
+        viewModel = MovieSearchVM(mockApp, mockMovieRepo)
 
         val viewStateTester = viewModel.viewState.test()
 
@@ -65,7 +62,7 @@ class MSMainVmTest {
 
     @Test
     fun onClickingMovieSearchResult_shouldPopulateHistoryList() {
-        viewModel = MSMainVm(mockApp, mockMovieRepo)
+        viewModel = MovieSearchVM(mockApp, mockMovieRepo)
 
         val viewStateTester = viewModel.viewState.test()
         val viewEffectTester = viewModel.viewEffects.test()
@@ -85,7 +82,7 @@ class MSMainVmTest {
 
     @Test
     fun onClickingMovieSearchResultTwice_shouldShowToastEachTime() {
-        viewModel = MSMainVm(mockApp, mockMovieRepo)
+        viewModel = MovieSearchVM(mockApp, mockMovieRepo)
 
         val viewEffectTester = viewModel.viewEffects.test()
 
@@ -102,7 +99,7 @@ class MSMainVmTest {
 
     @Test
     fun onClickingMovieHistoryResult_ResultViewIsRepopulatedWithInfo() {
-        viewModel = MSMainVm(mockApp, mockMovieRepo)
+        viewModel = MovieSearchVM(mockApp, mockMovieRepo)
 
         val viewStateTester = viewModel.viewState.test()
 
@@ -139,11 +136,11 @@ class MSMainVmTest {
 
     private val mockApp: MSApp by lazy { mock(MSApp::class.java) }
 
-    private val mockMovieRepo: MSMovieRepository by lazy {
-        mock(MSMovieRepository::class.java).apply {
-            whenever(searchMovie("blade runner 2049"))
+    private val mockMovieRepo: MovieRepository by lazy {
+        mock(MovieRepository::class.java).apply {
+            whenever(movieOnce("blade runner 2049"))
                 .thenReturn(Observable.just(bladeRunner2049))
-            whenever(searchMovie("blade"))
+            whenever(movieOnce("blade"))
                 .thenReturn(Observable.just(blade))
         }
     }
@@ -159,7 +156,7 @@ class MSMainVmTest {
             rating = "87%"
         )
 
-        MSMovie(
+        MovieSearchResult(
             result = true,
             errorMessage = null,
             title = "Blade Runner 2049",
@@ -179,7 +176,7 @@ class MSMainVmTest {
             rating = "54%"
         )
 
-        MSMovie(
+        MovieSearchResult(
             result = true,
             errorMessage = null,
             title = "Blade",

@@ -16,7 +16,7 @@
     android:theme="@style/AppTheme">
 
     <activity
-      android:name="co.kaush.msusf.movies.MSMovieActivity"
+      android:name="co.kaush.msusf.movies.search.MovieSearchActivity"
       android:windowSoftInputMode="adjustPan">
 
       <intent-filter>

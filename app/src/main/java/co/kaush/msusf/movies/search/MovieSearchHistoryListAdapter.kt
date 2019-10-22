@@ -1,4 +1,4 @@
-package co.kaush.msusf.movies
+package co.kaush.msusf.movies.search
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
@@ -12,12 +12,14 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import co.kaush.msusf.R
+import co.kaush.msusf.movies.MovieSearchResult
+import co.kaush.msusf.movies.growShrink
 import com.squareup.picasso.Picasso
 
 class MSMovieSearchHistoryAdapter(
-    private val historyClickListener: (MSMovie) -> Unit
-) : ListAdapter<MSMovie, MSMovieSearchVH>(
-    MSMovieSearchDiffCallback()
+    private val historyClickListener: (MovieSearchResult) -> Unit
+) : ListAdapter<MovieSearchResult, MSMovieSearchVH>(
+        MSMovieSearchDiffCallback()
 ) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MSMovieSearchVH {
         return MSMovieSearchVH(parent.inflate(R.layout.view_movie))
@@ -28,11 +30,11 @@ class MSMovieSearchHistoryAdapter(
     }
 }
 
-class MSMovieSearchDiffCallback : DiffUtil.ItemCallback<MSMovie>() {
+class MSMovieSearchDiffCallback : DiffUtil.ItemCallback<MovieSearchResult>() {
     // only one kind of item
-    override fun areItemsTheSame(oldItem: MSMovie, newItem: MSMovie): Boolean = true
+    override fun areItemsTheSame(oldItem: MovieSearchResult, newItem: MovieSearchResult): Boolean = true
 
-    override fun areContentsTheSame(oldItem: MSMovie, newItem: MSMovie): Boolean {
+    override fun areContentsTheSame(oldItem: MovieSearchResult, newItem: MovieSearchResult): Boolean {
         // this is just lazy!
         return oldItem?.posterUrl.equals(newItem?.posterUrl, ignoreCase = true)
     }
@@ -51,7 +53,7 @@ class MSMovieSearchVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
     }
 
     @SuppressLint("SetTextI18n")
-    fun bind(item: MSMovie, historyClickListener: (MSMovie) -> Unit) {
+    fun bind(item: MovieSearchResult, historyClickListener: (MovieSearchResult) -> Unit) {
 
         (item.ratings.first()).let { ratingView.text = it.summary }
 
