@@ -10,7 +10,9 @@ import androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import co.kaush.msusf.MSActivity
 import co.kaush.msusf.R
-import co.kaush.msusf.movies.*
+import co.kaush.msusf.movies.MovieRepository
+import co.kaush.msusf.movies.MovieSearchResult
+import co.kaush.msusf.movies.growShrink
 import co.kaush.msusf.movies.search.MSMovieEvent.*
 import co.kaush.msusf.movies.search.MovieSearchVM.MSMainVmFactory
 import com.jakewharton.rxbinding2.view.RxView
@@ -93,18 +95,18 @@ class MovieSearchActivity : MSActivity() {
         }
     }
 
-    private fun render(vs: MSMovieViewState) {
+    private fun render(vs: MovieSearchVM.ViewState) {
         vs.searchBoxText?.let {
             ms_mainScreen_searchText.setText(it)
         }
-        ms_mainScreen_title.text = vs.searchedMovieTitle
-        ms_mainScreen_rating.text = vs.searchedMovieRating
+        ms_mainScreen_title.text = vs.movieTitle
+        ms_mainScreen_rating.text = vs.rating1
 
-        vs.searchedMoviePoster
+        vs.moviePosterUrl
             .takeIf { it.isNotBlank() }
             ?.let {
                 Picasso.get()
-                    .load(vs.searchedMoviePoster)
+                    .load(vs.moviePosterUrl)
                     .placeholder(spinner)
                     .into(ms_mainScreen_poster)
 
@@ -118,7 +120,7 @@ class MovieSearchActivity : MSActivity() {
     override fun onResume() {
         super.onResume()
 
-        val screenLoadEvents: Observable<ScreenLoadEvent> = Observable.just(ScreenLoadEvent)
+        val screenLoadEvents: Observable<ViewResumeEvent> = Observable.just(ViewResumeEvent)
         val searchMovieEvents: Observable<SearchMovieEvent> = RxView.clicks(ms_mainScreen_searchBtn)
             .map { SearchMovieEvent(ms_mainScreen_searchText.text.toString()) }
         val addToHistoryEvents: Observable<AddToHistoryEvent> = RxView.clicks(ms_mainScreen_poster)

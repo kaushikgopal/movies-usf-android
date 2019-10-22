@@ -29,7 +29,7 @@ class MovieSearchVMTest {
 
         val viewStateTester = viewModel.viewState.test()
 
-        viewModel.processInput(ScreenLoadEvent)
+        viewModel.processInput(ViewResumeEvent)
 
         viewStateTester.assertValueAt(1) {
             assertThat(it.searchBoxText).isEqualTo("")
@@ -46,15 +46,15 @@ class MovieSearchVMTest {
         viewModel.processInput(SearchMovieEvent("blade runner 2049"))
 
         viewStateTester.assertValueAt(1) {
-            assertThat(it.searchedMovieTitle).isEqualTo("Searching Movie...")
+            assertThat(it.movieTitle).isEqualTo("Searching Movie...")
             true
         }
 
         viewStateTester.assertValueAt(2) {
-            assertThat(it.searchedMovieTitle).isEqualTo("Blade Runner 2049")
-            assertThat(it.searchedMoviePoster)
+            assertThat(it.movieTitle).isEqualTo("Blade Runner 2049")
+            assertThat(it.moviePosterUrl)
                 .isEqualTo("https://m.media-amazon.com/images/M/MV5BNzA1Njg4NzYxOV5BMl5BanBnXkFtZTgwODk5NjU3MzI@._V1_SX300.jpg")
-            assertThat(it.searchedMovieRating).isEqualTo("\n8.1/10 (IMDB)\n87% (RT)")
+            assertThat(it.rating1).isEqualTo("\n8.1/10 (IMDB)\n87% (RT)")
 
             true
         }
@@ -113,23 +113,23 @@ class MovieSearchVMTest {
 
         // check that the result is showing Blade
         viewStateTester.assertValueAt(viewStateTester.valueCount() - 1) {
-            assertThat(it.searchedMovieTitle).isEqualTo("Blade")
+            assertThat(it.movieTitle).isEqualTo("Blade")
             true
         }
 
         // click blade runner 2049 from history
         viewModel.processInput(RestoreFromHistoryEvent(bladeRunner2049))
         viewStateTester.assertValueAt(viewStateTester.valueCount() - 1) {
-            assertThat(it.searchedMovieTitle).isEqualTo("Blade Runner 2049")
-            assertThat(it.searchedMovieRating).isEqualTo(bladeRunner2049.ratingSummary)
+            assertThat(it.movieTitle).isEqualTo("Blade Runner 2049")
+            assertThat(it.rating1).isEqualTo(bladeRunner2049.ratingSummary)
             true
         }
 
         // click blade again
         viewModel.processInput(RestoreFromHistoryEvent(blade))
         viewStateTester.assertValueAt(viewStateTester.valueCount() - 1) {
-            assertThat(it.searchedMovieTitle).isEqualTo("Blade")
-            assertThat(it.searchedMovieRating).isEqualTo(blade.ratingSummary)
+            assertThat(it.movieTitle).isEqualTo("Blade")
+            assertThat(it.rating1).isEqualTo(blade.ratingSummary)
             true
         }
     }

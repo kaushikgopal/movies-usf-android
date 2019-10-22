@@ -26,15 +26,15 @@ class MovieSearchVM(
     private val movieRepo: MovieRepository
 ) : AndroidViewModel(app) {
 
-    private val eventEmitter: PublishSubject<MSMovieEvent> = PublishSubject.create()
+    private val viewEventSubject: PublishSubject<MSMovieEvent> = PublishSubject.create()
 
     private lateinit var disposable: Disposable
 
-    val viewState: Observable<MSMovieViewState>
+    val viewState: Observable<ViewState>
     val viewEffects: Observable<MSMovieViewEffect>
 
     init {
-            eventEmitter
+            viewEventSubject
             .doOnNext { Timber.d("----- event $it") }
             .eventToResult()
             .doOnNext { Timber.d("----- result $it") }
@@ -58,7 +58,7 @@ class MovieSearchVM(
     }
 
     fun processInput(event: MSMovieEvent) {
-        eventEmitter.onNext(event)
+        viewEventSubject.onNext(event)
     }
 
     // -----------------------------------------------------------------------------------
@@ -67,7 +67,7 @@ class MovieSearchVM(
     private fun Observable<MSMovieEvent>.eventToResult(): Observable<Lce<out MSMovieResult>> {
         return publish { o ->
             Observable.merge(
-                o.ofType(ScreenLoadEvent::class.java).onScreenLoad(),
+                o.ofType(ViewResumeEvent::class.java).onScreenLoad(),
                 o.ofType(SearchMovieEvent::class.java).onSearchMovie(),
                 o.ofType(AddToHistoryEvent::class.java).onAddToHistory(),
                 o.ofType(RestoreFromHistoryEvent::class.java).onRestoreFromHistory()
@@ -75,8 +75,8 @@ class MovieSearchVM(
         }
     }
 
-    private fun Observable<Lce<out MSMovieResult>>.resultToViewState(): Observable<MSMovieViewState> {
-        return scan(MSMovieViewState()) { vs, result ->
+    private fun Observable<Lce<out MSMovieResult>>.resultToViewState(): Observable<ViewState> {
+        return scan(ViewState()) { vs, result ->
             when (result) {
                 is Lce.Content -> {
                     when (result.packet) {
@@ -86,9 +86,9 @@ class MovieSearchVM(
                         is SearchMovieResult -> {
                             val movie: MovieSearchResult = result.packet.movie
                             vs.copy(
-                                searchedMovieTitle = movie.title,
-                                searchedMovieRating = movie.ratingSummary,
-                                searchedMoviePoster = movie.posterUrl,
+                                movieTitle = movie.title,
+                                rating1 = movie.ratingSummary,
+                                moviePosterUrl = movie.posterUrl,
                                 searchedMovieReference = movie
                             )
                         }
@@ -106,9 +106,9 @@ class MovieSearchVM(
                 is Lce.Loading -> {
                     vs.copy(
                         searchBoxText = null,
-                        searchedMovieTitle = "Searching Movie...",
-                        searchedMovieRating = "",
-                        searchedMoviePoster = "",
+                        movieTitle = "Searching Movie...",
+                        rating1 = "",
+                        moviePosterUrl = "",
                         searchedMovieReference = null
                     )
                 }
@@ -117,7 +117,7 @@ class MovieSearchVM(
                     when (result.packet) {
                         is SearchMovieResult -> {
                             val movie: MovieSearchResult = result.packet.movie
-                            vs.copy(searchedMovieTitle = movie.errorMessage!!)
+                            vs.copy(movieTitle = movie.errorMessage!!)
                         }
                         else -> throw RuntimeException("Unexpected result LCE state")
                     }
@@ -135,7 +135,7 @@ class MovieSearchVM(
     // -----------------------------------------------------------------------------------
     // use cases
 
-    private fun Observable<ScreenLoadEvent>.onScreenLoad(): Observable<Lce<ScreenLoadResult>> {
+    private fun Observable<ViewResumeEvent>.onScreenLoad(): Observable<Lce<ScreenLoadResult>> {
         return map { Lce.Content(ScreenLoadResult) }
     }
 
@@ -188,24 +188,27 @@ class MovieSearchVM(
     }
 
 
+    data class ViewState(
+        val searchBoxText: String? = null,
+        val movieTitle: String = "",
+        val moviePosterUrl: String?,
+        val genres: String = "",
+        val plot: String = "",
+        val rating1: String = "",
+
+        val searchedMovieReference: MovieSearchResult? = null,
+        val searchHistoryList: List<MovieSearchResult> = emptyList()
+    )
+
 
 }
-
-data class MSMovieViewState(
-        val searchBoxText: String? = null,
-        val searchedMovieTitle: String = "",
-        val searchedMovieRating: String = "",
-        val searchedMoviePoster: String = "",
-        val searchedMovieReference: MovieSearchResult? = null,
-        val adapterList: List<MovieSearchResult> = emptyList()
-)
 
 sealed class MSMovieViewEffect {
     object AddedToHistoryToastEffect: MSMovieViewEffect()
 }
 
 sealed class MSMovieEvent {
-    object ScreenLoadEvent : MSMovieEvent()
+    object ViewResumeEvent : MSMovieEvent()
     data class SearchMovieEvent(val searchedMovieTitle: String = "") : MSMovieEvent()
     data class AddToHistoryEvent(val searchedMovie: MovieSearchResult) : MSMovieEvent()
     data class RestoreFromHistoryEvent(val movieFromHistory: MovieSearchResult) : MSMovieEvent()
