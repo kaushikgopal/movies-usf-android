@@ -39,3 +39,6 @@ For great movie recommendations, ping me [@kaushikgopal](https://twitter.com/kau
 
 I gave a talk at [MBLT}Dev 2018](https://twitter.com/mbltdev) on how I went about building this app. [Slides can be found here](https://speakerdeck.com/kaushikgopal/unidirectional-state-flow-patterns-a-refactoring-story).
 
+# iOS app
+
+I gave another talk at [Mobilization IX](https://twitter.com/mobilizationpl/status/1184008559157219328?s=20) showing how we can use the same concepts on iOS too and wrote [my first iOS app to demonstrate these concepts - You can check that out here](https://github.com/kaushikgopal/movies-usf-ios).
