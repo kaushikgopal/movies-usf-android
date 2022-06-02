@@ -111,7 +111,7 @@ class MSMainVm(
                 is Lce.Content -> {
                     when (result.packet) {
                         is ScreenLoadResult -> {
-                            vs.copy(searchBoxText = "load")
+                            vs.copy(searchBoxText = "")
                         }
                         is SearchMovieResult -> {
                             val movie: MSMovie = result.packet.movie
