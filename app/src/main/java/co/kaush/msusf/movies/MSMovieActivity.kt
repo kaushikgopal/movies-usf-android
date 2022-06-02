@@ -65,7 +65,6 @@ class MSMovieActivity : MSActivity() {
         disposables.add(
             viewModel
                 .viewState
-                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext { Timber.d("----- onNext VS $it") }
                 .subscribe(
@@ -76,7 +75,6 @@ class MSMovieActivity : MSActivity() {
         disposables.add(
             viewModel
                 .viewEffects
-                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                     ::trigger
@@ -103,7 +101,6 @@ class MSMovieActivity : MSActivity() {
                 addToHistoryEvents,
                 restoreFromHistoryEvents
             )
-                .subscribeOn(Schedulers.io())
                 .subscribe(
                     { viewModel.processInput(it) },
                     { Timber.e(it, "error processing input ") }
@@ -113,6 +110,7 @@ class MSMovieActivity : MSActivity() {
     override fun onDestroy() {
         super.onDestroy()
         disposables.clear()
+        uiDisposable?.dispose()
     }
 
     private fun trigger(effect: MSMovieViewEffect?) {
@@ -175,7 +173,7 @@ class MSMovieActivity : MSActivity() {
 
     override fun onPause() {
         super.onPause()
-        uiDisposable?.dispose()
+//        uiDisposable?.dispose()
     }
 
     private fun setupListView() {

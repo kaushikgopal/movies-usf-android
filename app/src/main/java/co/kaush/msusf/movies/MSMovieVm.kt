@@ -33,8 +33,20 @@ class MSMainVm(
 
     private val eventEmitter: PublishSubject<MSMovieEvent> = PublishSubject.create()
 
-    private var disposables = CompositeDisposable()
+    private lateinit var disposable: Disposable
 
+
+    /**
+     * It is unnecessary to do `subscribeOn(Schedulers.io())` as
+     * the chain executes on the thread that pushed an "event" into [processInput].
+     *
+     * **Example:**
+     * ```
+     * vm.viewState
+     *  .observeOn(AndroidSchedulers.mainThread())
+     *  .subscribe(::render, Timber::w)
+     * ```
+     */
     val viewState: Observable<MSMovieViewState>
     val viewEffects: Observable<MSMovieViewEffect>
 
@@ -44,15 +56,24 @@ class MSMainVm(
             .doOnNext { Timber.d("----- event (init) ${Thread.currentThread().name} $it ") }
             .eventToResult()
             .doOnNext { Timber.d("----- result ${Thread.currentThread().name} $it") }
+            // share the result stream otherwise it will get subscribed to multiple times
+            // in the following also block
             .share()
-            .subscribeOn(Schedulers.io())
             .also { result ->
-                Timber.d("------ also ${Thread.currentThread().name}")
+                // Timber.d("------ also ${Thread.currentThread().name}")
                 viewState = result
                     .resultToViewState()
-                    .doOnNext { Timber.d("----- vs ${Thread.currentThread().name} $it") }
+                     // if the viewState is identical there's little reason to remit
+                    .distinctUntilChanged()
+                    .doOnNext { Timber.d("----- vs $it") }
+
+                    // when a View rebinds to the ViewModel after rotation/config change
+                    // emit the last viewState of the stream on subscription
                     .replay(1)
-                    .autoConnect(1) { disposables.add(it) }
+
+                    // autoConnect makes sure the streams stays alive even when the UI disconnects
+                    // autoConnect(0) kicks off the stream without waiting for anyone to subscribe
+                    .autoConnect(0) {disposable = it }
 
                 viewEffects = result
                     .resultToViewEffect()
@@ -62,7 +83,7 @@ class MSMainVm(
 
     override fun onCleared() {
         super.onCleared()
-        disposables.dispose()
+        disposable.dispose()
     }
 
     fun processInput(event: MSMovieEvent) {
@@ -133,7 +154,6 @@ class MSMainVm(
                 }
             }
         }
-            .distinctUntilChanged()
     }
 
     private fun Observable<Lce<out MSMovieResult>>.resultToViewEffect(): Observable<MSMovieViewEffect> {
@@ -144,7 +164,6 @@ class MSMainVm(
     // -----------------------------------------------------------------------------------
     // use cases
     private fun Observable<ScreenLoadEvent>.onScreenLoad(): Observable<Lce<ScreenLoadResult>> {
-        Timber.e("onScreenLoad")
         return map { Lce.Content(ScreenLoadResult) }
     }
 
