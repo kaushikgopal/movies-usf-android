@@ -56,19 +56,24 @@ class MSMainVm(
             .doOnNext { Timber.d("----- event (init) ${Thread.currentThread().name} $it ") }
             .eventToResult()
             .doOnNext { Timber.d("----- result ${Thread.currentThread().name} $it") }
+
             // share the result stream otherwise it will get subscribed to multiple times
             // in the following also block
             .share()
+
             .also { result ->
                 // Timber.d("------ also ${Thread.currentThread().name}")
                 viewState = result
                     .resultToViewState()
-                     // if the viewState is identical there's little reason to remit
+
+                    // if the viewState is identical
+                    // there's little reason to re-emit the same view state
                     .distinctUntilChanged()
+
                     .doOnNext { Timber.d("----- vs $it") }
 
-                    // when a View rebinds to the ViewModel after rotation/config change
-                    // emit the last viewState of the stream on subscription
+                    // when a screen rebinds to the ViewModel after rotation/config change
+                    // emit the last known viewState to new screen subscriber
                     .replay(1)
 
                     // autoConnect makes sure the streams stays alive even when the UI disconnects
