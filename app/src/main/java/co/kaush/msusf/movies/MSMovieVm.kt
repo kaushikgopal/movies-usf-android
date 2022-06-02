@@ -67,8 +67,8 @@ class MSMainVm(
                     .distinctUntilChanged()
                     .doOnNext { Timber.d("----- vs $it") }
 
-                    // when a View rebinds to the ViewModel after rotation/config change
-                    // emit the last viewState of the stream on subscription
+                    // when a screen rebinds to the ViewModel after rotation/config change
+                    // emit the last known viewState to new screen subscriber
                     .replay(1)
 
                     // autoConnect makes sure the streams stays alive even when the UI disconnects
