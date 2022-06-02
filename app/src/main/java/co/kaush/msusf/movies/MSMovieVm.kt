@@ -35,21 +35,50 @@ class MSMainVm(
 
     private lateinit var disposable: Disposable
 
+
+    /**
+     * It is unnecessary to do `subscribeOn(Schedulers.io())` as
+     * the chain executes on the thread that pushed an "event" into [processInput].
+     *
+     * **Example:**
+     * ```
+     * vm.viewState
+     *  .observeOn(AndroidSchedulers.mainThread())
+     *  .subscribe(::render, Timber::w)
+     * ```
+     */
     val viewState: Observable<MSMovieViewState>
     val viewEffects: Observable<MSMovieViewEffect>
 
     init {
-            eventEmitter
-            .doOnNext { Timber.d("----- event $it") }
+        Timber.d("------ init ${Thread.currentThread().name}")
+        eventEmitter
+            .doOnNext { Timber.d("----- event (init) ${Thread.currentThread().name} $it ") }
             .eventToResult()
-            .doOnNext { Timber.d("----- result $it") }
+            .doOnNext { Timber.d("----- result ${Thread.currentThread().name} $it") }
+
+            // share the result stream otherwise it will get subscribed to multiple times
+            // in the following also block
             .share()
+
             .also { result ->
+                // Timber.d("------ also ${Thread.currentThread().name}")
                 viewState = result
                     .resultToViewState()
+
+                     // if the viewState is identical
+                    // there's little reason to re-emit the same view state
+                    .distinctUntilChanged()
+
                     .doOnNext { Timber.d("----- vs $it") }
+
+                    // when a screen rebinds to the ViewModel after rotation/config change
+                    // emit the last known viewState to new screen subscriber
                     .replay(1)
-                    .autoConnect(1) { disposable = it }
+
+                    // autoConnect makes sure the streams stays alive even when the UI disconnects
+                    // autoConnect(0) kicks off the stream without waiting for anyone to subscribe
+                    .autoConnect(0) {disposable = it }
 
                 viewEffects = result
                     .resultToViewEffect()
@@ -63,6 +92,7 @@ class MSMainVm(
     }
 
     fun processInput(event: MSMovieEvent) {
+        Timber.d("----- event (processInput) [${eventEmitter.hasObservers()}] ${Thread.currentThread().name} $event ")
         eventEmitter.onNext(event)
     }
 
@@ -129,7 +159,6 @@ class MSMainVm(
                 }
             }
         }
-            .distinctUntilChanged()
     }
 
     private fun Observable<Lce<out MSMovieResult>>.resultToViewEffect(): Observable<MSMovieViewEffect> {
