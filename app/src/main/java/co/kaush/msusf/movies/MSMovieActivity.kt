@@ -21,6 +21,7 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.activity_main.*
 import timber.log.Timber
@@ -64,6 +65,7 @@ class MSMovieActivity : MSActivity() {
         disposables.add(
             viewModel
                 .viewState
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext { Timber.d("----- onNext VS $it") }
                 .subscribe(
@@ -74,11 +76,38 @@ class MSMovieActivity : MSActivity() {
         disposables.add(
             viewModel
                 .viewEffects
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                     ::trigger
                 ) { Timber.w(it, "something went terribly wrong processing view effects") }
         )
+
+
+        val screenLoadEvents: Observable<ScreenLoadEvent> = Observable.just(ScreenLoadEvent)
+        val searchMovieEvents: Observable<SearchMovieEvent> = RxView.clicks(ms_mainScreen_searchBtn)
+            .map { SearchMovieEvent(ms_mainScreen_searchText.text.toString()) }
+        val addToHistoryEvents: Observable<AddToHistoryEvent> = RxView.clicks(ms_mainScreen_poster)
+            .map {
+                ms_mainScreen_poster.growShrink()
+                AddToHistoryEvent(ms_mainScreen_poster.getTag(R.id.TAG_MOVIE_DATA) as MSMovie)
+            }
+        val restoreFromHistoryEvents: Observable<RestoreFromHistoryEvent> = historyItemClick
+            .map { RestoreFromHistoryEvent(it) }
+
+
+        uiDisposable =
+            Observable.merge(
+                screenLoadEvents,
+                searchMovieEvents,
+                addToHistoryEvents,
+                restoreFromHistoryEvents
+            )
+                .subscribeOn(Schedulers.io())
+                .subscribe(
+                    { viewModel.processInput(it) },
+                    { Timber.e(it, "error processing input ") }
+                )
     }
 
     override fun onDestroy() {
@@ -120,28 +149,28 @@ class MSMovieActivity : MSActivity() {
     override fun onResume() {
         super.onResume()
 
-        val screenLoadEvents: Observable<ScreenLoadEvent> = Observable.just(ScreenLoadEvent)
-        val searchMovieEvents: Observable<SearchMovieEvent> = RxView.clicks(ms_mainScreen_searchBtn)
-            .map { SearchMovieEvent(ms_mainScreen_searchText.text.toString()) }
-        val addToHistoryEvents: Observable<AddToHistoryEvent> = RxView.clicks(ms_mainScreen_poster)
-            .map {
-                ms_mainScreen_poster.growShrink()
-                AddToHistoryEvent(ms_mainScreen_poster.getTag(R.id.TAG_MOVIE_DATA) as MSMovie)
-            }
-        val restoreFromHistoryEvents: Observable<RestoreFromHistoryEvent> = historyItemClick
-            .map { RestoreFromHistoryEvent(it) }
-
-        uiDisposable =
-            Observable.merge(
-                screenLoadEvents,
-                searchMovieEvents,
-                addToHistoryEvents,
-                restoreFromHistoryEvents
-            )
-                .subscribe(
-                    { viewModel.processInput(it) },
-                    { Timber.e(it, "error processing input ") }
-                )
+//        val screenLoadEvents: Observable<ScreenLoadEvent> = Observable.just(ScreenLoadEvent)
+//        val searchMovieEvents: Observable<SearchMovieEvent> = RxView.clicks(ms_mainScreen_searchBtn)
+//            .map { SearchMovieEvent(ms_mainScreen_searchText.text.toString()) }
+//        val addToHistoryEvents: Observable<AddToHistoryEvent> = RxView.clicks(ms_mainScreen_poster)
+//            .map {
+//                ms_mainScreen_poster.growShrink()
+//                AddToHistoryEvent(ms_mainScreen_poster.getTag(R.id.TAG_MOVIE_DATA) as MSMovie)
+//            }
+//        val restoreFromHistoryEvents: Observable<RestoreFromHistoryEvent> = historyItemClick
+//            .map { RestoreFromHistoryEvent(it) }
+//
+//        uiDisposable =
+//            Observable.merge(
+//                screenLoadEvents,
+//                searchMovieEvents,
+//                addToHistoryEvents,
+//                restoreFromHistoryEvents
+//            )
+//                .subscribe(
+//                    { viewModel.processInput(it) },
+//                    { Timber.e(it, "error processing input ") }
+//                )
     }
 
     override fun onPause() {

@@ -33,23 +33,26 @@ class MSMainVm(
 
     private val eventEmitter: PublishSubject<MSMovieEvent> = PublishSubject.create()
 
-    private lateinit var disposable: Disposable
+    private var disposables = CompositeDisposable()
 
     val viewState: Observable<MSMovieViewState>
     val viewEffects: Observable<MSMovieViewEffect>
 
     init {
-            eventEmitter
-            .doOnNext { Timber.d("----- event $it") }
+        Timber.d("------ init ${Thread.currentThread().name}")
+        eventEmitter
+            .doOnNext { Timber.d("----- event (init) ${Thread.currentThread().name} $it ") }
             .eventToResult()
-            .doOnNext { Timber.d("----- result $it") }
+            .doOnNext { Timber.d("----- result ${Thread.currentThread().name} $it") }
             .share()
+            .subscribeOn(Schedulers.io())
             .also { result ->
+                Timber.d("------ also ${Thread.currentThread().name}")
                 viewState = result
                     .resultToViewState()
-                    .doOnNext { Timber.d("----- vs $it") }
+                    .doOnNext { Timber.d("----- vs ${Thread.currentThread().name} $it") }
                     .replay(1)
-                    .autoConnect(1) { disposable = it }
+                    .autoConnect(1) { disposables.add(it) }
 
                 viewEffects = result
                     .resultToViewEffect()
@@ -59,10 +62,11 @@ class MSMainVm(
 
     override fun onCleared() {
         super.onCleared()
-        disposable.dispose()
+        disposables.dispose()
     }
 
     fun processInput(event: MSMovieEvent) {
+        Timber.d("----- event (processInput) [${eventEmitter.hasObservers()}] ${Thread.currentThread().name} $event ")
         eventEmitter.onNext(event)
     }
 
@@ -86,7 +90,7 @@ class MSMainVm(
                 is Lce.Content -> {
                     when (result.packet) {
                         is ScreenLoadResult -> {
-                            vs.copy(searchBoxText = "")
+                            vs.copy(searchBoxText = "load")
                         }
                         is SearchMovieResult -> {
                             val movie: MSMovie = result.packet.movie
@@ -140,6 +144,7 @@ class MSMainVm(
     // -----------------------------------------------------------------------------------
     // use cases
     private fun Observable<ScreenLoadEvent>.onScreenLoad(): Observable<Lce<ScreenLoadResult>> {
+        Timber.e("onScreenLoad")
         return map { Lce.Content(ScreenLoadResult) }
     }
 
