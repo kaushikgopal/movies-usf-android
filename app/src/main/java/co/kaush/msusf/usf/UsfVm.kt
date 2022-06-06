@@ -36,5 +36,5 @@ interface UsfVm<Event : Any, Result, ViewState : Any, ViewEffect : Any> {
 
     fun viewEffect(): Observable<ViewEffect>
 
-    fun clear()
+    fun clear() = disposables.clear()
 }

@@ -13,11 +13,10 @@ class UsfVmImpl<E: Any, R: Any, VS: Any, VE: Any>(
 ) : UsfVm<E, R, VS, VE> {
 
     override val eventSink: PublishSubject<E> = PublishSubject.create()
+    override val disposables: CompositeDisposable = CompositeDisposable()
 
     private val viewStateSink: Observable<VS>
     private val viewEffectSink: Observable<VE>
-
-    override val disposables: CompositeDisposable = CompositeDisposable()
 
     init {
         Timber.d("------ init ${Thread.currentThread().name}")
@@ -61,6 +60,4 @@ class UsfVmImpl<E: Any, R: Any, VS: Any, VE: Any>(
     override fun viewState(): Observable<VS> = viewStateSink
 
     override fun viewEffect(): Observable<VE> = viewEffectSink
-
-    override fun clear() = disposables.clear()
 }
