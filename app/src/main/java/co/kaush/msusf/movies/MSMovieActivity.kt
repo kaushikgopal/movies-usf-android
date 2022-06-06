@@ -64,7 +64,7 @@ class MSMovieActivity : MSActivity() {
 
         disposables.add(
             viewModel
-                .viewState
+                .viewState()
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext { Timber.d("----- onNext VS $it") }
                 .subscribe(
@@ -74,7 +74,7 @@ class MSMovieActivity : MSActivity() {
 
         disposables.add(
             viewModel
-                .viewEffects
+                .viewEffect()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                     ::trigger
