@@ -66,7 +66,7 @@ class MSMainVm(
                 viewState = result
                     .resultToViewState()
 
-                    // if the viewState is identical
+                     // if the viewState is identical
                     // there's little reason to re-emit the same view state
                     .distinctUntilChanged()
 
@@ -116,7 +116,7 @@ class MSMainVm(
                 is Lce.Content -> {
                     when (result.packet) {
                         is ScreenLoadResult -> {
-                            vs.copy(searchBoxText = "load")
+                            vs.copy(searchBoxText = "")
                         }
                         is SearchMovieResult -> {
                             val movie: MSMovie = result.packet.movie
