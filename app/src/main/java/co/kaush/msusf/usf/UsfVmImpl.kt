@@ -10,6 +10,11 @@ class UsfVmImpl<E: Any, R: Any, VS: Any, VE: Any>(
     eventToResultTransformer: ObservableTransformer<E, R>,
     resultToViewStateTransformer: ObservableTransformer<R, VS>,
     resultToViewEffectTransformer: ObservableTransformer<R, VE>,
+    logger: UsfVmLogger = object : UsfVmLogger {
+        override fun debug(message: String) = Timber.d(message)
+        override fun warning(message: String) = Timber.w(message)
+        override fun error(error: Throwable, message: String)  = Timber.e(error, message)
+    }
 ) : UsfVm<E, R, VS, VE> {
 
     override val eventSink: PublishSubject<E> = PublishSubject.create()
@@ -19,18 +24,18 @@ class UsfVmImpl<E: Any, R: Any, VS: Any, VE: Any>(
     private val viewEffectSink: Observable<VE>
 
     init {
-        Timber.d("------ init ${Thread.currentThread().name}")
+        logger.debug("------ init ${Thread.currentThread().name}")
 
         eventSink
             .compose(eventToResultTransformer)
-            .doOnNext { Timber.d("----- result ${Thread.currentThread().name} $it") }
+            .doOnNext { logger.debug("----- result ${Thread.currentThread().name} $it") }
 
             // share the result stream otherwise it will get subscribed to multiple times
             // in the following also block
             .share()
 
             .also { result ->
-                 Timber.d("------ also ${Thread.currentThread().name}")
+                 logger.debug("------ also ${Thread.currentThread().name}")
                 viewStateSink = result
                     .compose(resultToViewStateTransformer)
 
@@ -39,7 +44,7 @@ class UsfVmImpl<E: Any, R: Any, VS: Any, VE: Any>(
                     // there's little reason to re-emit the same view state
                     .distinctUntilChanged()
 
-                    .doOnNext { Timber.d("----- vs $it") }
+                    .doOnNext { logger.debug("----- vs $it") }
 
                     // when a screen rebinds to the ViewModel after rotation/config change
                     // emit the last known viewState to new screen subscriber
@@ -53,11 +58,17 @@ class UsfVmImpl<E: Any, R: Any, VS: Any, VE: Any>(
 
                 viewEffectSink = result
                     .compose(resultToViewEffectTransformer)
-                    .doOnNext { Timber.d("----- ve $it") }
+                    .doOnNext { logger.debug("----- ve $it") }
             }
     }
 
     override fun viewState(): Observable<VS> = viewStateSink
 
     override fun viewEffect(): Observable<VE> = viewEffectSink
+
+    interface UsfVmLogger {
+        fun debug(message: String)
+        fun warning(message: String)
+        fun error(error: Throwable, message: String)
+    }
 }
