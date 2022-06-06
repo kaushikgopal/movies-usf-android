@@ -5,7 +5,7 @@
 ext.deps = [:]
 def versions = [:]
 
-versions.android_gradle_plugin = '3.5.1'
+versions.android_gradle_plugin = '7.2.1'
 versions.min_sdk = 21
 versions.target_sdk = 28
 // Preferably keep this in sync
@@ -50,15 +50,9 @@ versions.instacart_shared_lib = "25618a6"
 versions.javafmt = "0.1.4"
 versions.jackson = "2.8.9"
 versions.junit = "4.12"
-versions.kotlin = "1.3.21"
+versions.kotlin = "1.6.21"
 versions.leakcanary = "1.6.3"
 versions.lottie = "2.8.0"
-versions.mapbox = "6.5.0"
-versions.mapbox_services = "3.4.1"
-versions.mapbox_directions = "1.0.0"
-versions.mapbox_navigation = "0.20.0"
-versions.mapbox_plugin_geojson = "0.1.0"
-versions.mapbox_plugin_location_layer = "0.10.0"
 versions.mockito = "2.23.0"
 versions.mockito_kotlin = "1.6.0"
 versions.dexopener = "2.0.1"
@@ -308,6 +302,5 @@ static def addRepos(RepositoryHandler handler) {
     handler.maven { url "https://jitpack.io" }
     handler.maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
     handler.mavenLocal()
-    handler.maven { url 'https://mapbox.bintray.com/mapbox' }
 }
 ext.addRepos = this.&addRepos
