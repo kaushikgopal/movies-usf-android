@@ -80,6 +80,7 @@ class MSMainVmImpl(
 
     private fun Observable<SearchMovieEvent>.onSearchMovie(): Observable<SearchMovieResult> {
         return switchMap { searchMovieEvent ->
+
             movieRepo.searchMovie(searchMovieEvent.searchedMovieTitle)
                 .subscribeOn(Schedulers.io())
                 .map {
