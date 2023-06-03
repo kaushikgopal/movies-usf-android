@@ -1,19 +1,20 @@
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
-apply plugin: 'kotlin-kapt'
-apply plugin: 'kotlin-allopen'
-
-
-allOpen {
-    annotation 'co.kaush.msusf.movies.OpenClass'
-}
-
-
 buildscript {
     repositories {
         addRepos(repositories)
     }
+}
+
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'kotlin-android-extensions'
+    id 'kotlin-kapt'
+    id 'kotlin-allopen'
+    id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
+}
+
+allOpen {
+    annotation 'co.kaush.msusf.movies.OpenClass'
 }
 
 androidExtensions {
@@ -33,16 +34,18 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+
+    buildFeatures {
+        buildConfig true
+    }
+
     buildTypes {
-        debug {
-            buildConfigField 'String', "OMDB_API_KEY", omdb_apikey
-        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            buildConfigField 'String', "OMDB_API_KEY", omdb_apikey
         }
     }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8

@@ -13,7 +13,7 @@ I wanted to achieve the benefits of this pattern without necessarily introducing
 (aside from Rx). How would one familiar with an MVVM model today step to a world where all data flows in a single direction? I hope to demo those concepts with this app.
 
 
-The app in itself is a simple movie searching app. Clicking the movie result populates a history list. While this is not an extremely complex app, it isn't a silly Hello World one either, so the hope is that it'll cover regular use cases for a basic application. 
+The app in itself is a simple movie searching app. Clicking the movie result populates a history list. While this is not an extremely complex app, it isn't a silly Hello World one either, so the hope is that it'll cover regular use cases for a basic application.
 
 I've also started meaninful test cases in the repo.
 
@@ -25,15 +25,12 @@ _We use the wonderful [OMDB api](http://www.omdbapi.com) to fetch movie informat
 There are quotas on this api, so please don't use mine :)
 
 1. Get an [api key for OMDB here](http://www.omdbapi.com/apikey.aspx)
-2. Run this in a terminal like application
+2. Add it to you local.properties file (which shouldn't be checked in to a VCS) like so:
 
 ```
-touch $HOME/.gradle/gradle.properties
-echo "omdb_apikey=\"<API_KEY_GOES_HERE>\"" >> $HOME/.gradle/gradle.properties
+# local.properties
+OMDB_API_KEY="<API_KEY_GOES_HERE>"
 ```
-
-You can read [this post for instructions](https://varunbarad.com/android/2018/02/01/hiding-api-keys-from-your-android-repository.html) on this private api
-setting up process.
 
 For great movie recommendations, ping me [@kaushikgopal](https://twitter.com/kaushikgopal) (seriously, I watch a lot of movies).
 
