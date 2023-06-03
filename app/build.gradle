@@ -21,6 +21,8 @@ androidExtensions {
 }
 
 android {
+    namespace "co.kaush.msusf.movies"
+
     compileSdkVersion build_versions.build_sdk
 
     defaultConfig {
