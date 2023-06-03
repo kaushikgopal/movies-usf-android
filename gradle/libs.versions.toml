@@ -34,6 +34,7 @@ rxBindings = "2.2.0"
 rxBindingsViewpager = "3.0.0-alpha2"
 rxIdler = "0.9.1"
 rxJava = "2.2.2"
+secretsGradlePlugin = "2.0.1"
 spotless = "6.15.0"
 timber = "4.7.1"
 truth = "0.42"
@@ -43,9 +44,12 @@ android-application = { id = "com.android.application", version.ref = "androidGr
 android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kotlin =         { id = "org.jetbrains.kotlin.jvm",             version.ref = "kotlin" }  # for jvm only
+kotlin-allopen = { id = "org.jetbrains.kotlin.plugin.allopen",  version.ref = "kotlin" }  #
 kotlin-android = { id = "org.jetbrains.kotlin.android",         version.ref = "kotlin" }  # for andorid projects
+kotlin-kapt =    { id = "org.jetbrains.kotlin.kapt",            version.ref = "kotlin" }  # for annotation processing
 kotlin-kmp =     { id = "org.jetbrains.kotlin.multiplatform",   version.ref = "kotlin" }  # for multiplatform projects
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
+secrets-gradle-plugin = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", version.ref = "secretsGradlePlugin" }
 
 [libraries]
 
