@@ -1,6 +1,5 @@
 package co.kaush.msusf.movies
 
-import co.kaush.msusf.BuildConfig
 import com.google.gson.annotations.SerializedName
 import io.reactivex.Observable
 import retrofit2.Response
@@ -35,7 +34,6 @@ data class MSRating(
 ) {
 
     val summary: String get() = "$rating (${sourceShortName(source)})"
-
     private fun sourceShortName(ratingSource: String): String {
         return when {
             ratingSource.contains("Internet Movie Database") -> "IMDB"

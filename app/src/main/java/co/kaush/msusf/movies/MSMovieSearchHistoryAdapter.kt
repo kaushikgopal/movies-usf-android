@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
-import co.kaush.msusf.R
 import com.squareup.picasso.Picasso
 
 class MSMovieSearchHistoryAdapter(
