@@ -1,0 +1,94 @@
+[versions]
+compileSdk = "33"
+minSdk = "21"
+targetSdk = "33"
+
+trueTimeVersionCode = "12"
+trueTime = "4.0.0.alpha"
+trueTimeRx = "3.5"
+
+activityCompose = "1.7.2"
+androidGradlePlugin = "8.0.2"
+androidxAppCompat = "1.1.0"
+androidxLifecycle = "2.0.0"
+androidxTest = "1.1.1"
+composeBom = "2023.04.01" # https://developer.android.com/jetpack/compose/bom/bom-mapping
+composeCompiler = "1.4.2" # https://developer.android.com/jetpack/androidx/releases/compose-kotlin#kts
+constraintlayout = "2.1.4"
+dagger = "2.38.1"
+desugarJdk = "1.1.5"
+espresso = "3.1.1"
+junit = "4.12"
+kotlin = "1.6.21"
+kotlinInject = "0.6.1"
+kotlinxCoroutines = "1.6.4"
+ksp = "1.8.10-1.0.9"
+leakCanary = "1.6.3"
+mockito = "2.23.0"
+mockitoKotlin = "1.6.0"
+okhttp = "3.9.0"
+picasso = "2.71828"
+retrofit = "2.3.0"
+rxAndroid = "2.1.0"
+rxBindings = "2.2.0"
+rxBindingsViewpager = "3.0.0-alpha2"
+rxIdler = "0.9.1"
+rxJava = "2.2.2"
+spotless = "6.15.0"
+timber = "4.7.1"
+truth = "0.42"
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
+android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+kotlin =         { id = "org.jetbrains.kotlin.jvm",             version.ref = "kotlin" }  # for jvm only
+kotlin-android = { id = "org.jetbrains.kotlin.android",         version.ref = "kotlin" }  # for andorid projects
+kotlin-kmp =     { id = "org.jetbrains.kotlin.multiplatform",   version.ref = "kotlin" }  # for multiplatform projects
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
+
+[libraries]
+
+truetime = { group = "com.github.instacart", name = "truetime-android", version.ref = "trueTime" }
+truetime-rx = { group = "com.github.instacart.truetime-android", name = "library-extension-rx", version.ref = "trueTimeRx" }
+
+activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
+appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidxAppCompat" }
+atsl-runner = { group = "androidx.test", name = "runner", version.ref = "androidxTest" }
+compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
+compose-material3 = { module = "androidx.compose.material3:material3" }
+compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
+compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
+compose-ui-ui = { module = "androidx.compose.ui:ui" }
+constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+dagger =          { group = "com.google.dagger", name = "dagger", version.ref = "dagger" }
+dagger-compiler = { group = "com.google.dagger", name = "dagger-compiler", version.ref = "dagger" }
+desugar-jdk-lib = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "desugarJdk" }
+espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso" }
+google-truth = { group = "com.google.truth", name = "truth", version.ref = "truth" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+kotlin-inject-compiler = { group = "me.tatarka.inject", name = "kotlin-inject-compiler-ksp", version.ref = "kotlinInject" }
+kotlin-inject-runtime = { group = "me.tatarka.inject", name = "kotlin-inject-runtime", version.ref = "kotlinInject" }
+kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib-jdk8", version.ref = "kotlin" }
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
+leakcanary = { group = "com.squareup.leakcanary", name = "leakcanary-android", version.ref = "leakCanary" }
+leakcanary-noop = { group = "com.squareup.leakcanary", name = "leakcanary-android-no-op", version.ref = "leakCanary" }
+lifecycle-compiler = { group = "androidx.lifecycle", name = "lifecycle-compiler", version.ref = "androidxLifecycle" }
+lifecycle-extensions = { group = "androidx.lifecycle", name = "lifecycle-extensions", version.ref = "androidxLifecycle" }
+lifecycle-runtime = { group = "androidx.lifecycle", name = "lifecycle-runtime", version.ref = "androidxLifecycle" }
+lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "androidxLifecycle" }
+mockito-core = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }
+mockito-kotlin = { group = "com.nhaarman", name = "mockito-kotlin", version.ref = "mockitoKotlin" }
+okhttp-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
+picasso = { group = "com.squareup.picasso", name = "picasso", version.ref = "picasso" }
+recyclerview = { group = "androidx.recyclerview", name = "recyclerview", version.ref = "androidxAppCompat" }
+retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+retrofit-adapter_rxjava = { group = "com.squareup.retrofit2", name = "adapter-rxjava2", version.ref = "retrofit" }
+retrofit-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
+retrofit-mock = { group = "com.squareup.retrofit2", name = "retrofit-mock", version.ref = "retrofit" }
+rx-android = { group = "io.reactivex.rxjava2", name = "rxandroid", version.ref = "rxAndroid" }
+rx-bindings = { group = "com.jakewharton.rxbinding2", name = "rxbinding", version.ref = "rxBindings" }
+rx-java = { group = "io.reactivex.rxjava2", name = "rxjava", version.ref = "rxJava" }
+rx-replayingShare = { group = "com.jakewharton.rx2", name = "replaying-share", version.ref = "rxAndroid" }
+swiperefreshlayout = { group = "androidx.swiperefreshlayout", name = "swiperefreshlayout", version.ref = "androidxAppCompat" }
+timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
