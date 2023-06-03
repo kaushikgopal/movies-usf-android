@@ -17,4 +17,7 @@ dependencyResolutionManagement {
     mavenLocal()
   }
 }
+
+rootProject.name = "Movies USF Android"
+
 include(":app")
