@@ -1,9 +1,3 @@
-buildscript {
-    repositories {
-        addRepos(repositories)
-    }
-}
-
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
