@@ -1,7 +1,7 @@
 [versions]
-compileSdk = "33"
+compileSdk = "28"
 minSdk = "21"
-targetSdk = "33"
+targetSdk = "28"
 
 trueTimeVersionCode = "12"
 trueTime = "4.0.0.alpha"

@@ -24,14 +24,17 @@ androidExtensions {
 android {
     namespace "co.kaush.msusf.movies"
 
-    compileSdkVersion build_versions.build_sdk
+    compileSdkVersion libs.versions.compileSdk.get().toInteger()
 
     defaultConfig {
         applicationId "co.kaush.msusf"
-        minSdkVersion build_versions.min_sdk
-        targetSdkVersion build_versions.target_sdk
+
+        minSdkVersion libs.versions.minSdk.get()
+        targetSdkVersion libs.versions.targetSdk.get()
+
         versionCode 1
         versionName "1.0"
+
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
