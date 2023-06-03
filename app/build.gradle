@@ -54,34 +54,36 @@ android {
 
 dependencies {
 
-    implementation deps.constraint_layout
-    implementation deps.dagger.runtime
-    kapt deps.dagger.compiler
-    implementation deps.picasso
-    implementation deps.kotlin.stdlib
-    implementation deps.lifecycle.extensions
-    implementation deps.lifecycle.runtime
-    kapt deps.lifecycle.compiler
-    implementation deps.okhttp.logging_interceptor
-    implementation deps.retrofit.adapter_rxjava
-    implementation deps.retrofit.gson
-    implementation deps.retrofit.runtime
-    implementation deps.rx.android
-    implementation deps.rx.bindings
-    implementation deps.rx.java
-    implementation deps.rx.replaying_share
-    implementation deps.androidx.app_compat
-    implementation deps.androidx.recyclerview
-    implementation deps.timber
+    kapt libs.dagger.compiler
+    kapt libs.lifecycle.compiler
 
-    debugImplementation deps.leakcanary.lib
-    releaseImplementation deps.leakcanary.no_op
+    implementation libs.kotlin.stdlib
+    implementation libs.dagger
+    implementation libs.constraintlayout
+    implementation libs.picasso
+    implementation libs.lifecycle.extensions
+    implementation libs.lifecycle.runtime
+    implementation libs.okhttp.logging.interceptor
+    implementation libs.retrofit.adapter.rxjava
+    implementation libs.retrofit.gson
+    implementation libs.retrofit
+    implementation libs.rx.android
+    implementation libs.rx.bindings
+    implementation libs.rx.java
+    implementation libs.rx.replayingShare
+    implementation libs.swiperefreshlayout
+    implementation libs.appcompat
+    implementation libs.recyclerview
+    implementation libs.timber
 
-    testImplementation deps.google.truth
-    testImplementation deps.junit
-    testImplementation deps.mockito.core
-    testImplementation deps.mockito.kotlin
+    debugImplementation libs.leakcanary
+    releaseImplementation libs.leakcanary.noop
 
-    androidTestImplementation deps.atsl.runner
-    androidTestImplementation deps.espresso.core
+    testImplementation libs.google.truth
+    testImplementation libs.junit
+    testImplementation libs.mockito.core
+    testImplementation libs.mockito.kotlin
+
+    androidTestImplementation libs.atsl.runner
+    androidTestImplementation libs.espresso.core
 }
