@@ -4,8 +4,6 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.secrets.gradle.plugin)
     alias(libs.plugins.kotlin.allopen)
-
-    id("kotlin-android-extensions")
 }
 
 allOpen {
@@ -31,6 +29,7 @@ android {
 
     buildFeatures {
         buildConfig = true
+        viewBinding = true
     }
 
     buildTypes {

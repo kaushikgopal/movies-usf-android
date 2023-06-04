@@ -14,6 +14,7 @@ import co.kaush.msusf.movies.MSMovieEvent.AddToHistoryEvent
 import co.kaush.msusf.movies.MSMovieEvent.RestoreFromHistoryEvent
 import co.kaush.msusf.movies.MSMovieEvent.ScreenLoadEvent
 import co.kaush.msusf.movies.MSMovieEvent.SearchMovieEvent
+import co.kaush.msusf.movies.databinding.ActivityMainBinding
 import com.jakewharton.rxbinding2.view.RxView
 import com.squareup.picasso.Picasso
 import io.reactivex.Observable
@@ -21,7 +22,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.subjects.PublishSubject
-import kotlinx.android.synthetic.main.activity_main.*
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -32,6 +32,7 @@ class MSMovieActivity : MSActivity() {
 
     private lateinit var viewModel: MSMainVm
     private lateinit var listAdapter: MSMovieSearchHistoryAdapter
+    private lateinit var binding: ActivityMainBinding
 
     private var uiDisposable: Disposable? = null
     private var disposables: CompositeDisposable = CompositeDisposable()
@@ -51,7 +52,8 @@ class MSMovieActivity : MSActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         setupListView()
 
@@ -96,10 +98,10 @@ class MSMovieActivity : MSActivity() {
 
     private fun render(vs: MSMovieViewState) {
         vs.searchBoxText?.let {
-            ms_mainScreen_searchText.setText(it)
+            binding.msMainScreenSearchText.setText(it)
         }
-        ms_mainScreen_title.text = vs.searchedMovieTitle
-        ms_mainScreen_rating.text = vs.searchedMovieRating
+        binding.msMainScreenTitle.text = vs.searchedMovieTitle
+        binding.msMainScreenRating.text = vs.searchedMovieRating
 
         vs.searchedMoviePoster
             .takeIf { it.isNotBlank() }
@@ -107,11 +109,11 @@ class MSMovieActivity : MSActivity() {
                 Picasso.get()
                     .load(vs.searchedMoviePoster)
                     .placeholder(spinner)
-                    .into(ms_mainScreen_poster)
+                    .into(binding.msMainScreenPoster)
 
-                ms_mainScreen_poster.setTag(R.id.TAG_MOVIE_DATA, vs.searchedMovieReference)
+                binding.msMainScreenPoster.setTag(R.id.TAG_MOVIE_DATA, vs.searchedMovieReference)
             }
-            ?: run { ms_mainScreen_poster.setImageResource(0) }
+            ?: run { binding.msMainScreenPoster.setImageResource(0) }
 
         listAdapter.submitList(vs.adapterList)
     }
@@ -120,12 +122,12 @@ class MSMovieActivity : MSActivity() {
         super.onResume()
 
         val screenLoadEvents: Observable<ScreenLoadEvent> = Observable.just(ScreenLoadEvent)
-        val searchMovieEvents: Observable<SearchMovieEvent> = RxView.clicks(ms_mainScreen_searchBtn)
-            .map { SearchMovieEvent(ms_mainScreen_searchText.text.toString()) }
-        val addToHistoryEvents: Observable<AddToHistoryEvent> = RxView.clicks(ms_mainScreen_poster)
+        val searchMovieEvents: Observable<SearchMovieEvent> = RxView.clicks(binding.msMainScreenSearchBtn)
+            .map { SearchMovieEvent(binding.msMainScreenSearchText.text.toString()) }
+        val addToHistoryEvents: Observable<AddToHistoryEvent> = RxView.clicks(binding.msMainScreenPoster)
             .map {
-                ms_mainScreen_poster.growShrink()
-                AddToHistoryEvent(ms_mainScreen_poster.getTag(R.id.TAG_MOVIE_DATA) as MSMovie)
+                binding.msMainScreenPoster.growShrink()
+                AddToHistoryEvent(binding.msMainScreenPoster.getTag(R.id.TAG_MOVIE_DATA) as MSMovie)
             }
         val restoreFromHistoryEvents: Observable<RestoreFromHistoryEvent> = historyItemClick
             .map { RestoreFromHistoryEvent(it) }
@@ -150,15 +152,15 @@ class MSMovieActivity : MSActivity() {
 
     private fun setupListView() {
         val layoutManager = LinearLayoutManager(this, HORIZONTAL, false)
-        ms_mainScreen_searchHistory.layoutManager = layoutManager
+        binding.msMainScreenSearchHistory.layoutManager = layoutManager
 
         val dividerItemDecoration = DividerItemDecoration(this, HORIZONTAL)
         dividerItemDecoration.setDrawable(
             ContextCompat.getDrawable(this, R.drawable.ms_list_divider_space)!!
         )
-        ms_mainScreen_searchHistory.addItemDecoration(dividerItemDecoration)
+        binding.msMainScreenSearchHistory.addItemDecoration(dividerItemDecoration)
 
         listAdapter = MSMovieSearchHistoryAdapter { historyItemClick.onNext(it) }
-        ms_mainScreen_searchHistory.adapter = listAdapter
+        binding.msMainScreenSearchHistory.adapter = listAdapter
     }
 }
