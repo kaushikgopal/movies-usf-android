@@ -33,7 +33,7 @@ class MSMovieSearchDiffCallback : DiffUtil.ItemCallback<MSMovie>() {
 
     override fun areContentsTheSame(oldItem: MSMovie, newItem: MSMovie): Boolean {
         // this is just lazy!
-        return oldItem?.posterUrl.equals(newItem?.posterUrl, ignoreCase = true)
+        return oldItem.posterUrl.equals(newItem.posterUrl, ignoreCase = true)
     }
 }
 
