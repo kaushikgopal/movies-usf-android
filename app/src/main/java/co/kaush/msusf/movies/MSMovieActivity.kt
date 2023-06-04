@@ -3,7 +3,7 @@ package co.kaush.msusf.movies
 import android.os.Bundle
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL
@@ -57,7 +57,7 @@ class MSMovieActivity : MSActivity() {
 
         setupListView()
 
-        viewModel = ViewModelProviders.of(
+        viewModel = ViewModelProvider(
             this,
             MSMainVmFactory(app, movieRepo)
         ).get(MSMainVm::class.java)
