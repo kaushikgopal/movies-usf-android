@@ -1,7 +1,7 @@
 [versions]
-compileSdk = "28"
+compileSdk = "33"
 minSdk = "21"
-targetSdk = "28"
+targetSdk = "33"
 
 trueTimeVersionCode = "12"
 trueTime = "4.0.0.alpha"
@@ -10,7 +10,7 @@ trueTimeRx = "3.5"
 activityCompose = "1.7.2"
 androidGradlePlugin = "8.0.2"
 androidxAppCompat = "1.1.0"
-androidxLifecycle = "2.0.0"
+androidxLifecycle = "2.4.0"
 androidxTest = "1.1.1"
 composeBom = "2023.04.01" # https://developer.android.com/jetpack/compose/bom/bom-mapping
 composeCompiler = "1.4.2" # https://developer.android.com/jetpack/androidx/releases/compose-kotlin#kts
@@ -23,7 +23,7 @@ kotlin = "1.6.21"
 kotlinInject = "0.6.1"
 kotlinxCoroutines = "1.6.4"
 ksp = "1.8.10-1.0.9"
-leakCanary = "1.6.3"
+leakCanary = "2.11"
 mockito = "2.23.0"
 mockitoKotlin = "1.6.0"
 okhttp = "3.9.0"
