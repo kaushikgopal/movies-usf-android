@@ -9,19 +9,21 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import co.kaush.msusf.MSActivity
-import co.kaush.msusf.movies.MSMainVm.MSMainVmFactory
 import co.kaush.msusf.movies.MSMovieEvent.AddToHistoryEvent
 import co.kaush.msusf.movies.MSMovieEvent.RestoreFromHistoryEvent
 import co.kaush.msusf.movies.MSMovieEvent.ScreenLoadEvent
 import co.kaush.msusf.movies.MSMovieEvent.SearchMovieEvent
+import co.kaush.msusf.movies.MSMovieVm.MSMovieVmFactory
 import co.kaush.msusf.movies.databinding.ActivityMainBinding
 import com.jakewharton.rxbinding2.view.RxView
 import com.squareup.picasso.Picasso
 import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.subjects.PublishSubject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -30,7 +32,7 @@ class MSMovieActivity : MSActivity() {
     @Inject
     lateinit var movieRepo: MSMovieRepository
 
-    private lateinit var viewModel: MSMainVm
+    private lateinit var viewModel: MSMovieVm
     private lateinit var listAdapter: MSMovieSearchHistoryAdapter
     private lateinit var binding: ActivityMainBinding
 
@@ -59,28 +61,14 @@ class MSMovieActivity : MSActivity() {
 
         viewModel = ViewModelProvider(
             this,
-            MSMainVmFactory(app, movieRepo)
-        ).get(MSMainVm::class.java)
+            MSMovieVmFactory(app, movieRepo),
+        )[MSMovieVm::class.java]
 
-        disposables.add(
-            viewModel
-                .viewState()
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext { Timber.d("----- onNext VS $it") }
-                .subscribe(
-                    ::render
-                ) { Timber.w(it, "something went terribly wrong processing view state") }
-        )
-
-        disposables.add(
-            viewModel
-                .viewEffect()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                    ::trigger
-                ) { Timber.w(it, "something went terribly wrong processing view effects") }
-        )
-    }
+        CoroutineScope(Dispatchers.Main).launch {
+          viewModel.viewState().collect { render(it) }
+          viewModel.viewEffect().collect { trigger(it) }
+        }
+  }
 
     override fun onDestroy() {
         super.onDestroy()
