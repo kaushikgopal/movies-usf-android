@@ -7,6 +7,9 @@ trueTimeVersionCode = "12"
 trueTime = "4.0.0.alpha"
 trueTimeRx = "3.5"
 
+kotlin = "1.8.20"
+coroutines = "1.7.1"
+
 activityCompose = "1.7.2"
 androidGradlePlugin = "8.0.2"
 androidxAppCompat = "1.1.0"
@@ -15,12 +18,10 @@ androidxTest = "1.1.1"
 composeBom = "2023.04.01" # https://developer.android.com/jetpack/compose/bom/bom-mapping
 composeCompiler = "1.4.2" # https://developer.android.com/jetpack/androidx/releases/compose-kotlin#kts
 constraintlayout = "2.1.4"
-coroutines = "1.6.4"
 dagger = "2.38.1"
 desugarJdk = "1.1.5"
 espresso = "3.1.1"
 junit = "4.12"
-kotlin = "1.6.21"
 kotlinInject = "0.6.1"
 ksp = "1.8.10-1.0.9"
 leakCanary = "2.11"
