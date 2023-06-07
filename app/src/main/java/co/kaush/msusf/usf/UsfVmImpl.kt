@@ -9,6 +9,7 @@ abstract class UsfVmImpl<E : Any, R : Any, VS : Any, VE : Any>(
   initialState: VS,
   private val viewModelScope: CoroutineScope,
   private val processingDispatcher: CoroutineDispatcher = Dispatchers.IO,
+
   logger: UsfVmLogger = object : UsfVmLogger {
     override fun debug(message: String) = Timber.d(message)
     override fun warning(message: String) = Timber.w(message)
@@ -55,29 +56,28 @@ abstract class UsfVmImpl<E : Any, R : Any, VS : Any, VE : Any>(
     logger.debug("------ [init] ${Thread.currentThread().name}")
 
     viewModelScope.launch(processingDispatcher) {
-        _events
-            .flatMapConcat { event ->
-              logger.debug("----- [event] ${Thread.currentThread().name} $event")
-              eventToResultFlow(event)
-            }
-            .collect { result ->
-              logger.debug("----- [result] ${Thread.currentThread().name} $result")
+      _events
+          .flatMapConcat { event ->
+            logger.debugEvents(event)
+            eventToResultFlow(event)
+          }
+          .collect { result ->
+            logger.debugResults(result)
 
-              // StateFlow already behaves as if distinctUntilChanged operator is applied to it
-              resultToViewState(_viewState.value, result).let { vs ->
-                logger.debug("----- [view-state] ${Thread.currentThread().name} $result")
-                _viewState.emit(vs)
-              }
-
-              // effects are emitted after a view state by virtue of this collect call
-              // (rarely) would we want VS & VE to be emitted at the exact same instant
-              _viewEffects.emitAll(
-                  resultToViewEffectFlow(result)
-                      .filterNotNull()
-                      .onEach { logger.debug("----- [view-effect] ${Thread.currentThread().name} $it") },
-              )
+            // StateFlow already behaves as if distinctUntilChanged operator is applied to it
+            resultToViewState(_viewState.value, result).let { vs ->
+              logger.debugViewState(vs)
+              _viewState.emit(vs)
             }
-//      }
+
+            // effects are emitted after a view state by virtue of this collect call
+            // (rarely) would we want VS & VE to be emitted at the exact same instant
+            _viewEffects.emitAll(
+                resultToViewEffectFlow(result)
+                    .filterNotNull()
+                    .onEach { logger.debugViewEffects(it) },
+            )
+          }
     }
   }
 
@@ -89,7 +89,21 @@ abstract class UsfVmImpl<E : Any, R : Any, VS : Any, VE : Any>(
 
   interface UsfVmLogger {
     fun debug(message: String)
+
+    fun debugEvents(event: Any, message: String? = null) =
+        debug(message ?: "----- [event] ${Thread.currentThread().name} $event")
+
+    fun debugResults(result: Any, message: String? = null) =
+        debug(message ?: "----- [result] ${Thread.currentThread().name} $result")
+
+    fun debugViewState(viewState: Any, message: String? = null) =
+        debug(message ?: "----- [view-state] ${Thread.currentThread().name} $viewState")
+
+    fun debugViewEffects(viewEffect: Any, message: String? = null) =
+        debug(message ?: "----- [view-effect] ${Thread.currentThread().name} $viewEffect")
+
     fun warning(message: String)
+
     fun error(error: Throwable, message: String)
   }
 }
