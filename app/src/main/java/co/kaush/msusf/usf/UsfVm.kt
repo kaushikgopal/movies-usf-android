@@ -1,6 +1,7 @@
 package co.kaush.msusf.usf
 
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 
 /**
  *
@@ -14,7 +15,7 @@ interface UsfVm<Event : Any, Result, ViewState : Any, ViewEffect : Any> {
 
   fun processInput(event: Event)
 
-  fun viewState(): Flow<ViewState>
+  val viewState: StateFlow<ViewState>
 
-  fun viewEffect(): Flow<ViewEffect>
+  val viewEffect: SharedFlow<ViewEffect>
 }

@@ -6,6 +6,7 @@ import timber.log.Timber
 
 @OptIn(ExperimentalCoroutinesApi::class)
 abstract class UsfVmImpl<E : Any, R : Any, VS : Any, VE : Any>(
+  initialState: VS,
   private val viewModelScope: CoroutineScope,
   private val processingDispatcher: CoroutineDispatcher = Dispatchers.IO,
   logger: UsfVmLogger = object : UsfVmLogger {
@@ -15,79 +16,76 @@ abstract class UsfVmImpl<E : Any, R : Any, VS : Any, VE : Any>(
   }
 ) : UsfVm<E, R, VS, VE> {
 
-  // remember that a single E(vent) can yield multiple R(esult)s
-  //  so if you wish to show an initial loading state before the final result
-  //  emit multiple R(esult)s for the single E(vent)
-  abstract fun eventToResultFlow(): (E) -> Flow<R>
+  /**
+   * @return [Flow]<[R]> a single [E]vent can result in multiple [R]esults
+   *                     for e.g. emit a R for loading and another for the actual result
+   *
+   *  @param event every input is processed into an [E]vent
+   */
+  abstract suspend fun eventToResultFlow(event: E): Flow<R>
 
-  // curiously, we don't return a Flow<VS> here
-  //  as every (R)esult will only ever be transformed into a single (V)iew(S)tate
-  //  if you want multiple (V)iew(S)tates, then emit multiple (R)esults
-  //  and transform each (R)esult accordingly to the respective (V)iew(S)tate
-  abstract fun resultToViewState(): (currentViewState: VS, result: R) -> VS
+  /**
+   * @param currentViewState  the current [VS]tate of the view
+   *                          (.copy it for the returned [VS]tate)
+   *
+   * @return [VS]tate Curiously, we don't return a [Flow]<[VS]> here
+   *                  every [R]esult will only ever be transformed into a single [VS]tate
+   *                  if you want multiple [VS]tates emit multiple [R]esults
+   *                   transforming each [R]esult to the respective [VS]tate
+   */
+  abstract suspend fun resultToViewState(currentViewState: VS, result: R): VS
 
-  // a single (R)esult can result in multiple (V)iew(E)ffects
-  //  for e.g. emit one VE for navigation and another for making an analytics call
-  //  hence a return type of Flow<VE>
-  abstract fun resultToViewEffectFlow(): (R) -> Flow<VE>
+  /**
+   * @param result  a single [R]esult can result in multiple [VE]s
+   *                for e.g. emit a VE for navigation and another for an analytics call
+   *                hence a return type of [Flow]<[VE]>
+   *
+   * @return [Flow] of [VE]s where null emissions will be ignored automatically
+   */
+  abstract suspend fun resultToViewEffectFlow(result: R): Flow<VE?>
 
-  abstract val initialViewState: VS
-  private val eventSink = MutableSharedFlow<E>()
-  private lateinit var viewStateSink: Flow<VS>
-  private lateinit var viewEffectSink: Flow<VE>
+  private val _events = MutableSharedFlow<E>()
+  private val _viewState = MutableStateFlow(initialState)
+  private val _viewEffects = MutableSharedFlow<VE>()
 
+  override val viewState = _viewState.asStateFlow()
+  override val viewEffect = _viewEffects.asSharedFlow()
 
   init {
-    logger.debug("------ init ${Thread.currentThread().name}")
+    logger.debug("------ [init] ${Thread.currentThread().name}")
 
-    viewModelScope.launch {
-      val resultFlow: Flow<R> = eventSink.flatMapLatest(transform = eventToResultFlow())
-          .onEach { logger.debug("----- result ${Thread.currentThread().name} $it") }
+    viewModelScope.launch(processingDispatcher) {
+        _events
+            .flatMapConcat { event ->
+              logger.debug("----- [event] ${Thread.currentThread().name} $event")
+              eventToResultFlow(event)
+            }
+            .collect { result ->
+              logger.debug("----- [result] ${Thread.currentThread().name} $result")
 
-      // share the result stream otherwise it will get subscribed to multiple times
-      // in the following also block
-      //  TODO: i'm not yet sure if we need this given we're using a mutable shared flow
+              // StateFlow already behaves as if distinctUntilChanged operator is applied to it
+              resultToViewState(_viewState.value, result).let { vs ->
+                logger.debug("----- [view-state] ${Thread.currentThread().name} $result")
+                _viewState.emit(vs)
+              }
 
-      withContext(processingDispatcher) {
-        viewStateSink = resultFlow
-            .scan(initialViewState, resultToViewState())
-
-            // if the viewState is identical
-            // there's little reason to re-emit the same view state
-            .distinctUntilChanged()
-
-            .onEach { logger.debug("----- vs $it") }
-
-            .shareIn(
-                // sharing is started within view model scope
-                viewModelScope,
-
-                // stream starts when first subscriber appears
-                // stops immediately when last subscriber disappears
-                // but keeps replay  forever
-                SharingStarted.WhileSubscribed(),
-
-                // keep the last view state in cache
-                // for new UI subscribers
-                replay = 1,
-            )
-
-        viewEffectSink = resultFlow.flatMapLatest(transform = resultToViewEffectFlow())
-            .onEach { logger.debug("----- ve $it") }
-      }
+              // effects are emitted after a view state by virtue of this collect call
+              // (rarely) would we want VS & VE to be emitted at the exact same instant
+              _viewEffects.emitAll(
+                  resultToViewEffectFlow(result)
+                      .filterNotNull()
+                      .onEach { logger.debug("----- [view-effect] ${Thread.currentThread().name} $it") },
+              )
+            }
+//      }
     }
-
   }
 
   override fun processInput(event: E) {
     viewModelScope.launch(processingDispatcher) {
-      eventSink.emit(event)
+      _events.emit(event)
     }
   }
-
-  override fun viewState(): Flow<VS> = viewStateSink
-
-  override fun viewEffect(): Flow<VE> = viewEffectSink
 
   interface UsfVmLogger {
     fun debug(message: String)

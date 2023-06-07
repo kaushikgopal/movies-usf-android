@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL
@@ -23,6 +25,10 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.subjects.PublishSubject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -64,10 +70,15 @@ class MSMovieActivity : MSActivity() {
             MSMovieVmFactory(app, movieRepo),
         )[MSMovieVm::class.java]
 
-        CoroutineScope(Dispatchers.Main).launch {
-          viewModel.viewState().collect { render(it) }
-          viewModel.viewEffect().collect { trigger(it) }
-        }
+      viewModel.viewState
+          .onEach { render(it) }
+          .catch { Timber.e(it, "error rendering view state") }
+          .launchIn(lifecycleScope)
+
+      viewModel.viewEffect
+          .onEach { trigger(it) }
+          .catch { Timber.e(it, "error triggering view effect") }
+          .launchIn(lifecycleScope)
   }
 
     override fun onDestroy() {
@@ -75,8 +86,8 @@ class MSMovieActivity : MSActivity() {
         disposables.clear()
     }
 
-    private fun trigger(effect: MSMovieViewEffect?) {
-        effect ?: return
+    private fun trigger(effect: MSMovieViewEffect) {
+        Timber.d("----- [trigger] ${Thread.currentThread().name}")
         when (effect) {
             is MSMovieViewEffect.AddedToHistoryToastEffect -> {
                 Toast.makeText(this, "added to history", Toast.LENGTH_SHORT).show()
@@ -85,6 +96,7 @@ class MSMovieActivity : MSActivity() {
     }
 
     private fun render(vs: MSMovieViewState) {
+        Timber.d("----- [render] ${Thread.currentThread().name}")
         vs.searchBoxText?.let {
             binding.msMainScreenSearchText.setText(it)
         }
