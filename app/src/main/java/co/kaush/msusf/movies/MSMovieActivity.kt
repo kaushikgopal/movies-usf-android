@@ -21,6 +21,7 @@ import co.kaush.msusf.movies.databinding.ActivityMainBinding
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -137,7 +138,7 @@ class MSMovieActivity : MSActivity() {
         )
             .onEach { viewModel.processInput(it) }
             .catch { Timber.e(it, "error processing input ") }
-            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
             .launchIn(lifecycleScope)
     }
 
