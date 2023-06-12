@@ -40,6 +40,7 @@ secretsGradlePlugin = "2.0.1"
 spotless = "6.15.0"
 timber = "4.7.1"
 truth = "0.42"
+turbine = "0.13.0"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
@@ -79,6 +80,7 @@ kotlin-inject-runtime = { group = "me.tatarka.inject", name = "kotlin-inject-run
 kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib-jdk8", version.ref = "kotlin" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
 leakcanary = { group = "com.squareup.leakcanary", name = "leakcanary-android", version.ref = "leakCanary" }
 leakcanary-noop = { group = "com.squareup.leakcanary", name = "leakcanary-android-no-op", version.ref = "leakCanary" }
 lifecycle-compiler = { group = "androidx.lifecycle", name = "lifecycle-compiler", version.ref = "androidxLifecycle" }
@@ -101,3 +103,4 @@ rx-java = { group = "io.reactivex.rxjava2", name = "rxjava", version.ref = "rxJa
 rx-replayingShare = { group = "com.jakewharton.rx2", name = "replaying-share", version.ref = "rxAndroid" }
 swiperefreshlayout = { group = "androidx.swiperefreshlayout", name = "swiperefreshlayout", version.ref = "androidxAppCompat" }
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
+turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
