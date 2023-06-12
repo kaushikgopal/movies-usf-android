@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import co.kaush.msusf.MSApp
 import co.kaush.msusf.usf.UsfVm
+import kotlinx.coroutines.CoroutineScope
 
 /**
  * For this example, a simple ViewModel would have sufficed,
@@ -14,15 +15,16 @@ import co.kaush.msusf.usf.UsfVm
  * Our Unit tests should still be able to run given this
  */
 class MSMovieVm(
-    app: MSApp,
-    movieRepo: MSMovieRepository,
+  app: MSApp,
+  movieRepo: MSMovieRepository,
+  coroutineScope: CoroutineScope? = null,
 ) : AndroidViewModel(app),
   UsfVm<MSMovieEvent, MSMovieResult, MSMovieViewState, MSMovieViewEffect> {
 
   private val usfVmImpl: UsfVm<MSMovieEvent, MSMovieResult, MSMovieViewState, MSMovieViewEffect> =
       MSMovieVmImpl(
           movieRepo,
-          viewModelScope,
+          coroutineScope ?: viewModelScope,
       )
 
   override fun processInput(event: MSMovieEvent) = usfVmImpl.processInput(event)

@@ -7,10 +7,10 @@ import kotlinx.coroutines.flow.flow
 
 class MSMovieVmImpl(
   private val movieRepo: MSMovieRepository,
-  viewModelScope: CoroutineScope,
+  coroutineScope: CoroutineScope,
 ) : UsfVmImpl<MSMovieEvent, MSMovieResult, MSMovieViewState, MSMovieViewEffect>(
     MSMovieViewState(),
-    viewModelScope,
+    coroutineScope,
 ) {
 
   // -----------------------------------------------------------------------------------

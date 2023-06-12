@@ -7,7 +7,7 @@ import timber.log.Timber
 @OptIn(ExperimentalCoroutinesApi::class)
 abstract class UsfVmImpl<E : Any, R : Any, VS : Any, VE : Any>(
   initialState: VS,
-  private val viewModelScope: CoroutineScope,
+  private val coroutineScope: CoroutineScope,
   private val processingDispatcher: CoroutineDispatcher = Dispatchers.IO,
 
   logger: UsfVmLogger = object : UsfVmLogger {
@@ -55,7 +55,7 @@ abstract class UsfVmImpl<E : Any, R : Any, VS : Any, VE : Any>(
   init {
     logger.debug("------ [init] ${Thread.currentThread().name}")
 
-    viewModelScope.launch(processingDispatcher) {
+    coroutineScope.launch(processingDispatcher) {
       _events
           .flatMapConcat { event ->
             logger.debugEvents(event)
@@ -82,7 +82,7 @@ abstract class UsfVmImpl<E : Any, R : Any, VS : Any, VE : Any>(
   }
 
   override fun processInput(event: E) {
-    viewModelScope.launch(processingDispatcher) {
+    coroutineScope.launch(processingDispatcher) {
       _events.emit(event)
     }
   }
