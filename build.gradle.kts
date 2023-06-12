@@ -1,4 +1,5 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
+// TODO: Remove once KTIJ-19369 is fixed
 plugins {
     // https://youtrack.jetbrains.com/issue/KT-46200
     alias(libs.plugins.android.application) apply false

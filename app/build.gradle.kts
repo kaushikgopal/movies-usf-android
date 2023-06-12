@@ -1,3 +1,4 @@
+@Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.kapt)
@@ -40,8 +41,10 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+      // after agp 8.1.0-alpha09, this is no longer needed
+      // https://kotlinlang.org/docs/gradle-configure-project.html#gradle-java-toolchains-support
+      sourceCompatibility = JavaVersion.VERSION_17
+      targetCompatibility = JavaVersion.VERSION_17
     }
 }
 
@@ -53,17 +56,15 @@ dependencies {
     implementation(libs.kotlin.stdlib)
     implementation(libs.dagger)
     implementation(libs.constraintlayout)
+    implementation(libs.flowbinding)
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.coroutines.core)
     implementation(libs.picasso)
-    implementation(libs.lifecycle.extensions)
-    implementation(libs.lifecycle.runtime)
+    implementation(libs.lifecycle.viewmodel.ktx)
+    implementation(libs.lifecycle.runtime.ktx)
     implementation(libs.okhttp.logging.interceptor)
-    implementation(libs.retrofit.adapter.rxjava)
     implementation(libs.retrofit.gson)
     implementation(libs.retrofit)
-    implementation(libs.rx.android)
-    implementation(libs.rx.bindings)
-    implementation(libs.rx.java)
-    implementation(libs.rx.replayingShare)
     implementation(libs.swiperefreshlayout)
     implementation(libs.appcompat)
     implementation(libs.recyclerview)
@@ -76,6 +77,8 @@ dependencies {
     testImplementation(libs.junit)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.turbine)
 
     androidTestImplementation(libs.atsl.runner)
     androidTestImplementation(libs.espresso.core)

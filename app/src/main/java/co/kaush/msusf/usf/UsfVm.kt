@@ -1,8 +1,7 @@
 package co.kaush.msusf.usf
 
-import io.reactivex.Observable
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.subjects.PublishSubject
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 
 /**
  *
@@ -14,27 +13,9 @@ import io.reactivex.subjects.PublishSubject
  */
 interface UsfVm<Event : Any, Result, ViewState : Any, ViewEffect : Any> {
 
-    val eventSink: PublishSubject<Event>
-    val disposables: CompositeDisposable
+  fun processInput(event: Event)
 
-    fun processInput(event: Event) {
-        eventSink.onNext(event)
-    }
+  val viewState: StateFlow<ViewState>
 
-    /**
-     * It is unnecessary to do `subscribeOn(Schedulers.io())` as
-     * the chain executes on the thread that pushed an "event" into [processInput].
-     *
-     * **Example:**
-     * ```
-     * vm.viewState
-     *  .observeOn(AndroidSchedulers.mainThread())
-     *  .subscribe(::render, Timber::w)
-     * ```
-     */
-    fun viewState(): Observable<ViewState>
-
-    fun viewEffect(): Observable<ViewEffect>
-
-    fun clear() = disposables.clear()
+  val viewEffect: SharedFlow<ViewEffect>
 }

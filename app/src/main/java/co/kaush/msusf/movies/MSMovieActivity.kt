@@ -3,25 +3,32 @@ package co.kaush.msusf.movies
 import android.os.Bundle
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import co.kaush.msusf.MSActivity
-import co.kaush.msusf.movies.MSMainVm.MSMainVmFactory
 import co.kaush.msusf.movies.MSMovieEvent.AddToHistoryEvent
 import co.kaush.msusf.movies.MSMovieEvent.RestoreFromHistoryEvent
 import co.kaush.msusf.movies.MSMovieEvent.ScreenLoadEvent
 import co.kaush.msusf.movies.MSMovieEvent.SearchMovieEvent
+import co.kaush.msusf.movies.MSMovieVm.MSMovieVmFactory
 import co.kaush.msusf.movies.databinding.ActivityMainBinding
-import com.jakewharton.rxbinding2.view.RxView
 import com.squareup.picasso.Picasso
-import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
-import io.reactivex.subjects.PublishSubject
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import reactivecircus.flowbinding.android.view.clicks
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -30,13 +37,11 @@ class MSMovieActivity : MSActivity() {
     @Inject
     lateinit var movieRepo: MSMovieRepository
 
-    private lateinit var viewModel: MSMainVm
+    private lateinit var viewModel: MSMovieVm
     private lateinit var listAdapter: MSMovieSearchHistoryAdapter
     private lateinit var binding: ActivityMainBinding
 
-    private var uiDisposable: Disposable? = null
-    private var disposables: CompositeDisposable = CompositeDisposable()
-    private val historyItemClick: PublishSubject<MSMovie> = PublishSubject.create()
+    private val historyItemClick = MutableSharedFlow<MSMovie>()
 
     private val spinner: CircularProgressDrawable by lazy {
         val circularProgressDrawable = CircularProgressDrawable(this)
@@ -57,38 +62,27 @@ class MSMovieActivity : MSActivity() {
 
         setupListView()
 
-        viewModel = ViewModelProviders.of(
+        viewModel = ViewModelProvider(
             this,
-            MSMainVmFactory(app, movieRepo)
-        ).get(MSMainVm::class.java)
+            MSMovieVmFactory(app, movieRepo),
+        )[MSMovieVm::class.java]
 
-        disposables.add(
-            viewModel
-                .viewState()
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext { Timber.d("----- onNext VS $it") }
-                .subscribe(
-                    ::render
-                ) { Timber.w(it, "something went terribly wrong processing view state") }
-        )
+      viewModel.viewState
+          .onEach { render(it) }
+          .catch { Timber.e(it, "error rendering view state") }
+          .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+          .launchIn(lifecycleScope)
 
-        disposables.add(
-            viewModel
-                .viewEffect()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                    ::trigger
-                ) { Timber.w(it, "something went terribly wrong processing view effects") }
-        )
+      viewModel.viewEffect
+          .onEach { trigger(it) }
+          .catch { Timber.e(it, "error triggering view effect") }
+          .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+          .launchIn(lifecycleScope)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        disposables.clear()
-    }
 
-    private fun trigger(effect: MSMovieViewEffect?) {
-        effect ?: return
+    private fun trigger(effect: MSMovieViewEffect) {
+        Timber.d("----- [trigger] ${Thread.currentThread().name}")
         when (effect) {
             is MSMovieViewEffect.AddedToHistoryToastEffect -> {
                 Toast.makeText(this, "added to history", Toast.LENGTH_SHORT).show()
@@ -97,6 +91,7 @@ class MSMovieActivity : MSActivity() {
     }
 
     private fun render(vs: MSMovieViewState) {
+        Timber.d("----- [render] ${Thread.currentThread().name}")
         vs.searchBoxText?.let {
             binding.msMainScreenSearchText.setText(it)
         }
@@ -121,33 +116,30 @@ class MSMovieActivity : MSActivity() {
     override fun onResume() {
         super.onResume()
 
-        val screenLoadEvents: Observable<ScreenLoadEvent> = Observable.just(ScreenLoadEvent)
-        val searchMovieEvents: Observable<SearchMovieEvent> = RxView.clicks(binding.msMainScreenSearchBtn)
+        val screenLoadEvents = flowOf(ScreenLoadEvent)
+
+        val searchMovieEvents = binding.msMainScreenSearchBtn.clicks()
             .map { SearchMovieEvent(binding.msMainScreenSearchText.text.toString()) }
-        val addToHistoryEvents: Observable<AddToHistoryEvent> = RxView.clicks(binding.msMainScreenPoster)
+
+        val addToHistoryEvents = binding.msMainScreenPoster.clicks()
             .map {
                 binding.msMainScreenPoster.growShrink()
                 AddToHistoryEvent(binding.msMainScreenPoster.getTag(R.id.TAG_MOVIE_DATA) as MSMovie)
             }
-        val restoreFromHistoryEvents: Observable<RestoreFromHistoryEvent> = historyItemClick
+
+        val restoreFromHistoryEvents = historyItemClick
             .map { RestoreFromHistoryEvent(it) }
 
-        uiDisposable =
-            Observable.merge(
-                screenLoadEvents,
-                searchMovieEvents,
-                addToHistoryEvents,
-                restoreFromHistoryEvents
-            )
-                .subscribe(
-                    { viewModel.processInput(it) },
-                    { Timber.e(it, "error processing input ") }
-                )
-    }
-
-    override fun onPause() {
-        super.onPause()
-        uiDisposable?.dispose()
+        merge(
+          screenLoadEvents,
+          searchMovieEvents,
+          addToHistoryEvents,
+          restoreFromHistoryEvents,
+        )
+            .onEach { viewModel.processInput(it) }
+            .catch { Timber.e(it, "error processing input ") }
+            .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
+            .launchIn(lifecycleScope)
     }
 
     private fun setupListView() {
@@ -160,7 +152,11 @@ class MSMovieActivity : MSActivity() {
         )
         binding.msMainScreenSearchHistory.addItemDecoration(dividerItemDecoration)
 
-        listAdapter = MSMovieSearchHistoryAdapter { historyItemClick.onNext(it) }
+        listAdapter = MSMovieSearchHistoryAdapter {
+          lifecycleScope.launch {
+            historyItemClick.emit(it)
+          }
+        }
         binding.msMainScreenSearchHistory.adapter = listAdapter
     }
 }
