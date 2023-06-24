@@ -13,17 +13,14 @@ allOpen {
 
 android {
     namespace = "co.kaush.msusf.movies"
-
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
         applicationId = "co.kaush.msusf"
-
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-
-        versionCode = 2
-        versionName = "2.0"
+        versionCode = libs.versions.appVersionCode.get().toInt()
+        versionName = libs.versions.appVersionName.get()
 
         testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
     }

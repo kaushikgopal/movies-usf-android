@@ -2,6 +2,7 @@ package co.kaush.msusf.movies
 
 import app.cash.turbine.test
 import app.cash.turbine.testIn
+import app.cash.turbine.turbineScope
 import co.kaush.msusf.MSApp
 import co.kaush.msusf.movies.MSMovieEvent.AddToHistoryEvent
 import co.kaush.msusf.movies.MSMovieEvent.RestoreFromHistoryEvent
@@ -57,34 +58,37 @@ class MSMovieVmTest {
 
   @Test
   fun onClickingMovieSearchResult_shouldPopulateHistoryList() = runTest {
+    turbineScope {
+      val vsTester = viewModel.viewState.testIn(backgroundScope)
+      val veTester = viewModel.viewEffect.testIn(backgroundScope)
 
-    val vsTester = viewModel.viewState.testIn(backgroundScope)
-    val veTester = viewModel.viewEffect.testIn(backgroundScope)
+      viewModel.processInput(SearchMovieEvent("blade runner 2049"))
+      viewModel.processInput(AddToHistoryEvent(bladeRunner2049))
 
-    viewModel.processInput(SearchMovieEvent("blade runner 2049"))
-    viewModel.processInput(AddToHistoryEvent(bladeRunner2049))
+      assertThat(vsTester.awaitItem()).isEqualTo(MSMovieViewState())
+      assertThat(vsTester.awaitItem().searchedMovieTitle).isEqualTo("Searching Movie...")
+      assertThat(vsTester.awaitItem().searchedMovieTitle).isEqualTo("Blade Runner 2049")
+      with(vsTester.awaitItem()) {
+        assertThat(adapterList).hasSize(1)
+        assertThat(adapterList[0]).isEqualTo(bladeRunner2049)
+      }
 
-    assertThat(vsTester.awaitItem()).isEqualTo(MSMovieViewState())
-    assertThat(vsTester.awaitItem().searchedMovieTitle).isEqualTo("Searching Movie...")
-    assertThat(vsTester.awaitItem().searchedMovieTitle).isEqualTo("Blade Runner 2049")
-    with(vsTester.awaitItem()) {
-      assertThat(adapterList).hasSize(1)
-      assertThat(adapterList[0]).isEqualTo(bladeRunner2049)
+      assertThat(veTester.awaitItem()).isEqualTo(AddedToHistoryToastEffect)
     }
-
-    assertThat(veTester.awaitItem()).isEqualTo(AddedToHistoryToastEffect)
   }
 
   @Test
   fun onClickingMovieSearchResultTwice_shouldShowToastEachTime() = runTest {
-    val veTester = viewModel.viewEffect.testIn(backgroundScope)
+    turbineScope {
+      val veTester = viewModel.viewEffect.testIn(backgroundScope)
 
-    viewModel.processInput(SearchMovieEvent("blade runner 2049"))
-    viewModel.processInput(AddToHistoryEvent(bladeRunner2049))
-    viewModel.processInput(AddToHistoryEvent(bladeRunner2049))
+      viewModel.processInput(SearchMovieEvent("blade runner 2049"))
+      viewModel.processInput(AddToHistoryEvent(bladeRunner2049))
+      viewModel.processInput(AddToHistoryEvent(bladeRunner2049))
 
-    assertThat(veTester.awaitItem()).isEqualTo(AddedToHistoryToastEffect)
-    assertThat(veTester.awaitItem()).isEqualTo(AddedToHistoryToastEffect)
+      assertThat(veTester.awaitItem()).isEqualTo(AddedToHistoryToastEffect)
+      assertThat(veTester.awaitItem()).isEqualTo(AddedToHistoryToastEffect)
+    }
   }
 
   @Test

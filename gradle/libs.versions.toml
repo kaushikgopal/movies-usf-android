@@ -6,6 +6,8 @@ targetSdk = "33"
 trueTimeVersionCode = "12"
 trueTime = "4.0.0.alpha"
 trueTimeRx = "3.5"
+appVersionCode = "2"
+appVersionName = "23.063.000"
 
 kotlin = "1.8.20"
 coroutines = "1.7.1"
@@ -40,7 +42,7 @@ secretsGradlePlugin = "2.0.1"
 spotless = "6.15.0"
 timber = "4.7.1"
 truth = "0.42"
-turbine = "0.13.0"
+turbine = "1.0.0"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
