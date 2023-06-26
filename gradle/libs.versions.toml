@@ -26,7 +26,7 @@ kotlinInject = "0.6.1"
 ksp = "1.8.10-1.0.9"
 leakCanary = "2.11"
 mockito = "2.23.0"
-mockitoKotlin = "1.6.0"
+mockitoKotlin = "5.0.0"
 okhttp = "3.9.0"
 picasso = "2.71828"
 retrofit = "2.6.0"
@@ -88,7 +88,7 @@ lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtim
 lifecycle-viewmodel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel", version.ref = "androidxLifecycle" }
 lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "androidxLifecycle" }
 mockito-core = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }
-mockito-kotlin = { group = "com.nhaarman", name = "mockito-kotlin", version.ref = "mockitoKotlin" }
+mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "mockitoKotlin" }
 okhttp-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
 picasso = { group = "com.squareup.picasso", name = "picasso", version.ref = "picasso" }
 recyclerview = { group = "androidx.recyclerview", name = "recyclerview", version.ref = "androidxAppCompat" }

@@ -6,22 +6,21 @@ import co.kaush.msusf.movies.MSMovieApi
 import co.kaush.msusf.movies.MSMovieRepository
 import me.tatarka.inject.annotations.Component
 import me.tatarka.inject.annotations.Provides
-import me.tatarka.inject.annotations.Scope
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-/** The application-level scope. There will only be one instance of anything annotated with this. */
-@Scope annotation class AppScope
+/** These are components that you'll need in both Test and Prod */
+abstract class CommonAppComponent {
+  abstract val movieRepository: MSMovieRepository
+}
 
 @AppScope
 @Component
 abstract class AppComponent(
     @get:Provides val app: MSApp,
-) {
-
-  abstract val movieRepository: MSMovieRepository
+) : CommonAppComponent() {
 
   @AppScope
   @Provides
