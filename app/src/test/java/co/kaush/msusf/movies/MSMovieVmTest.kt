@@ -50,7 +50,9 @@ class MSMovieVmTest {
       assertThat(awaitItem().searchedMovieTitle).isEqualTo("Searching Movie...")
       with(awaitItem()) {
         assertThat(searchedMovieTitle).isEqualTo("Blade Runner 2049")
-        assertThat(searchedMoviePoster).isEqualTo("https://m.media-amazon.com/images/M/MV5BNzA1Njg4NzYxOV5BMl5BanBnXkFtZTgwODk5NjU3MzI@._V1_SX300.jpg")
+        assertThat(searchedMoviePoster)
+            .isEqualTo(
+                "https://m.media-amazon.com/images/M/MV5BNzA1Njg4NzYxOV5BMl5BanBnXkFtZTgwODk5NjU3MzI@._V1_SX300.jpg")
         assertThat(searchedMovieRating).isEqualTo("\n8.1/10 (IMDB)\n87% (RT)")
       }
     }
@@ -122,42 +124,48 @@ class MSMovieVmTest {
   private class FakeMSMovieRepository : MSMovieRepository(mock(MSMovieApi::class.java)) {
 
     val bladeRunner2049 by lazy {
-      val ratingImdb = MSRating(
-          source = "Internet Movie Database",
-          rating = "8.1/10",
-      )
+      val ratingImdb =
+          MSRating(
+              source = "Internet Movie Database",
+              rating = "8.1/10",
+          )
 
-      val ratingRottenTomatoes = MSRating(
-          source = "Rotten Tomatoes",
-          rating = "87%",
-      )
+      val ratingRottenTomatoes =
+          MSRating(
+              source = "Rotten Tomatoes",
+              rating = "87%",
+          )
 
       MSMovie(
           result = true,
           errorMessage = null,
           title = "Blade Runner 2049",
           ratings = listOf(ratingImdb, ratingRottenTomatoes),
-          posterUrl = "https://m.media-amazon.com/images/M/MV5BNzA1Njg4NzYxOV5BMl5BanBnXkFtZTgwODk5NjU3MzI@._V1_SX300.jpg",
+          posterUrl =
+              "https://m.media-amazon.com/images/M/MV5BNzA1Njg4NzYxOV5BMl5BanBnXkFtZTgwODk5NjU3MzI@._V1_SX300.jpg",
       )
     }
 
     val blade by lazy {
-      val ratingImdb = MSRating(
-          source = "Internet Movie Database",
-          rating = "7.1/10",
-      )
+      val ratingImdb =
+          MSRating(
+              source = "Internet Movie Database",
+              rating = "7.1/10",
+          )
 
-      val ratingRottenTomatoes = MSRating(
-          source = "Rotten Tomatoes",
-          rating = "54%",
-      )
+      val ratingRottenTomatoes =
+          MSRating(
+              source = "Rotten Tomatoes",
+              rating = "54%",
+          )
 
       MSMovie(
           result = true,
           errorMessage = null,
           title = "Blade",
           ratings = listOf(ratingImdb, ratingRottenTomatoes),
-          posterUrl = "https://m.media-amazon.com/images/M/MV5BMTQ4MzkzNjcxNV5BMl5BanBnXkFtZTcwNzk4NTU0Mg@@._V1_SX300.jpg",
+          posterUrl =
+              "https://m.media-amazon.com/images/M/MV5BMTQ4MzkzNjcxNV5BMl5BanBnXkFtZTcwNzk4NTU0Mg@@._V1_SX300.jpg",
       )
     }
 
@@ -169,5 +177,4 @@ class MSMovieVmTest {
       }
     }
   }
-
 }

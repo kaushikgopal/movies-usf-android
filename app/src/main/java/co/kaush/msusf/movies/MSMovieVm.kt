@@ -9,17 +9,16 @@ import co.kaush.msusf.usf.UsfVm
 import kotlinx.coroutines.CoroutineScope
 
 /**
- * For this example, a simple ViewModel would have sufficed,
- * but in most real world examples we would use an AndroidViewModel
+ * For this example, a simple ViewModel would have sufficed, but in most real world examples we
+ * would use an AndroidViewModel
  *
  * Our Unit tests should still be able to run given this
  */
 class MSMovieVm(
-  app: MSApp,
-  movieRepo: MSMovieRepository,
-  coroutineScope: CoroutineScope? = null,
-) : AndroidViewModel(app),
-  UsfVm<MSMovieEvent, MSMovieResult, MSMovieViewState, MSMovieViewEffect> {
+    app: MSApp,
+    movieRepo: MSMovieRepository,
+    coroutineScope: CoroutineScope? = null,
+) : AndroidViewModel(app), UsfVm<MSMovieEvent, MSMovieResult, MSMovieViewState, MSMovieViewEffect> {
 
   private val usfVmImpl: UsfVm<MSMovieEvent, MSMovieResult, MSMovieViewState, MSMovieViewEffect> =
       MSMovieVmImpl(
@@ -30,8 +29,8 @@ class MSMovieVm(
   override fun processInput(event: MSMovieEvent) = usfVmImpl.processInput(event)
 
   class MSMovieVmFactory(
-    private val app: MSApp,
-    private val movieRepo: MSMovieRepository,
+      private val app: MSApp,
+      private val movieRepo: MSMovieRepository,
   ) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")

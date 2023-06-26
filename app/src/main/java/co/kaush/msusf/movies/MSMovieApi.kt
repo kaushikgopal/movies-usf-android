@@ -7,11 +7,11 @@ import retrofit2.http.Query
 
 interface MSMovieApi {
 
-    @GET("/")
-    suspend fun searchMovie(
-            @Query("t") movieName: String,
-            @Query("apiKey") apiKey: String = BuildConfig.OMDB_API_KEY
-    ): Response<MSMovie>
+  @GET("/")
+  suspend fun searchMovie(
+      @Query("t") movieName: String,
+      @Query("apiKey") apiKey: String = BuildConfig.OMDB_API_KEY
+  ): Response<MSMovie>
 }
 
 data class MSMovie(
@@ -21,10 +21,10 @@ data class MSMovie(
     @SerializedName("Poster") val posterUrl: String = "",
     @SerializedName("Ratings") val ratings: List<MSRating> = emptyList()
 ) {
-    val ratingSummary: String
-        get() {
-            return ratings.fold("") { summary, msRating -> "$summary\n${msRating.summary}" }
-        }
+  val ratingSummary: String
+    get() {
+      return ratings.fold("") { summary, msRating -> "$summary\n${msRating.summary}" }
+    }
 }
 
 data class MSRating(
@@ -32,13 +32,14 @@ data class MSRating(
     @SerializedName("Value") val rating: String
 ) {
 
-    val summary: String get() = "$rating (${sourceShortName(source)})"
-    private fun sourceShortName(ratingSource: String): String {
-        return when {
-            ratingSource.contains("Internet Movie Database") -> "IMDB"
-            ratingSource.contains("Rotten Tomatoes") -> "RT"
-            ratingSource.contains("Metacritic") -> "Metac"
-            else -> ratingSource
-        }
+  val summary: String
+    get() = "$rating (${sourceShortName(source)})"
+  private fun sourceShortName(ratingSource: String): String {
+    return when {
+      ratingSource.contains("Internet Movie Database") -> "IMDB"
+      ratingSource.contains("Rotten Tomatoes") -> "RT"
+      ratingSource.contains("Metacritic") -> "Metac"
+      else -> ratingSource
     }
+  }
 }

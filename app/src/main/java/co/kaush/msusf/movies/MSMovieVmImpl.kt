@@ -6,12 +6,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 class MSMovieVmImpl(
-  private val movieRepo: MSMovieRepository,
-  coroutineScope: CoroutineScope,
-) : UsfVmImpl<MSMovieEvent, MSMovieResult, MSMovieViewState, MSMovieViewEffect>(
-    MSMovieViewState(),
-    coroutineScope,
-) {
+    private val movieRepo: MSMovieRepository,
+    coroutineScope: CoroutineScope,
+) :
+    UsfVmImpl<MSMovieEvent, MSMovieResult, MSMovieViewState, MSMovieViewEffect>(
+        MSMovieViewState(),
+        coroutineScope,
+    ) {
 
   // -----------------------------------------------------------------------------------
   // Event -> Results
@@ -49,23 +50,21 @@ class MSMovieVmImpl(
   }
 
   private fun onAddToHistory(event: MSMovieEvent.AddToHistoryEvent): Flow<MSMovieResult> {
-    return flow {
-      emit(MSMovieResult.AddToHistoryResult(movie = event.searchedMovie))
-    }
+    return flow { emit(MSMovieResult.AddToHistoryResult(movie = event.searchedMovie)) }
   }
 
-  private fun onRestoreFromHistory(event: MSMovieEvent.RestoreFromHistoryEvent): Flow<MSMovieResult> {
-    return flow {
-      emit(MSMovieResult.SearchMovieResult(movie = event.movieFromHistory))
-    }
+  private fun onRestoreFromHistory(
+      event: MSMovieEvent.RestoreFromHistoryEvent
+  ): Flow<MSMovieResult> {
+    return flow { emit(MSMovieResult.SearchMovieResult(movie = event.movieFromHistory)) }
   }
 
   // -----------------------------------------------------------------------------------
   // Results -> ViewState
 
   override suspend fun resultToViewState(
-    currentViewState: MSMovieViewState,
-    result: MSMovieResult
+      currentViewState: MSMovieViewState,
+      result: MSMovieResult
   ): MSMovieViewState {
     return when {
       result.loading -> {
@@ -77,15 +76,12 @@ class MSMovieVmImpl(
             searchedMovieReference = null,
         )
       }
-
       result.errorMessage.isNotBlank() -> {
         currentViewState.copy(searchedMovieTitle = result.errorMessage)
       }
-
       result is MSMovieResult.ScreenLoadResult -> {
         currentViewState.copy(searchBoxText = "load test")
       }
-
       result is MSMovieResult.SearchMovieResult -> {
         val movie: MSMovie = result.movie!!
 
@@ -97,7 +93,6 @@ class MSMovieVmImpl(
             searchedMovieReference = movie,
         )
       }
-
       result is MSMovieResult.AddToHistoryResult -> {
         val movie: MSMovie = result.movie!!
 
@@ -105,7 +100,6 @@ class MSMovieVmImpl(
           currentViewState.copy(adapterList = currentViewState.adapterList.plus(movie))
         } else currentViewState.copy()
       }
-
       else -> throw RuntimeException("Unexpected result")
     }
   }

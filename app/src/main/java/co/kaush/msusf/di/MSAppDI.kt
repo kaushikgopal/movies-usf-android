@@ -12,15 +12,13 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-
 /** The application-level scope. There will only be one instance of anything annotated with this. */
-@Scope
-annotation class AppScope
+@Scope annotation class AppScope
 
 @AppScope
 @Component
 abstract class AppComponent(
-  @get:Provides val app: MSApp,
+    @get:Provides val app: MSApp,
 ) {
 
   abstract val movieRepository: MSMovieRepository
@@ -28,8 +26,7 @@ abstract class AppComponent(
   @AppScope
   @Provides
   protected fun provideRetrofit(): Retrofit {
-    val interceptor = (HttpLoggingInterceptor())
-        .apply { level = HttpLoggingInterceptor.Level.BODY }
+    val interceptor = (HttpLoggingInterceptor()).apply { level = HttpLoggingInterceptor.Level.BODY }
 
     val okHttpClient: OkHttpClient = OkHttpClient.Builder().addInterceptor(interceptor).build()
 
@@ -46,13 +43,13 @@ abstract class AppComponent(
     return retrofit.create(MSMovieApi::class.java)
   }
 
-
   companion object {
     private var instance: AppComponent? = null
 
     fun from(context: Context): AppComponent =
         instance
-          ?: AppComponent::class.create(context.applicationContext as MSApp).also { instance = it }
+            ?: AppComponent::class.create(context.applicationContext as MSApp).also {
+              instance = it
+            }
   }
 }
-

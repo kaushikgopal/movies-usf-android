@@ -6,41 +6,35 @@ import timber.log.Timber
 
 @OptIn(ExperimentalCoroutinesApi::class)
 abstract class UsfVmImpl<E : Any, R : Any, VS : Any, VE : Any>(
-  initialState: VS,
-  private val coroutineScope: CoroutineScope,
-  private val processingDispatcher: CoroutineDispatcher = Dispatchers.IO,
-
-  logger: UsfVmLogger = object : UsfVmLogger {
-    override fun debug(message: String) = Timber.d(message)
-    override fun warning(message: String) = Timber.w(message)
-    override fun error(error: Throwable, message: String) = Timber.e(error, message)
-  }
+    initialState: VS,
+    private val coroutineScope: CoroutineScope,
+    private val processingDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    logger: UsfVmLogger =
+        object : UsfVmLogger {
+          override fun debug(message: String) = Timber.d(message)
+          override fun warning(message: String) = Timber.w(message)
+          override fun error(error: Throwable, message: String) = Timber.e(error, message)
+        }
 ) : UsfVm<E, R, VS, VE> {
 
   /**
-   * @return [Flow]<[R]> a single [E]vent can result in multiple [R]esults
-   *                     for e.g. emit a R for loading and another for the actual result
-   *
-   *  @param event every input is processed into an [E]vent
+   * @param event every input is processed into an [E]vent
+   * @return [Flow]<[R]> a single [E]vent can result in multiple [R]esults for e.g. emit a R for
+   *   loading and another for the actual result
    */
   abstract suspend fun eventToResultFlow(event: E): Flow<R>
 
   /**
-   * @param currentViewState  the current [VS]tate of the view
-   *                          (.copy it for the returned [VS]tate)
-   *
-   * @return [VS]tate Curiously, we don't return a [Flow]<[VS]> here
-   *                  every [R]esult will only ever be transformed into a single [VS]tate
-   *                  if you want multiple [VS]tates emit multiple [R]esults
-   *                   transforming each [R]esult to the respective [VS]tate
+   * @param currentViewState the current [VS]tate of the view (.copy it for the returned [VS]tate)
+   * @return [VS]tate Curiously, we don't return a [Flow]<[VS]> here every [R]esult will only ever
+   *   be transformed into a single [VS]tate if you want multiple [VS]tates emit multiple [R]esults
+   *   transforming each [R]esult to the respective [VS]tate
    */
   abstract suspend fun resultToViewState(currentViewState: VS, result: R): VS
 
   /**
-   * @param result  a single [R]esult can result in multiple [VE]s
-   *                for e.g. emit a VE for navigation and another for an analytics call
-   *                hence a return type of [Flow]<[VE]>
-   *
+   * @param result a single [R]esult can result in multiple [VE]s for e.g. emit a VE for navigation
+   *   and another for an analytics call hence a return type of [Flow]<[VE]>
    * @return [Flow] of [VE]s where null emissions will be ignored automatically
    */
   abstract suspend fun resultToViewEffectFlow(result: R): Flow<VE?>
@@ -73,18 +67,16 @@ abstract class UsfVmImpl<E : Any, R : Any, VS : Any, VE : Any>(
             // effects are emitted after a view state by virtue of this collect call
             // (rarely) would we want VS & VE to be emitted at the exact same instant
             _viewEffects.emitAll(
-                resultToViewEffectFlow(result)
-                    .filterNotNull()
-                    .onEach { logger.debugViewEffects(it) },
+                resultToViewEffectFlow(result).filterNotNull().onEach {
+                  logger.debugViewEffects(it)
+                },
             )
           }
     }
   }
 
   override fun processInput(event: E) {
-    coroutineScope.launch(processingDispatcher) {
-      _events.emit(event)
-    }
+    coroutineScope.launch(processingDispatcher) { _events.emit(event) }
   }
 
   interface UsfVmLogger {

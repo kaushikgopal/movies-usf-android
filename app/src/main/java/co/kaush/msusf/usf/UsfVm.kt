@@ -4,10 +4,8 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 
 /**
- *
- * [Any]    type used because of a Kotlin Compiler bug
- *          that won't take in @NotNull event: E
- *          https://youtrack.jetbrains.com/issue/KT-36770
+ * [Any] type used because of a Kotlin Compiler bug that won't take in @NotNull event: E
+ * https://youtrack.jetbrains.com/issue/KT-36770
  *
  * @param Event
  */

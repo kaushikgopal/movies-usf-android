@@ -10,8 +10,8 @@ class MSApp : Application() {
 
   private val appComponent by lazy(LazyThreadSafetyMode.NONE) { AppComponent.from(this) }
 
-    override fun onCreate() {
-        super.onCreate()
-        Timber.plant(Timber.DebugTree())
-    }
+  override fun onCreate() {
+    super.onCreate()
+    Timber.plant(Timber.DebugTree())
+  }
 }
