@@ -1,10 +1,10 @@
 package co.kaush.msusf.movies
 
+import co.kaush.msusf.di.AppScope
 import com.google.gson.Gson
-import javax.inject.Inject
+import me.tatarka.inject.annotations.Inject
 
-@OpenClassOnDebug
-class MSMovieRepository @Inject constructor(
+class MSMovieRepository @AppScope @Inject constructor(
     val movieApi: MSMovieApi
 ) {
   suspend fun searchMovie(movieName: String): MSMovie? {

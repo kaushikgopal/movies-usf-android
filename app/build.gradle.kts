@@ -1,18 +1,14 @@
 @Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.ksp)
     alias(libs.plugins.secrets.gradle.plugin)
-    alias(libs.plugins.kotlin.allopen)
-}
-
-allOpen {
-    annotation("co.kaush.msusf.movies.OpenClass")
 }
 
 android {
     namespace = "co.kaush.msusf.movies"
+
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
@@ -47,11 +43,10 @@ android {
 
 dependencies {
 
-    kapt(libs.dagger.compiler)
-    kapt(libs.lifecycle.compiler)
+    ksp(libs.kotlin.inject.compiler)
+    implementation(libs.kotlin.inject.runtime)
 
     implementation(libs.kotlin.stdlib)
-    implementation(libs.dagger)
     implementation(libs.constraintlayout)
     implementation(libs.flowbinding)
     implementation(libs.kotlinx.coroutines.android)

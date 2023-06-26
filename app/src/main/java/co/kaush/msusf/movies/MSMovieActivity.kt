@@ -2,6 +2,7 @@ package co.kaush.msusf.movies
 
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -11,7 +12,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
-import co.kaush.msusf.MSActivity
+import co.kaush.msusf.di.AppComponent
 import co.kaush.msusf.movies.MSMovieEvent.AddToHistoryEvent
 import co.kaush.msusf.movies.MSMovieEvent.RestoreFromHistoryEvent
 import co.kaush.msusf.movies.MSMovieEvent.ScreenLoadEvent
@@ -21,7 +22,6 @@ import co.kaush.msusf.movies.databinding.ActivityMainBinding
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -30,13 +30,10 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import reactivecircus.flowbinding.android.view.clicks
 import timber.log.Timber
-import javax.inject.Inject
 
-class MSMovieActivity : MSActivity() {
+class MSMovieActivity : ComponentActivity() {
 
-    @Inject
-    lateinit var movieRepo: MSMovieRepository
-
+    private lateinit var movieRepo: MSMovieRepository
     private lateinit var viewModel: MSMovieVm
     private lateinit var listAdapter: MSMovieSearchHistoryAdapter
     private lateinit var binding: ActivityMainBinding
@@ -51,20 +48,19 @@ class MSMovieActivity : MSActivity() {
         circularProgressDrawable
     }
 
-    override fun inject(activity: MSActivity) {
-        app.appComponent.inject(this)
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val appComponent = AppComponent.from(this)
+        movieRepo = appComponent.movieRepository
+
         setupListView()
 
         viewModel = ViewModelProvider(
             this,
-            MSMovieVmFactory(app, movieRepo),
+            MSMovieVmFactory(appComponent.app, movieRepo),
         )[MSMovieVm::class.java]
 
       viewModel.viewState
