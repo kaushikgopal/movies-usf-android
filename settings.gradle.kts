@@ -21,3 +21,7 @@ dependencyResolutionManagement {
 rootProject.name = "Movies USF Android"
 
 include(":app")
+
+include(":annotations")
+
+include(":annotations-processors")
