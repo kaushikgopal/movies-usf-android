@@ -48,6 +48,9 @@ dependencies {
   ksp(libs.kotlin.inject.compiler)
   implementation(libs.kotlin.inject.runtime)
 
+  ksp(project(":annotations-processors"))
+  implementation(project(":annotations"))
+
   implementation(libs.kotlin.stdlib)
   implementation(libs.constraintlayout)
   implementation(libs.flowbinding)
