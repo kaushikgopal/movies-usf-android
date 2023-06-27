@@ -30,8 +30,9 @@ class ViewModelProcessor(
   /**
    * This function contains the main logic to process the [ViewModel] annotation.
    *
-   * @param resolver [Resolver] helps you grab a bunch of info on class annotated with [ViewModel]
-   *   including classes, properties, functions (each having their own [KDeclaration])
+   * @param resolver [Resolver] helps you grab a bunch of info on class annotated with
+   *   [UsfViewModel] including classes, properties, functions (each having their own
+   *   [KDeclaration])
    */
   override fun process(resolver: Resolver): List<KSAnnotated> {
     val viewModelClassName = ViewModel::class.asClassName()
@@ -48,8 +49,11 @@ class ViewModelProcessor(
 
     val sourceFiles = symbols.mapNotNull { it.containingFile }
     val fileText = buildString {
-      append("// ")
-      append(sourceFiles.joinToString(", "))
+      sourceFiles.forEach {
+        append("// ")
+        append(it.fileName)
+        append("\n")
+      }
     }
     val file =
         codeGenerator.createNewFile(
