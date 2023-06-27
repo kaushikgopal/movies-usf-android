@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.*
 import timber.log.Timber
 
 @OptIn(ExperimentalCoroutinesApi::class)
-abstract class UsfVmImpl<E : Any, R : Any, VS : Any, VE : Any>(
+abstract class UsfViewModelImpl<E : Any, R : Any, VS : Any, VE : Any>(
     initialState: VS,
     private val coroutineScope: CoroutineScope,
     private val processingDispatcher: CoroutineDispatcher = Dispatchers.IO,

@@ -17,7 +17,7 @@ import co.kaush.msusf.movies.MSMovieEvent.AddToHistoryEvent
 import co.kaush.msusf.movies.MSMovieEvent.RestoreFromHistoryEvent
 import co.kaush.msusf.movies.MSMovieEvent.ScreenLoadEvent
 import co.kaush.msusf.movies.MSMovieEvent.SearchMovieEvent
-import co.kaush.msusf.movies.MSMovieVm.MSMovieVmFactory
+import co.kaush.msusf.movies.MSMovieViewModel.MSMovieVmFactory
 import co.kaush.msusf.movies.databinding.ActivityMainBinding
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -34,7 +34,7 @@ import timber.log.Timber
 class MSMovieActivity : ComponentActivity() {
 
   private lateinit var movieRepo: MSMovieRepository
-  private lateinit var viewModel: MSMovieVm
+  private lateinit var viewModel: MSMovieViewModel
   private lateinit var listAdapter: MSMovieSearchHistoryAdapter
   private lateinit var binding: ActivityMainBinding
 
@@ -62,7 +62,7 @@ class MSMovieActivity : ComponentActivity() {
         ViewModelProvider(
             this,
             MSMovieVmFactory(appComponent.app, movieRepo),
-        )[MSMovieVm::class.java]
+        )[MSMovieViewModel::class.java]
 
     viewModel.viewState
         .onEach { render(it) }

@@ -16,14 +16,14 @@ import kotlinx.coroutines.CoroutineScope
  * Our Unit tests should still be able to run given this
  */
 @UsfViewModel
-class MSMovieVm(
+class MSMovieViewModel(
     app: MSApp,
     movieRepo: MSMovieRepository,
     coroutineScope: CoroutineScope? = null,
 ) : AndroidViewModel(app), UsfVm<MSMovieEvent, MSMovieResult, MSMovieViewState, MSMovieViewEffect> {
 
   private val usfVmImpl: UsfVm<MSMovieEvent, MSMovieResult, MSMovieViewState, MSMovieViewEffect> =
-      MSMovieVmImpl(
+      MSMovieViewModelImpl(
           movieRepo,
           coroutineScope ?: viewModelScope,
       )
@@ -37,7 +37,7 @@ class MSMovieVm(
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-      return MSMovieVm(app, movieRepo) as T
+      return MSMovieViewModel(app, movieRepo) as T
     }
   }
 
