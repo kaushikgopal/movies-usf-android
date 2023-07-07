@@ -18,9 +18,9 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.mock
 
-class MSMovieVmTest {
+class MSMovieViewModelTest {
 
-  private lateinit var viewModel: MSMovieVm
+  private lateinit var viewModel: MSMovieViewModel
 
   private val testAppComponent = TestAppComponent::class.create()
 
@@ -28,7 +28,7 @@ class MSMovieVmTest {
 
   @Before
   fun setUp() {
-    viewModel = MSMovieVm(mockApp, fakeMovieAppRepository)
+    viewModel = MSMovieViewModel(mockApp, fakeMovieAppRepository)
   }
 
   @Test

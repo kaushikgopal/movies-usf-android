@@ -1,15 +1,15 @@
 package co.kaush.msusf.movies
 
-import co.kaush.msusf.usf.UsfVmImpl
+import co.kaush.msusf.usf.UsfViewModelImpl
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-class MSMovieVmImpl(
+class MSMovieViewModelImpl(
     private val movieRepo: MSMovieRepository,
     coroutineScope: CoroutineScope,
 ) :
-    UsfVmImpl<MSMovieEvent, MSMovieResult, MSMovieViewState, MSMovieViewEffect>(
+    UsfViewModelImpl<MSMovieEvent, MSMovieResult, MSMovieViewState, MSMovieViewEffect>(
         MSMovieViewState(),
         coroutineScope,
     ) {
