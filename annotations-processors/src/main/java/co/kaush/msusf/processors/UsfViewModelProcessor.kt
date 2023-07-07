@@ -1,8 +1,8 @@
 package co.kaush.msusf.processor
 
-import co.kaush.msusf.annotations.ViewModel
+import co.kaush.msusf.annotations.UsfViewModel
+import co.kaush.msusf.processors.UsfViewModelVisitor
 import com.google.devtools.ksp.processing.CodeGenerator
-import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
@@ -21,7 +21,7 @@ import com.squareup.kotlinpoet.asClassName
  *   using the code from the processor
  * @param logger [KSPLogger] responsible for logging messages to the console (errors/warnings)
  */
-class ViewModelProcessor(
+class UsfViewModelProcessor(
     private val codeGenerator: CodeGenerator,
     private val logger: KSPLogger,
     private val options: Map<String, String>,
@@ -35,7 +35,7 @@ class ViewModelProcessor(
    *   [KDeclaration])
    */
   override fun process(resolver: Resolver): List<KSAnnotated> {
-    val viewModelClassName = ViewModel::class.asClassName()
+    val viewModelClassName = UsfViewModel::class.asClassName()
 
     // find all classes that have been annotated with @ViewModel
     val symbols =
@@ -48,6 +48,14 @@ class ViewModelProcessor(
     if (!symbols.iterator().hasNext()) return emptyList()
 
     val sourceFiles = symbols.mapNotNull { it.containingFile }
+
+    symbols.forEach { annotatedClass ->
+      // Visit different parts of the class and perform actions
+      annotatedClass.accept(UsfViewModelVisitor(codeGenerator, logger, options), Unit)
+    }
+
+    /*val sourceFiles = symbols.mapNotNull { it.containingFile }
+
     val fileText = buildString {
       sourceFiles.forEach {
         append("// ")
@@ -65,34 +73,7 @@ class ViewModelProcessor(
             "GeneratedLists",
         )
 
-    file.write(fileText.toByteArray())
-
-    /*
-          symbols.forEach { classDeclaration ->
-            // The ViewModelContainer provide information on what Dagger Scope the generated classes
-            // should be added to all of these values are hard coded strings not the best, but I couldn't
-            // figure out a better way
-            val scopeArg: KSValueArgument? =
-                classDeclaration.annotations
-                    .first { it.shortName.asString() == viewModelClassName.simpleName }
-                    .arguments
-                    .firstOrNull { arg -> arg.name?.asString() == "scope" }
-
-            if (scopeArg == null) {
-              classDeclaration.accept(ViewModelVisitor(codeGenerator, logger), Unit)
-            } else {
-              val scopeClassType = (scopeArg.value as KSType).toClassName()
-
-              if (scopeClassType == Nothing::class.asClassName() ||
-                scopeClassType == Void::class.asClassName()) {
-                classDeclaration.accept(ViewModelVisitor(codeGenerator, logger), Unit)
-              } else {
-      //          classDeclaration.accept(Visitor(scopeClassType), Unit)
-              }
-            }
-
-          }
-    */
+    file.write(fileText.toByteArray())*/
 
     return (symbols).filterNot { it.validate() }.toList()
   }
