@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import co.kaush.msusf.MSApp
-import co.kaush.msusf.annotations.UsfViewModel
 import co.kaush.msusf.usf.UsfVm
 import kotlinx.coroutines.CoroutineScope
 
@@ -15,7 +14,6 @@ import kotlinx.coroutines.CoroutineScope
  *
  * Our Unit tests should still be able to run given this
  */
-@UsfViewModel
 class MSMovieViewModel(
     app: MSApp,
     movieRepo: MSMovieRepository,
