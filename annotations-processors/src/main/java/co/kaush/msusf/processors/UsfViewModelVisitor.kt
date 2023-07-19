@@ -1,13 +1,17 @@
 package co.kaush.msusf.processors
 
-import co.kaush.msusf.processors.UsfViewModelClassBuilderDefinition.Companion.RESERVED_WORDS
+import com.google.devtools.ksp.innerArguments
+import com.google.devtools.ksp.isPublic
 import com.google.devtools.ksp.processing.CodeGenerator
+import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.ClassKind
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.symbol.KSTypeReference
 import com.google.devtools.ksp.symbol.KSVisitorVoid
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import com.squareup.kotlinpoet.ksp.toClassName
 
 class UsfViewModelVisitor(
     private val codeGenerator: CodeGenerator,
@@ -15,24 +19,116 @@ class UsfViewModelVisitor(
     private val options: Map<String, String>,
 ) : KSVisitorVoid() {
 
+  private val reservedFunctionsNames =
+      setOf("equals", "hashCode", "toString", "getApplication", "<init>")
+
   override fun visitClassDeclaration(classDeclaration: KSClassDeclaration, data: Unit) {
     if (classDeclaration.classKind != ClassKind.CLASS) {
       logger.error("Only class can be annotated with @CLASS", classDeclaration)
       throw IllegalArgumentException()
     }
 
-    // ensure no reserved words are used
-    RESERVED_WORDS.forEach { reservedWord ->
-      if (classDeclaration.simpleName.getShortName().endsWith(reservedWord)) {
-        logger.error("Class can not end in $reservedWord", classDeclaration)
-        throw UnsupportedOperationException()
+    if (classDeclaration.containingFile == null) {
+      logger.error(
+          "Attempted to add annotation to file that does not exist",
+          classDeclaration.containingFile,
+      )
+      throw IllegalArgumentException()
+    }
+
+    val definition = generateGenericClassBuilderDefinition(classDeclaration)
+    val fileSpec = UsfViewModelFileBuilder.buildFileSpecForAndroidViewModel(definition)
+
+    codeGenerator
+        .createNewFile(
+            dependencies = Dependencies(false, classDeclaration.containingFile!!),
+            packageName = classDeclaration.toClassName().packageName,
+            fileName = fileSpec.name,
+        )
+        .use { it.write(fileSpec.toString().toByteArray()) }
+  }
+
+  private fun generateGenericClassBuilderDefinition(
+      classDeclaration: KSClassDeclaration
+  ): UsfViewModelClassBuilderDefinition {
+    val constructorParams = mutableListOf<ParametersDefinition>()
+
+    classDeclaration.primaryConstructor?.parameters?.forEach { ksValueParameter ->
+      val paramType = ksValueParameter.type.resolve().toClassName()
+      val name = ksValueParameter.name?.getShortName()
+
+      if (name != null) {
+        constructorParams.add(ParametersDefinition(name, paramType))
       }
     }
 
+    val functions = mutableListOf<FunctionsDefinition>()
+    classDeclaration.getAllFunctions().forEach { ksFunctionDeclaration ->
+      val functionName = ksFunctionDeclaration.simpleName.getShortName()
 
+      if (ksFunctionDeclaration.isPublic() && !reservedFunctionsNames.contains(functionName)) {
 
+        val funParams = mutableListOf<ParametersDefinition>()
+        ksFunctionDeclaration.parameters.map {
+          val varName = it.name?.getShortName()
+          if (varName != null) {
+            funParams.add(ParametersDefinition(varName, it.type.resolve().toClassName()))
+          }
+        }
 
+        val returnType =
+            try {
+              ksFunctionDeclaration.returnType?.resolve()?.toClassName()
+            } catch (ex: Exception) {
+              throw ex
+            }
 
+        // might need to include nullability data....
+        functions.add(
+            FunctionsDefinition(
+                functionName,
+                funParams,
+                returnType,
+            ),
+        )
+      }
+    }
+
+    val properties = mutableListOf<ParametersDefinition>()
+    classDeclaration.getAllProperties().forEach { ksPropertyDecleration ->
+      if (ksPropertyDecleration.isPublic()) {
+
+        val returnType = ksPropertyDecleration.type.resolve()
+
+        val genericParams =
+            returnType.innerArguments.mapNotNull { it.type?.resolve()?.toClassName() }
+
+        // TODO: Figure this out
+        val returnTypeClassName =
+            if (genericParams.isNotEmpty()) {
+              returnType.toClassName().parameterizedBy(genericParams).rawType
+            } else {
+              returnType.toClassName()
+            }
+
+        properties.add(
+            ParametersDefinition(
+                ksPropertyDecleration.simpleName.getShortName(),
+                returnTypeClassName,
+            ),
+        )
+      }
+    }
+
+    return UsfViewModelClassBuilderDefinition(
+        constructorParams,
+        functions,
+        properties,
+        ParametersDefinition(
+            classDeclaration.simpleName.getShortName(),
+            classDeclaration.toClassName(),
+        ),
+    )
   }
 
   override fun visitFunctionDeclaration(function: KSFunctionDeclaration, data: Unit) {
