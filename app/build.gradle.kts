@@ -59,6 +59,7 @@ dependencies {
   implementation(libs.picasso)
   implementation(libs.lifecycle.viewmodel.ktx)
   implementation(libs.lifecycle.runtime.ktx)
+  implementation(libs.lifecycle.viewmodel.savedstate)
   implementation(libs.okhttp.logging.interceptor)
   implementation(libs.retrofit.gson)
   implementation(libs.retrofit)
