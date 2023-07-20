@@ -28,7 +28,7 @@ class MSMovieViewModelTest {
 
   @Before
   fun setUp() {
-    viewModel = MSMovieViewModel(mockApp, fakeMovieAppRepository)
+    viewModel = MSMovieViewModel(fakeMovieAppRepository, mockApp)
   }
 
   @Test

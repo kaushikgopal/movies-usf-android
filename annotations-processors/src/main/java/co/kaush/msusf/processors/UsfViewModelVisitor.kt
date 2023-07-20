@@ -24,7 +24,7 @@ class UsfViewModelVisitor(
 
   override fun visitClassDeclaration(classDeclaration: KSClassDeclaration, data: Unit) {
     if (classDeclaration.classKind != ClassKind.CLASS) {
-      logger.error("Only class can be annotated with @CLASS", classDeclaration)
+      logger.error("Only a class can be annotated with this annotation", classDeclaration)
       throw IllegalArgumentException()
     }
 
@@ -36,16 +36,20 @@ class UsfViewModelVisitor(
       throw IllegalArgumentException()
     }
 
-    val definition = generateGenericClassBuilderDefinition(classDeclaration)
-    val fileSpec = UsfViewModelFileBuilder.buildFileSpecForAndroidViewModel(definition)
+    val classBuilderDefinition = generateGenericClassBuilderDefinition(classDeclaration)
+
+    val packageName = classDeclaration.toClassName().packageName
+
+    val fileSpecForClass =
+        UsfViewModelFileBuilder.buildFileSpec(classBuilderDefinition, packageName)
 
     codeGenerator
         .createNewFile(
             dependencies = Dependencies(false, classDeclaration.containingFile!!),
-            packageName = classDeclaration.toClassName().packageName,
-            fileName = fileSpec.name,
+            packageName = packageName,
+            fileName = fileSpecForClass.name,
         )
-        .use { it.write(fileSpec.toString().toByteArray()) }
+        .use { it.write(fileSpecForClass.toString().toByteArray()) }
   }
 
   private fun generateGenericClassBuilderDefinition(

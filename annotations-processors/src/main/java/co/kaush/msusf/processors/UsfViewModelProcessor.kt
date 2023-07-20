@@ -12,10 +12,11 @@ import com.google.devtools.ksp.validate
 import com.squareup.kotlinpoet.asClassName
 
 /**
- * This processor handles all classes annotated with @[ViewModel]. You typically annotate a
- * ViewModel implementation class (*VMImpl) with @[ViewModel]. The processor then goes on to
- * generate the corresponding *VM boilerplate code necessary to access the ViewModel from an
- * Activity/Fragment.
+ * This processor handles all classes annotated with @[UsfViewModel].
+ *
+ * You typically annotate a ViewModel implementation class (*VMImpl) with @[UsfViewModel]. The
+ * processor then goes on to generate the corresponding *VM boilerplate code necessary to access the
+ * ViewModel from an Activity/Fragment.
  *
  * @param codeGenerator [CodeGenerator] responsible for creating the files that will be generated
  *   using the code from the processor
@@ -37,7 +38,7 @@ class UsfViewModelProcessor(
   override fun process(resolver: Resolver): List<KSAnnotated> {
     val viewModelClassName = UsfViewModel::class.asClassName()
 
-    // find all classes that have been annotated with @ViewModel
+    // find all classes that have been annotated with @UsfViewModel
     val symbols =
         resolver
             .getSymbolsWithAnnotation(viewModelClassName.toString())
@@ -46,8 +47,6 @@ class UsfViewModelProcessor(
     // symbols is a [Sequence] not a [List], so we don't know its size in advance
     // hence the use of an iterator to check if it's empty
     if (!symbols.iterator().hasNext()) return emptyList()
-
-    val sourceFiles = symbols.mapNotNull { it.containingFile }
 
     symbols.forEach { annotatedClass ->
       // Visit different parts of the class and perform actions
