@@ -3,9 +3,9 @@ package co.kaush.msusf.movies
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -17,7 +17,7 @@ import co.kaush.msusf.movies.MSMovieEvent.AddToHistoryEvent
 import co.kaush.msusf.movies.MSMovieEvent.RestoreFromHistoryEvent
 import co.kaush.msusf.movies.MSMovieEvent.ScreenLoadEvent
 import co.kaush.msusf.movies.MSMovieEvent.SearchMovieEvent
-import co.kaush.msusf.movies.MSMovieViewModel.MSMovieVmFactory
+import co.kaush.msusf.movies.MSMovieViewModel.MSMovieViewModelFactory
 import co.kaush.msusf.movies.databinding.ActivityMainBinding
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -34,7 +34,8 @@ import timber.log.Timber
 class MSMovieActivity : ComponentActivity() {
 
   private lateinit var movieRepo: MSMovieRepository
-  private lateinit var viewModel: MSMovieViewModel
+  private val viewModel: MSMovieViewModel by viewModels { MSMovieViewModelFactory(movieRepo, this) }
+
   private lateinit var listAdapter: MSMovieSearchHistoryAdapter
   private lateinit var binding: ActivityMainBinding
 
@@ -57,12 +58,6 @@ class MSMovieActivity : ComponentActivity() {
     movieRepo = appComponent.movieRepository
 
     setupListView()
-
-    viewModel =
-        ViewModelProvider(
-            this,
-            MSMovieVmFactory(appComponent.app, movieRepo),
-        )[MSMovieViewModel::class.java]
 
     viewModel.viewState
         .onEach { render(it) }
@@ -143,7 +138,8 @@ class MSMovieActivity : ComponentActivity() {
 
     val dividerItemDecoration = DividerItemDecoration(this, HORIZONTAL)
     dividerItemDecoration.setDrawable(
-        ContextCompat.getDrawable(this, R.drawable.ms_list_divider_space)!!)
+        ContextCompat.getDrawable(this, R.drawable.ms_list_divider_space)!!,
+    )
     binding.msMainScreenSearchHistory.addItemDecoration(dividerItemDecoration)
 
     listAdapter = MSMovieSearchHistoryAdapter {

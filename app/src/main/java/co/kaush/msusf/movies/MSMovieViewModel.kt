@@ -1,10 +1,11 @@
 package co.kaush.msusf.movies
 
-import androidx.lifecycle.AndroidViewModel
+import android.os.Bundle
+import androidx.lifecycle.AbstractSavedStateViewModelFactory
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import co.kaush.msusf.MSApp
+import androidx.savedstate.SavedStateRegistryOwner
 import co.kaush.msusf.usf.UsfVm
 import kotlinx.coroutines.CoroutineScope
 
@@ -16,9 +17,9 @@ import kotlinx.coroutines.CoroutineScope
  */
 class MSMovieViewModel(
     movieRepo: MSMovieRepository,
-    app: MSApp,
     coroutineScope: CoroutineScope? = null,
-) : AndroidViewModel(app), UsfVm<MSMovieEvent, MSMovieResult, MSMovieViewState, MSMovieViewEffect> {
+    handle: SavedStateHandle? = null,
+) : ViewModel() {
 
   private val usfViewModelImpl:
       UsfVm<MSMovieEvent, MSMovieResult, MSMovieViewState, MSMovieViewEffect> =
@@ -29,17 +30,26 @@ class MSMovieViewModel(
 
   override fun processInput(event: MSMovieEvent) = usfViewModelImpl.processInput(event)
 
-  class MSMovieVmFactory(
-      private val app: MSApp,
-      private val movieRepo: MSMovieRepository,
-  ) : ViewModelProvider.Factory {
-
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-      return MSMovieViewModel(movieRepo, app) as T
-    }
-  }
-
   override val viewState = usfViewModelImpl.viewState
   override val viewEffect = usfViewModelImpl.viewEffect
+
+  // Define ViewModel factory in a companion object
+  class MSMovieViewModelFactory(
+      private val movieRepo: MSMovieRepository,
+      owner: SavedStateRegistryOwner,
+      defaultArgs: Bundle? = null,
+  ) : AbstractSavedStateViewModelFactory(owner = owner, defaultArgs = defaultArgs) {
+
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : ViewModel> create(
+        key: String,
+        modelClass: Class<T>,
+        handle: SavedStateHandle,
+    ): T =
+        MSMovieViewModel(
+            movieRepo = movieRepo,
+            handle = handle,
+        )
+            as T
+  }
 }
