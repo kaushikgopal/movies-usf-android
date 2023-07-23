@@ -28,7 +28,7 @@ abstract class UsfViewModelImpl<E : Any, R : Any, VS : Any, VE : Any>(
    * @return [Flow]<[R]> a single [E]vent can result in multiple [R]esults for e.g. emit a R for
    *   loading and another for the actual result
    */
-  abstract suspend fun eventToResultFlow(event: E): Flow<R>
+  protected abstract suspend fun eventToResultFlow(event: E): Flow<R>
 
   /**
    * @param currentViewState the current [VS]tate of the view (.copy it for the returned [VS]tate)
@@ -36,14 +36,14 @@ abstract class UsfViewModelImpl<E : Any, R : Any, VS : Any, VE : Any>(
    *   be transformed into a single [VS]tate if you want multiple [VS]tates emit multiple [R]esults
    *   transforming each [R]esult to the respective [VS]tate
    */
-  abstract suspend fun resultToViewState(currentViewState: VS, result: R): VS
+  protected abstract suspend fun resultToViewState(currentViewState: VS, result: R): VS
 
   /**
    * @param result a single [R]esult can result in multiple [VE]s for e.g. emit a VE for navigation
    *   and another for an analytics call hence a return type of [Flow]<[VE]>
    * @return [Flow] of [VE]s where null emissions will be ignored automatically
    */
-  abstract suspend fun resultToViewEffectFlow(result: R): Flow<VE?>
+  protected abstract suspend fun resultToViewEffectFlow(result: R): Flow<VE?>
 
   private val _events = MutableSharedFlow<E>()
   private val _viewState = MutableStateFlow(initialState)
