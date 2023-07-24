@@ -1,5 +1,6 @@
 package co.kaush.msusf.processors
 
+import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
@@ -134,9 +135,14 @@ object UsfViewModelFileBuilder {
 
     val genericViewModel =
         com.squareup.kotlinpoet.TypeVariableName("T", androidViewModelTypeClassName)
+
+    val suppressAnnotation =
+        AnnotationSpec.Companion.builder(Suppress::class).addMember("%S", "UNCHECKED_CAST").build()
+
     val factoryCreateFunctionSpec =
         FunSpec.builder("create")
             .addTypeVariable(genericViewModel)
+            .addAnnotation(suppressAnnotation)
             .addParameter(
                 "modelClass", Class::class.asClassName().parameterizedBy(genericViewModel))
             .addCode(
