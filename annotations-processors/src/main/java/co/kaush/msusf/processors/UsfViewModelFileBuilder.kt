@@ -14,108 +14,75 @@ import com.squareup.kotlinpoet.asClassName
 object UsfViewModelFileBuilder {
 
   private const val androidxPackage = "androidx.lifecycle"
-  private val saveStateHandleTypeClassName = ClassName(androidxPackage, "SavedStateHandle")
-  private val androidViewModelTypeClassName = ClassName(androidxPackage, "AndroidViewModel")
-  private val vmFactoryTypeClassName =
-      ClassName(androidxPackage, "AbstractSavedStateViewModelFactory")
+  private val androidViewModelTypeClassName = ClassName(androidxPackage, "ViewModel")
+
+  private val viewModelProviderTypeClassName =
+      ClassName(androidxPackage, "ViewModelProvider.Factory")
 
   private const val kotlinxPackage = "kotlinx.coroutines"
   private val coroutineScopeClassName = ClassName(kotlinxPackage, "CoroutineScope")
 
   private const val viewModelScopeReservedWord = "viewModelScope"
-  private const val handleReservedWord = "handle"
 
   /** File level structure */
   fun buildFileSpec(
       viewModelClassBuilderDefinition: UsfViewModelClassBuilderDefinition,
       packageName: String,
   ): FileSpec {
-
-    val vmInterfaceTypeName = "UsfVm"
-    val vmInterfacePackage = "co.kaush.msusf.usf"
-
-    val vmInterfaceTypeInterfaceName = ClassName(vmInterfacePackage, vmInterfaceTypeName)
-
-    return FileSpec.builder(
-            packageName,
-            "${viewModelClassBuilderDefinition.simplifiedClassName()}1",
-        )
-        .addType(
-            buildAndroidViewModelClassSpec(
-                vmInterfaceTypeInterfaceName,
-                packageName,
-                viewModelClassBuilderDefinition,
-            ),
-        )
-        .addImport(androidxPackage, "viewModelScope")
-        .addImport(vmInterfacePackage, vmInterfaceTypeName)
+    return FileSpec.builder(packageName, viewModelClassBuilderDefinition.simplifiedClassName)
+        .addType(buildAndroidViewModelClassSpec(viewModelClassBuilderDefinition))
+        .addImport(androidxPackage, "viewModelScope", "ViewModelProvider")
         .build()
   }
 
   /** Class level structure */
   private fun buildAndroidViewModelClassSpec(
-      vmInterfaceTypeInterfaceName: ClassName,
-      packageName: String,
-      viewModelClassBuilderDefinition: UsfViewModelClassBuilderDefinition
+      viewModelClassBuilderDefinition: UsfViewModelClassBuilderDefinition,
   ): TypeSpec {
 
     val classBuilder =
-        TypeSpec.classBuilder("${viewModelClassBuilderDefinition.simplifiedClassName()}1")
+        TypeSpec.classBuilder(viewModelClassBuilderDefinition.simplifiedClassName)
             .addModifiers(KModifier.PUBLIC)
             .superclass(androidViewModelTypeClassName)
-            .addSuperinterface(vmInterfaceTypeInterfaceName)
 
     val constructorBuilder = FunSpec.constructorBuilder()
 
-    addParamsToClassConstructor(
-        viewModelClassBuilderDefinition,
-        constructorBuilder,
-        classBuilder,
-        false,
-    )
-
     val paramsForConstructor =
         buildParamForwardingConstructorBody(
-            viewModelClassBuilderDefinition.parameters,
-            setOf(),
-            setOf(coroutineScopeClassName),
-        ) { sb, param ->
-          when (param.paramType) {
-            coroutineScopeClassName -> {
-              sb.append("\t${param.paramName} = $viewModelScopeReservedWord,\n")
+            viewModelClassBuilderDefinition.parameters, setOf(), setOf(coroutineScopeClassName)) {
+                sb,
+                param ->
+              when (param.paramType) {
+                coroutineScopeClassName -> {
+                  sb.append("\t${param.paramName} = $viewModelScopeReservedWord,\n")
+                }
+                else -> {
+                  // no-op
+                }
+              }
             }
-          }
-        }
+
+    addParamsToClassConstructor(
+        viewModelClassBuilderDefinition, constructorBuilder, classBuilder, false)
 
     classBuilder.addProperty(
         PropertySpec.builder(
-                viewModelClassBuilderDefinition.simplifiedClassName(),
+                viewModelClassBuilderDefinition.viewModel.paramName,
                 viewModelClassBuilderDefinition.viewModel.paramType,
-                KModifier.PRIVATE,
-            )
+                KModifier.PRIVATE)
             .initializer(
-                "${viewModelClassBuilderDefinition.viewModel.paramType.simpleName}$paramsForConstructor",
-            )
-            .build(),
-    )
+                "${(viewModelClassBuilderDefinition.viewModel.paramType as? ClassName)?.simpleName}$paramsForConstructor")
+            .build())
     classBuilder.primaryConstructor(constructorBuilder.build())
 
     viewModelClassBuilderDefinition.functions.forEach { functionMetaData ->
       val functionBuilder = FunSpec.builder(functionMetaData.name).addModifiers(KModifier.PUBLIC)
 
-      val params =
-          functionMetaData.parameters.map {
-            ParameterSpec(
-                it.paramName,
-                it.paramType,
-            )
-          }
+      val params = functionMetaData.parameters.map { ParameterSpec(it.paramName, it.paramType) }
       functionBuilder.addParameters(params)
 
       val funcCallString =
-          "${viewModelClassBuilderDefinition.simplifiedClassName()}.${functionMetaData.name}${
-            buildParamForwardingConstructorBody(functionMetaData.parameters)
-          }"
+          "${viewModelClassBuilderDefinition.viewModel.paramName}.${functionMetaData.name}${buildParamForwardingConstructorBody(functionMetaData.parameters)}"
 
       if (functionMetaData.returnType != null) {
         functionBuilder.returns(functionMetaData.returnType)
@@ -138,10 +105,8 @@ object UsfViewModelFileBuilder {
               .getter(
                   FunSpec.getterBuilder()
                       .addStatement(
-                          "return ${viewModelClassBuilderDefinition.simplifiedClassName()}.${propertyMetaData.paramName}",
-                      )
-                      .build(),
-              )
+                          "return ${viewModelClassBuilderDefinition.viewModel.paramName}.${propertyMetaData.paramName}")
+                      .build())
 
       classBuilder.addProperty(property.build())
     }
@@ -155,47 +120,27 @@ object UsfViewModelFileBuilder {
       ViewModelClassBuilderDefinition: UsfViewModelClassBuilderDefinition
   ): TypeSpec {
     val classBuilder =
-        TypeSpec.classBuilder(
-            "${ViewModelClassBuilderDefinition.simplifiedClassName()}Factory",
-        )
-    val constructorBuilder = FunSpec.constructorBuilder()
+        TypeSpec.classBuilder("${ViewModelClassBuilderDefinition.simplifiedClassName}Factory")
+            .addSuperinterface(viewModelProviderTypeClassName)
 
-    classBuilder.superclass(vmFactoryTypeClassName)
+    val constructorBuilder = FunSpec.constructorBuilder()
 
     val paramsForConstructor =
         buildParamForwardingConstructorBody(
-            ViewModelClassBuilderDefinition.parameters,
-            setOf(coroutineScopeClassName),
-            setOf(saveStateHandleTypeClassName),
-        ) { sb, param ->
-          when (param.paramType) {
-            saveStateHandleTypeClassName -> {
-              sb.append("\t${param.paramName} = $handleReservedWord,\n")
-            }
-          }
-        }
+            ViewModelClassBuilderDefinition.parameters, setOf(coroutineScopeClassName), emptySet())
 
     addParamsToClassConstructor(
-        ViewModelClassBuilderDefinition,
-        constructorBuilder,
-        classBuilder,
-        true,
-    )
+        ViewModelClassBuilderDefinition, constructorBuilder, classBuilder, true)
 
     val genericViewModel =
         com.squareup.kotlinpoet.TypeVariableName("T", androidViewModelTypeClassName)
     val factoryCreateFunctionSpec =
         FunSpec.builder("create")
             .addTypeVariable(genericViewModel)
-            .addParameter("key", String::class)
             .addParameter(
-                "modelClass",
-                Class::class.asClassName().parameterizedBy(genericViewModel),
-            )
-            .addParameter(handleReservedWord, saveStateHandleTypeClassName)
+                "modelClass", Class::class.asClassName().parameterizedBy(genericViewModel))
             .addCode(
-                "return ${ViewModelClassBuilderDefinition.viewModel.paramName}$paramsForConstructor as T",
-            )
+                "return ${ViewModelClassBuilderDefinition.simplifiedClassName}$paramsForConstructor as T")
             .returns(genericViewModel)
             .addModifiers(KModifier.OVERRIDE)
 
@@ -223,13 +168,9 @@ object UsfViewModelFileBuilder {
       if (addAsProperty) {
         classBuilder.addProperty(
             PropertySpec.builder(
-                    paramMetaData.paramName,
-                    paramMetaData.paramType,
-                    KModifier.PRIVATE,
-                )
+                    paramMetaData.paramName, paramMetaData.paramType, KModifier.PRIVATE)
                 .initializer(paramMetaData.paramName)
-                .build(),
-        )
+                .build())
       }
     }
   }
@@ -259,7 +200,6 @@ object UsfViewModelFileBuilder {
       if (params.isNotEmpty()) {
         delete(length - 2, length)
       }
-
       append("\n)")
     }
   }
