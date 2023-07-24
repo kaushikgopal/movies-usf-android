@@ -9,16 +9,15 @@ Many of my contemporaries have already done amazing work in this area and I've d
 * [MVI patterns with Hannes Dorfmann](http://fragmentedpodcast.com/episodes/103/) - [Hannes Dorfmann](https://twitter.com/sockeqwe)
 * [LCE: Modeling Data Loading in RxJava](https://tech.instacart.com/lce-modeling-data-loading-in-rxjava-b798ac98d80) - [Laimonas](https://twitter.com/ThatLime)
 
-I wanted to achieve the benefits of this pattern without necessarily introducing any new libraries
-(aside from Rx). How would one familiar with an MVVM model today step to a world where all data flows in a single direction? I hope to demo those concepts with this app.
+I wanted to achieve the benefits of this pattern without introducing any new libraries
+or a new framework. How would one familiar with an MVVM model today leverage the principles/benefits of a unidirectional state/data flow? I hope to demo those concepts with this app.
 
 ![usf_animation.gif "picture showing the USF animation"](usf_animation.gif)
 
 
-The app in itself is a simple movie searching app. Clicking the movie result populates a history list. While this is not an extremely complex app, it isn't a silly Hello World one either, so the hope is that it'll cover regular use cases for a basic application.
+The app is a simple movie search app. Clicking the movie result populates a history list. While this is not an extremely complex app, it isn't a silly Hello World one either, so the hope is that it'll cover regular use cases for a basic application.
 
 I've also started meaninful test cases in the repo.
-
 
 ## Setting up your OMDB API KEY
 
@@ -34,9 +33,17 @@ There are quotas on this api, so please don't use mine :)
 OMDB_API_KEY="<API_KEY_GOES_HERE>"
 ```
 
-For great movie recommendations, ping me [@kaushikgopal](https://twitter.com/kaushikgopal) (seriously, I watch a lot of movies).
+For great movie recommendations, ping me [@kau.sh](https://kau.sh) (seriously, I watch a lot of movies).
 
 I gave a talk at [MBLT}Dev 2018](https://twitter.com/mbltdev) on how I went about building this app. [Slides can be found here](https://speakerdeck.com/kaushikgopal/unidirectional-state-flow-patterns-a-refactoring-story).
+
+## Getting Started
+
+This project now uses [ksp](https://kotlinlang.org/docs/ksp-overview.html) to reduce the boilerplate in wiring up a new feature. [This PR](https://github.com/kaushikgopal/movies-usf-android/pull/32) has the details for how this change was made.
+
+All that's needed is writing the implementation of your ViewModel so `MyFeatureViewModelImpl: UsfViewModelImpl<E, R, VS, VE>` and adding the `@UsfViewModel` annotation. Your ViewModel boilerplate code will be auto-generated.
+
+Take a look at [MSMovieViewModelImpl](https://github.com/kaushikgopal/movies-usf-android/blob/master/app/src/main/java/co/kaush/msusf/movies/MSMovieViewModelImpl.kt) for details. 
 
 # iOS app
 
