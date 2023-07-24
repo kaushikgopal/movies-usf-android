@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 
 sealed class MSMovieResult {
+
   abstract val loading: Boolean
   abstract val errorMessage: String
   abstract fun toViewState(currentViewState: MSMovieViewState): MSMovieViewState
@@ -25,6 +26,7 @@ sealed class MSMovieResult {
       override val errorMessage: String = "",
       val movie: MSMovie? = null,
   ) : MSMovieResult() {
+
     override fun toViewState(currentViewState: MSMovieViewState): MSMovieViewState {
       val movie: MSMovie = movie!!
 
@@ -45,6 +47,7 @@ sealed class MSMovieResult {
       override val errorMessage: String = "",
       val movie: MSMovie? = null,
   ) : MSMovieResult() {
+
     override fun toViewState(currentViewState: MSMovieViewState): MSMovieViewState {
       val movie: MSMovie = movie!!
 

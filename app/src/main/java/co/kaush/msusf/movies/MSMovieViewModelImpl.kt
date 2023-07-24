@@ -88,7 +88,6 @@ class MSMovieViewModelImpl(
   // -----------------------------------------------------------------------------------
   // Results -> ViewEffect
 
-  override suspend fun resultToViewEffectFlow(result: MSMovieResult): Flow<MSMovieViewEffect?> {
-    return result.toViewEffect()
-  }
+  override suspend fun resultToViewEffectFlow(result: MSMovieResult): Flow<MSMovieViewEffect?> =
+      result.toViewEffect()
 }
