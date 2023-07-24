@@ -81,40 +81,13 @@ class MSMovieViewModelImpl(
       result.errorMessage.isNotBlank() -> {
         currentViewState.copy(searchedMovieTitle = result.errorMessage)
       }
-      result is MSMovieResult.ScreenLoadResult -> {
-        currentViewState.copy(searchBoxText = "load test")
-      }
-      result is MSMovieResult.SearchMovieResult -> {
-        val movie: MSMovie = result.movie!!
-
-        currentViewState.copy(
-            searchBoxText = movie.title,
-            searchedMovieTitle = movie.title,
-            searchedMovieRating = movie.ratingSummary,
-            searchedMoviePoster = movie.posterUrl,
-            searchedMovieReference = movie,
-        )
-      }
-      result is MSMovieResult.AddToHistoryResult -> {
-        val movie: MSMovie = result.movie!!
-
-        if (!currentViewState.adapterList.contains(movie)) {
-          currentViewState.copy(adapterList = currentViewState.adapterList.plus(movie))
-        } else currentViewState.copy()
-      }
-      else -> throw RuntimeException("Unexpected result")
+      else -> result.toViewState(currentViewState)
     }
   }
 
   // -----------------------------------------------------------------------------------
   // Results -> ViewEffect
 
-  override suspend fun resultToViewEffectFlow(result: MSMovieResult): Flow<MSMovieViewEffect?> {
-    return flow {
-      when (result) {
-        is MSMovieResult.AddToHistoryResult -> emit(MSMovieViewEffect.AddedToHistoryToastEffect)
-        else -> emit(null)
-      }
-    }
-  }
+  override suspend fun resultToViewEffectFlow(result: MSMovieResult): Flow<MSMovieViewEffect?> =
+      result.toViewEffect()
 }
