@@ -2,7 +2,6 @@ package co.kaush.msusf.movies
 
 import app.cash.turbine.test
 import app.cash.turbine.turbineScope
-import co.kaush.msusf.MSApp
 import co.kaush.msusf.movies.MSMovieEvent.AddToHistoryEvent
 import co.kaush.msusf.movies.MSMovieEvent.RestoreFromHistoryEvent
 import co.kaush.msusf.movies.MSMovieEvent.ScreenLoadEvent
@@ -16,7 +15,6 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito.mock
 
 class MSMovieViewModelTest {
 
@@ -28,7 +26,7 @@ class MSMovieViewModelTest {
 
   @Before
   fun setUp() {
-    viewModel = MSMovieViewModel(fakeMovieAppRepository, mockApp)
+    viewModel = MSMovieViewModel(fakeMovieAppRepository)
   }
 
   @Test
@@ -122,6 +120,4 @@ class MSMovieViewModelTest {
       }
     }
   }
-
-  private val mockApp: MSApp by lazy { mock(MSApp::class.java) }
 }
