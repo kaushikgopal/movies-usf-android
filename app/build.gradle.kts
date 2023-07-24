@@ -1,4 +1,4 @@
-@Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
+@file:Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed (or agp 8.1)
 plugins {
   alias(libs.plugins.android.application)
   alias(libs.plugins.kotlin.android)
@@ -48,14 +48,20 @@ dependencies {
   ksp(libs.kotlin.inject.compiler)
   implementation(libs.kotlin.inject.runtime)
 
+  ksp(project(":annotations-processors"))
+  implementation(project(":annotations"))
+
   implementation(libs.kotlin.stdlib)
   implementation(libs.constraintlayout)
+  implementation(libs.activity.ktx)
   implementation(libs.flowbinding)
   implementation(libs.kotlinx.coroutines.android)
   implementation(libs.kotlinx.coroutines.core)
   implementation(libs.picasso)
-  implementation(libs.lifecycle.viewmodel.ktx)
   implementation(libs.lifecycle.runtime.ktx)
+  implementation(libs.lifecycle.viewmodel)
+  implementation(libs.lifecycle.viewmodel.ktx)
+  implementation(libs.lifecycle.viewmodel.savedstate)
   implementation(libs.okhttp.logging.interceptor)
   implementation(libs.retrofit.gson)
   implementation(libs.retrofit)
