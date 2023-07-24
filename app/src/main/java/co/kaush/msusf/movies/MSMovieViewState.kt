@@ -19,25 +19,3 @@ sealed class MSMovieEvent {
   data class AddToHistoryEvent(val searchedMovie: MSMovie) : MSMovieEvent()
   data class RestoreFromHistoryEvent(val movieFromHistory: MSMovie) : MSMovieEvent()
 }
-
-sealed class MSMovieResult {
-  abstract val loading: Boolean
-  abstract val errorMessage: String
-
-  data class ScreenLoadResult(
-      override val loading: Boolean = false,
-      override val errorMessage: String = "",
-  ) : MSMovieResult()
-
-  data class SearchMovieResult(
-      override val loading: Boolean = false,
-      override val errorMessage: String = "",
-      val movie: MSMovie? = null,
-  ) : MSMovieResult()
-
-  data class AddToHistoryResult(
-      override val loading: Boolean = false,
-      override val errorMessage: String = "",
-      val movie: MSMovie? = null,
-  ) : MSMovieResult()
-}
