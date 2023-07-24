@@ -43,7 +43,7 @@ This project now uses [ksp](https://kotlinlang.org/docs/ksp-overview.html) to re
 
 All that's needed is writing the implementation of your ViewModel so `MyFeatureViewModelImpl: UsfViewModelImpl<E, R, VS, VE>` and adding the `@UsfViewModel` annotation. Your ViewModel boilerplate code will be auto-generated.
 
-Take a look at [MSMovieViewModelImpl](https://github.com/kaushikgopal/movies-usf-android/blob/master/app/src/main/java/co/kaush/msusf/movies/MSMovieViewModelImpl.kt) for details. 
+Take a look at [MSMovieViewModelImpl](https://github.com/kaushikgopal/movies-usf-android/blob/master/app/src/main/java/co/kaush/msusf/movies/MSMovieViewModelImpl.kt) for the View Model logic and [MSMovieActivity](https://github.com/kaushikgopal/movies-usf-android/blob/master/app/src/main/java/co/kaush/msusf/movies/MSMovieActivity.kt) to see how the `viewModel` is invoked.
 
 # iOS app
 
