@@ -27,7 +27,8 @@ abstract class AppComponent(
   protected fun provideRetrofit(): Retrofit {
     val interceptor = (HttpLoggingInterceptor()).apply { level = HttpLoggingInterceptor.Level.BODY }
 
-    val okHttpClient: OkHttpClient = OkHttpClient.Builder().addInterceptor(interceptor).build()
+    val okHttpClient: OkHttpClient =
+        OkHttpClient.Builder().addNetworkInterceptor(interceptor).build()
 
     return Retrofit.Builder()
         .baseUrl("http://www.omdbapi.com")

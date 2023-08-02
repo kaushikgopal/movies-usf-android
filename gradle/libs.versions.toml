@@ -28,9 +28,9 @@ ksp = "1.8.10-1.0.9" # first half is kotlin version
 leakCanary = "2.11"
 mockito = "2.23.0"
 mockitoKotlin = "5.0.0"
-okhttp = "3.9.0"
+okhttp = "4.11.0"
 picasso = "2.71828"
-retrofit = "2.6.0"
+retrofit = "2.9.0"
 rxAndroid = "2.1.0"
 rxBindings = "2.2.0"
 rxBindingsViewpager = "3.0.0-alpha2"
@@ -95,7 +95,9 @@ lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-view
 lifecycle-viewmodel-savedstate = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-savedstate", version.ref = "androidxLifecycle" }
 mockito-core = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }
 mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "mockitoKotlin" }
-okhttp-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
+okhttp-bom = { module = "com.squareup.okhttp3:okhttp-bom", version.ref = "okhttp" }
+okhttp = { group = "com.squareup.okhttp3", name = "okhttp" }
+okhttp-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor" }
 picasso = { group = "com.squareup.picasso", name = "picasso", version.ref = "picasso" }
 recyclerview = { group = "androidx.recyclerview", name = "recyclerview", version.ref = "androidxAppCompat" }
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
