@@ -18,7 +18,7 @@ import co.kaush.msusf.movies.MSMovieEvent.RestoreFromHistoryEvent
 import co.kaush.msusf.movies.MSMovieEvent.ScreenLoadEvent
 import co.kaush.msusf.movies.MSMovieEvent.SearchMovieEvent
 import co.kaush.msusf.movies.databinding.ActivityMainBinding
-import com.squareup.picasso.Picasso
+import coil.load
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOf
@@ -91,10 +91,7 @@ class MSMovieActivity : ComponentActivity() {
     vs.searchedMoviePoster
         .takeIf { it.isNotBlank() }
         ?.let {
-          Picasso.get()
-              .load(vs.searchedMoviePoster)
-              .placeholder(spinner)
-              .into(binding.msMainScreenPoster)
+          binding.msMainScreenPoster.load(vs.searchedMoviePoster) { placeholder(spinner) }
 
           binding.msMainScreenPoster.setTag(R.id.TAG_MOVIE_DATA, vs.searchedMovieReference)
         }

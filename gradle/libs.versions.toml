@@ -14,6 +14,7 @@ androidGradlePlugin = "8.0.2"
 androidxAppCompat = "1.1.0"
 androidxLifecycle = "2.6.1"
 androidxTest = "1.1.1"
+coil = "2.4.0"
 composeBom = "2023.04.01" # https://developer.android.com/jetpack/compose/bom/bom-mapping
 composeCompiler = "1.4.2" # https://developer.android.com/jetpack/androidx/releases/compose-kotlin#kts
 constraintlayout = "2.1.4"
@@ -63,6 +64,7 @@ activity-compose = { module = "androidx.activity:activity-compose", version.ref 
 activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activity" }
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidxAppCompat" }
 atsl-runner = { group = "androidx.test", name = "runner", version.ref = "androidxTest" }
+coil = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
 compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
 compose-material3 = { module = "androidx.compose.material3:material3" }
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }

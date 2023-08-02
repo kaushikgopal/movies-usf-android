@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
-import com.squareup.picasso.Picasso
+import coil.load
 
 class MSMovieSearchHistoryAdapter(private val historyClickListener: (MSMovie) -> Unit) :
     ListAdapter<MSMovie, MSMovieSearchVH>(MSMovieSearchDiffCallback()) {
@@ -51,9 +51,7 @@ class MSMovieSearchVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     (item.ratings.first()).let { ratingView.text = it.summary }
 
-    item.posterUrl
-        .takeIf { it.isNotBlank() }
-        ?.let { Picasso.get().load(it).placeholder(spinner).into(posterView) }
+    item.posterUrl.takeIf { it.isNotBlank() }?.let { posterView.load(it) { placeholder(spinner) } }
         ?: run { posterView.setImageResource(0) }
 
     itemView.setOnClickListener {
