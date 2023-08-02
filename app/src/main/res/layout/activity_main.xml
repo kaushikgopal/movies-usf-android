@@ -21,21 +21,20 @@
     app:layout_constraintGuide_percent="0.50"/>
 
   <ImageView
-    android:id="@+id/ms_mainScreen_poster"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:clickable="true"
-    android:focusable="true"
-    android:minHeight="150dp"
-    android:minWidth="100dp"
-    app:layout_constraintBottom_toTopOf="@id/ms_mainScreen_guideline_3"
-    app:layout_constraintEnd_toStartOf="@id/ms_mainScreen_guideline_2"
-    app:layout_constraintStart_toStartOf="parent"
+      android:id="@+id/ms_mainScreen_poster"
+      android:layout_width="wrap_content"
+      android:layout_height="180dp"
+      android:adjustViewBounds="true"
+      android:scaleType="centerCrop"
+      android:clickable="true"
+      android:focusable="true"
+      app:layout_constraintTop_toBottomOf="@id/ms_mainScreen_guideline_1"
 
-    app:layout_constraintTop_toBottomOf="@id/ms_mainScreen_guideline_1"
-    tools:background="@android:color/holo_blue_bright"
-    tools:ignore="ContentDescription"/>
+      app:layout_constraintEnd_toStartOf="@+id/ms_mainScreen_guideline_2"
+      app:layout_constraintStart_toStartOf="parent"
 
+      tools:background="@android:color/holo_blue_bright"
+      tools:ignore="ContentDescription" />
   <TextView
     android:id="@+id/ms_mainScreen_title"
     android:textStyle="bold"

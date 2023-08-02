@@ -9,10 +9,10 @@
 
     <ImageView
             android:id="@+id/ms_result_poster"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:minHeight="150dp"
-            android:minWidth="100dp"
+            android:layout_width="wrap_content"
+            android:layout_height="180dp"
+            android:adjustViewBounds="true"
+            android:scaleType="centerCrop"
 
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
