@@ -110,18 +110,14 @@ class MSMovieViewModelTest {
   @Test
   fun onClickingMovieHistoryResult_ResultViewIsRepopulatedWithInfo() = runTest {
     viewModel.viewState.test {
-
-      // skipItems(1) // skip tends to be flaky
-      awaitItem() // starting state
+      skipItems(1) // starting state
 
       // populate history
       viewModel.processInput(SearchMovieEvent("blade runner 2049"))
-      awaitItem()
-      awaitItem()
+      skipItems(2)
 
       viewModel.processInput(SearchMovieEvent("blade"))
-      awaitItem()
-      awaitItem()
+      skipItems(2)
 
       // click blade runner 2049 from history
       viewModel.processInput(RestoreFromHistoryEvent(bladeRunner2049))
