@@ -81,7 +81,7 @@ dependencies {
   testImplementation(libs.mockito.kotlin)
   testImplementation(libs.kotlinx.coroutines.test)
   testImplementation(libs.turbine)
+  //  testImplementation(libs.atsl.runner)
 
-  androidTestImplementation(libs.atsl.runner)
   androidTestImplementation(libs.espresso.core)
 }
