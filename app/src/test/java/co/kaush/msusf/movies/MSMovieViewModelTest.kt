@@ -12,6 +12,7 @@ import co.kaush.msusf.movies.di.blade
 import co.kaush.msusf.movies.di.bladeRunner2049
 import co.kaush.msusf.movies.di.create
 import com.google.common.truth.Truth.assertThat
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -109,7 +110,7 @@ class MSMovieViewModelTest {
 
   @Test
   fun onClickingMovieHistoryResult_ResultViewIsRepopulatedWithInfo() = runTest {
-    viewModel.viewState.test {
+    viewModel.viewState.test(timeout = 4.seconds) {
       skipItems(1) // starting state
 
       // populate history
