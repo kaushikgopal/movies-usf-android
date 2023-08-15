@@ -71,7 +71,7 @@ class MSMovieViewModelImpl(
     return when {
       result.loading -> {
         currentViewState.copy(
-            searchBoxText = null,
+            searchBoxText = "",
             searchedMovieTitle = "Searching Movie...",
             searchedMovieRating = "",
             searchedMoviePoster = "",

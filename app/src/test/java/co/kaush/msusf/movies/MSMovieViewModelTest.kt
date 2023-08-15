@@ -12,41 +12,52 @@ import co.kaush.msusf.movies.di.blade
 import co.kaush.msusf.movies.di.bladeRunner2049
 import co.kaush.msusf.movies.di.create
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class MSMovieViewModelTest {
 
+  // Set the main coroutines dispatcher for unit testing.
+  @ExperimentalCoroutinesApi @get:Rule val mainCoroutineRule = MainCoroutineRule()
+
+  // Subject under test
   private lateinit var viewModel: MSMovieViewModel
 
+  // Use a fake repository to be injected into the viewModel
   private val testAppComponent = TestAppComponent::class.create()
-
   private var fakeMovieAppRepository: MSMovieRepository = testAppComponent.movieRepository
 
   @Before
-  fun setUp() {
+  fun setupViewModel() {
     viewModel = MSMovieViewModel(fakeMovieAppRepository)
   }
 
   @Test
-  fun onSubscribing_shouldReceiveStartingviewState() = runTest {
-    assertThat(viewModel.viewState.value).isEqualTo(MSMovieViewState())
+  fun onSubscription_InitialStateIsEmitted() = runTest {
+    val vs = viewModel.viewState.first()
+    assertThat(vs.searchBoxText).isEqualTo("Blade")
   }
 
   @Test
   fun onScreenLoad_searchBoxText_shouldBeCleared() = runTest {
     viewModel.viewState.test {
-      assertThat(awaitItem()).isEqualTo(MSMovieViewState())
+      assertThat(awaitItem().searchBoxText).isEqualTo("Blade")
       viewModel.processInput(ScreenLoadEvent)
-      assertThat(awaitItem().searchBoxText).isEqualTo("load test")
+      assertThat(awaitItem().searchBoxText).isEmpty()
+      expectNoEvents()
     }
   }
 
   @Test
-  fun onSearchingMovie_shouldSeeSearchResults() = runTest {
+  fun onSearchingMovie_showLoadingIndicator_ThenResult() = runTest {
     viewModel.viewState.test {
-      assertThat(awaitItem()).isEqualTo(MSMovieViewState())
+      skipItems(1) // starting state
+
       viewModel.processInput(SearchMovieEvent("blade runner 2049"))
       assertThat(awaitItem().searchedMovieTitle).isEqualTo("Searching Movie...")
       with(awaitItem()) {
@@ -57,6 +68,7 @@ class MSMovieViewModelTest {
             )
         assertThat(searchedMovieRating).isEqualTo("\n8.1/10 (IMDB)\n87% (RT)")
       }
+      expectNoEvents()
     }
   }
 
@@ -69,41 +81,41 @@ class MSMovieViewModelTest {
       viewModel.processInput(SearchMovieEvent("blade runner 2049"))
       viewModel.processInput(AddToHistoryEvent(bladeRunner2049))
 
-      assertThat(vsTester.awaitItem()).isEqualTo(MSMovieViewState())
-      assertThat(vsTester.awaitItem().searchedMovieTitle).isEqualTo("Searching Movie...")
-      assertThat(vsTester.awaitItem().searchedMovieTitle).isEqualTo("Blade Runner 2049")
+      vsTester.skipItems(3)
       with(vsTester.awaitItem()) {
         assertThat(adapterList).hasSize(1)
         assertThat(adapterList[0]).isEqualTo(bladeRunner2049)
       }
 
       assertThat(veTester.awaitItem()).isEqualTo(AddedToHistoryToastEffect)
+
+      vsTester.expectNoEvents()
+      veTester.expectNoEvents()
     }
   }
 
   @Test
   fun onClickingMovieSearchResultTwice_shouldShowToastEachTime() = runTest {
-    turbineScope {
-      val veTester = viewModel.viewEffect.testIn(backgroundScope)
-
+    viewModel.viewEffect.test {
       viewModel.processInput(SearchMovieEvent("blade runner 2049"))
       viewModel.processInput(AddToHistoryEvent(bladeRunner2049))
       viewModel.processInput(AddToHistoryEvent(bladeRunner2049))
 
-      assertThat(veTester.awaitItem()).isEqualTo(AddedToHistoryToastEffect)
-      assertThat(veTester.awaitItem()).isEqualTo(AddedToHistoryToastEffect)
+      assertThat(awaitItem()).isEqualTo(AddedToHistoryToastEffect)
+      assertThat(awaitItem()).isEqualTo(AddedToHistoryToastEffect)
+      expectNoEvents()
     }
   }
 
   @Test
   fun onClickingMovieHistoryResult_ResultViewIsRepopulatedWithInfo() = runTest {
     viewModel.viewState.test {
-      awaitItem() // starting state
+      skipItems(1) // starting state
 
       // populate history
       viewModel.processInput(SearchMovieEvent("blade runner 2049"))
       viewModel.processInput(SearchMovieEvent("blade"))
-      repeat(4) { awaitItem() }
+      skipItems(4)
 
       // click blade runner 2049 from history
       viewModel.processInput(RestoreFromHistoryEvent(bladeRunner2049))

@@ -16,7 +16,7 @@ sealed class MSMovieResult {
       override val errorMessage: String = "",
   ) : MSMovieResult() {
     override fun toViewState(currentViewState: MSMovieViewState): MSMovieViewState =
-        currentViewState.copy(searchBoxText = "load test")
+        currentViewState.copy(searchBoxText = "")
 
     override fun toViewEffect(): Flow<MSMovieViewEffect> = emptyFlow()
   }
