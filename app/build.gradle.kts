@@ -44,6 +44,14 @@ android {
   }
 }
 
+tasks.withType<Test> {
+  testLogging {
+    exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+    events("skipped", "passed", "failed")
+    showStandardStreams = true
+  }
+}
+
 dependencies {
   ksp(libs.kotlin.inject.compiler)
   implementation(libs.kotlin.inject.runtime)

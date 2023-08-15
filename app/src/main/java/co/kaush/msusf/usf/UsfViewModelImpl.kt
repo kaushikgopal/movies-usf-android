@@ -28,7 +28,7 @@ abstract class UsfViewModelImpl<E : Any, R : Any, VS : Any, VE : Any>(
    * @return [Flow]<[R]> a single [E]vent can result in multiple [R]esults for e.g. emit a R for
    *   loading and another for the actual result
    */
-  protected abstract suspend fun eventToResultFlow(event: E): Flow<R>
+  protected abstract fun Flow<E>.toResultFlow(): Flow<R>
 
   /**
    * @param currentViewState the current [VS]tate of the view (.copy it for the returned [VS]tate)
@@ -57,10 +57,8 @@ abstract class UsfViewModelImpl<E : Any, R : Any, VS : Any, VE : Any>(
 
     coroutineScope.launch(processingDispatcher) {
       _events
-          .flatMapConcat { event ->
-            logger.debugEvents(event)
-            eventToResultFlow(event)
-          }
+          .onEach { logger.debugEvents(it) }
+          .toResultFlow()
           .collect { result ->
             logger.debugResults(result)
 
@@ -82,7 +80,10 @@ abstract class UsfViewModelImpl<E : Any, R : Any, VS : Any, VE : Any>(
   }
 
   override fun processInput(event: E) {
-    coroutineScope.launch(processingDispatcher) { _events.emit(event) }
+    coroutineScope.launch(processingDispatcher) {
+      delay(1)
+      _events.emit(event)
+    }
   }
 
   interface UsfVmLogger {
