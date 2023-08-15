@@ -84,7 +84,7 @@ class MSMovieActivity : ComponentActivity() {
 
   private fun render(vs: MSMovieViewState) {
     Timber.d("----- [render] ${Thread.currentThread().name}")
-    vs.searchBoxText?.let { binding.msMainScreenSearchText.setText(it) }
+    vs.searchBoxText.let { binding.msMainScreenSearchText.setText(it) }
     binding.msMainScreenTitle.text = vs.searchedMovieTitle
     binding.msMainScreenRating.text = vs.searchedMovieRating
 
