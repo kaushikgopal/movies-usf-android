@@ -43,14 +43,14 @@ abstract class UsfViewModelImpl<E : Any, R : Any, VS : Any, VE : Any>(
    *   and another for an analytics call hence a return type of [Flow]<[VE]>
    * @return [Flow] of [VE]s where null emissions will be ignored automatically
    */
-  protected abstract suspend fun resultToViewEffectFlow(result: R): Flow<VE?>
+  protected abstract suspend fun resultToEffects(result: R): Flow<VE?>
 
   private val _events = MutableSharedFlow<E>()
   private val _viewState = MutableStateFlow(initialState)
-  private val _viewEffects = MutableSharedFlow<VE>()
+  private val _effects = MutableSharedFlow<VE>()
 
   override val viewState = _viewState.asStateFlow()
-  override val viewEffect = _viewEffects.asSharedFlow()
+  override val effects = _effects.asSharedFlow()
 
   init {
     logger.debug("------ [init] ${Thread.currentThread().name}")
@@ -72,10 +72,8 @@ abstract class UsfViewModelImpl<E : Any, R : Any, VS : Any, VE : Any>(
 
             // effects are emitted after a view state by virtue of this collect call
             // (rarely) would we want VS & VE to be emitted at the exact same instant
-            _viewEffects.emitAll(
-                resultToViewEffectFlow(result).filterNotNull().onEach {
-                  logger.debugViewEffects(it)
-                },
+            _effects.emitAll(
+                resultToEffects(result).filterNotNull().onEach { logger.debugSideEffects(it) },
             )
           }
     }
@@ -97,8 +95,8 @@ abstract class UsfViewModelImpl<E : Any, R : Any, VS : Any, VE : Any>(
     fun debugViewState(viewState: Any, message: String? = null) =
         debug(message ?: "----- [view-state] ${Thread.currentThread().name} $viewState")
 
-    fun debugViewEffects(viewEffect: Any, message: String? = null) =
-        debug(message ?: "----- [view-effect] ${Thread.currentThread().name} $viewEffect")
+    fun debugSideEffects(effect: Any, message: String? = null) =
+        debug(message ?: "----- [effect] ${Thread.currentThread().name} $effect")
 
     fun warning(message: String)
 

@@ -11,7 +11,7 @@ class MSMovieViewModelImpl(
     private val movieRepo: MSMovieRepository,
     coroutineScope: CoroutineScope,
 ) :
-    UsfViewModelImpl<MSMovieEvent, MSMovieResult, MSMovieViewState, MSMovieViewEffect>(
+    UsfViewModelImpl<MSMovieEvent, MSMovieResult, MSMovieViewState, MSMovieEffect>(
         MSMovieViewState(),
         coroutineScope,
     ) {
@@ -86,8 +86,8 @@ class MSMovieViewModelImpl(
   }
 
   // -----------------------------------------------------------------------------------
-  // Results -> ViewEffect
+  // Results -> Effect
 
-  override suspend fun resultToViewEffectFlow(result: MSMovieResult): Flow<MSMovieViewEffect?> =
-      result.toViewEffect()
+  override suspend fun resultToEffects(result: MSMovieResult): Flow<MSMovieEffect?> =
+      result.toEffects()
 }

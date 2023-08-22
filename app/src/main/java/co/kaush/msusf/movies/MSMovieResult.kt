@@ -9,7 +9,7 @@ sealed class MSMovieResult {
   abstract val loading: Boolean
   abstract val errorMessage: String
   abstract fun toViewState(currentViewState: MSMovieViewState): MSMovieViewState
-  abstract fun toViewEffect(): Flow<MSMovieViewEffect>
+  abstract fun toEffects(): Flow<MSMovieEffect>
 
   data class ScreenLoadResult(
       override val loading: Boolean = false,
@@ -18,7 +18,7 @@ sealed class MSMovieResult {
     override fun toViewState(currentViewState: MSMovieViewState): MSMovieViewState =
         currentViewState.copy(searchBoxText = "")
 
-    override fun toViewEffect(): Flow<MSMovieViewEffect> = emptyFlow()
+    override fun toEffects(): Flow<MSMovieEffect> = emptyFlow()
   }
 
   data class SearchMovieResult(
@@ -39,7 +39,7 @@ sealed class MSMovieResult {
       )
     }
 
-    override fun toViewEffect(): Flow<MSMovieViewEffect> = emptyFlow()
+    override fun toEffects(): Flow<MSMovieEffect> = emptyFlow()
   }
 
   data class AddToHistoryResult(
@@ -56,8 +56,8 @@ sealed class MSMovieResult {
       } else currentViewState.copy()
     }
 
-    override fun toViewEffect(): Flow<MSMovieViewEffect> {
-      return flow { emit(MSMovieViewEffect.AddedToHistoryToastEffect) }
+    override fun toEffects(): Flow<MSMovieEffect> {
+      return flow { emit(MSMovieEffect.AddedToHistoryToastEffect) }
     }
   }
 }

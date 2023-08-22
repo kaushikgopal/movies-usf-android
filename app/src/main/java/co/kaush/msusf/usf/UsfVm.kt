@@ -16,11 +16,11 @@ import kotlinx.coroutines.flow.StateFlow
  *
  * @param Event
  */
-interface UsfVm<Event : Any, ViewState : Any, ViewEffect : Any> {
+interface UsfVm<Event : Any, ViewState : Any, Effect : Any> {
 
   fun processInput(event: Event)
 
   val viewState: StateFlow<ViewState>
 
-  val viewEffect: SharedFlow<ViewEffect>
+  val effects: SharedFlow<Effect>
 }

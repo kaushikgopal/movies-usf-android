@@ -66,38 +66,11 @@ class MSMovieActivity : ComponentActivity() {
         .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
         .launchIn(lifecycleScope)
 
-    viewModel.viewEffect
+    viewModel.effects
         .onEach { trigger(it) }
-        .catch { Timber.e(it, "error triggering view effect") }
+        .catch { Timber.e(it, "error triggering side effect") }
         .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
         .launchIn(lifecycleScope)
-  }
-
-  private fun trigger(effect: MSMovieViewEffect) {
-    Timber.d("----- [trigger] ${Thread.currentThread().name}")
-    when (effect) {
-      is MSMovieViewEffect.AddedToHistoryToastEffect -> {
-        Toast.makeText(this, "added to history", Toast.LENGTH_SHORT).show()
-      }
-    }
-  }
-
-  private fun render(vs: MSMovieViewState) {
-    Timber.d("----- [render] ${Thread.currentThread().name}")
-    vs.searchBoxText.let { binding.msMainScreenSearchText.setText(it) }
-    binding.msMainScreenTitle.text = vs.searchedMovieTitle
-    binding.msMainScreenRating.text = vs.searchedMovieRating
-
-    vs.searchedMoviePoster
-        .takeIf { it.isNotBlank() }
-        ?.let {
-          binding.msMainScreenPoster.load(vs.searchedMoviePoster) { placeholder(spinner) }
-
-          binding.msMainScreenPoster.setTag(R.id.TAG_MOVIE_DATA, vs.searchedMovieReference)
-        }
-        ?: run { binding.msMainScreenPoster.setImageResource(0) }
-
-    listAdapter.submitList(vs.adapterList)
   }
 
   override fun onResume() {
@@ -128,6 +101,33 @@ class MSMovieActivity : ComponentActivity() {
         .catch { Timber.e(it, "error processing input ") }
         .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
         .launchIn(lifecycleScope)
+  }
+
+  private fun trigger(effect: MSMovieEffect) {
+    Timber.d("----- [trigger] ${Thread.currentThread().name}")
+    when (effect) {
+      is MSMovieEffect.AddedToHistoryToastEffect -> {
+        Toast.makeText(this, "added to history", Toast.LENGTH_SHORT).show()
+      }
+    }
+  }
+
+  private fun render(vs: MSMovieViewState) {
+    Timber.d("----- [render] ${Thread.currentThread().name}")
+    vs.searchBoxText.let { binding.msMainScreenSearchText.setText(it) }
+    binding.msMainScreenTitle.text = vs.searchedMovieTitle
+    binding.msMainScreenRating.text = vs.searchedMovieRating
+
+    vs.searchedMoviePoster
+        .takeIf { it.isNotBlank() }
+        ?.let {
+          binding.msMainScreenPoster.load(vs.searchedMoviePoster) { placeholder(spinner) }
+
+          binding.msMainScreenPoster.setTag(R.id.TAG_MOVIE_DATA, vs.searchedMovieReference)
+        }
+        ?: run { binding.msMainScreenPoster.setImageResource(0) }
+
+    listAdapter.submitList(vs.adapterList)
   }
 
   private fun setupListView() {

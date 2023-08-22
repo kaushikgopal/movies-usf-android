@@ -9,8 +9,8 @@ data class MSMovieViewState(
     val adapterList: List<MSMovie> = emptyList()
 )
 
-sealed class MSMovieViewEffect {
-  object AddedToHistoryToastEffect : MSMovieViewEffect()
+sealed class MSMovieEffect {
+  object AddedToHistoryToastEffect : MSMovieEffect()
 }
 
 sealed class MSMovieEvent {

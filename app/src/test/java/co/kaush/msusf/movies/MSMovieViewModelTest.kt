@@ -2,11 +2,11 @@ package co.kaush.msusf.movies
 
 import app.cash.turbine.test
 import app.cash.turbine.turbineScope
+import co.kaush.msusf.movies.MSMovieEffect.AddedToHistoryToastEffect
 import co.kaush.msusf.movies.MSMovieEvent.AddToHistoryEvent
 import co.kaush.msusf.movies.MSMovieEvent.RestoreFromHistoryEvent
 import co.kaush.msusf.movies.MSMovieEvent.ScreenLoadEvent
 import co.kaush.msusf.movies.MSMovieEvent.SearchMovieEvent
-import co.kaush.msusf.movies.MSMovieViewEffect.AddedToHistoryToastEffect
 import co.kaush.msusf.movies.di.TestAppComponent
 import co.kaush.msusf.movies.di.blade
 import co.kaush.msusf.movies.di.bladeRunner2049
@@ -76,7 +76,7 @@ class MSMovieViewModelTest {
   fun onClickingMovieSearchResult_shouldPopulateHistoryList() = runTest {
     turbineScope {
       val vsTester = viewModel.viewState.testIn(backgroundScope)
-      val veTester = viewModel.viewEffect.testIn(backgroundScope)
+      val veTester = viewModel.effects.testIn(backgroundScope)
 
       viewModel.processInput(SearchMovieEvent("blade runner 2049"))
       viewModel.processInput(AddToHistoryEvent(bladeRunner2049))
@@ -96,7 +96,7 @@ class MSMovieViewModelTest {
 
   @Test
   fun onClickingMovieSearchResultTwice_shouldShowToastEachTime() = runTest {
-    viewModel.viewEffect.test {
+    viewModel.effects.test {
       viewModel.processInput(SearchMovieEvent("blade runner 2049"))
       viewModel.processInput(AddToHistoryEvent(bladeRunner2049))
       viewModel.processInput(AddToHistoryEvent(bladeRunner2049))
