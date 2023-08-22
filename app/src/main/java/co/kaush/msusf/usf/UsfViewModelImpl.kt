@@ -21,7 +21,7 @@ abstract class UsfViewModelImpl<E : Any, R : Any, VS : Any, VE : Any>(
           override fun warning(message: String) = Timber.w(message)
           override fun error(error: Throwable, message: String) = Timber.e(error, message)
         }
-) : UsfVm<E, R, VS, VE> {
+) : UsfVm<E, VS, VE> {
 
   /**
    * @param event every input is processed into an [E]vent

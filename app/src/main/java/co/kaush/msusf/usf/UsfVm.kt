@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.StateFlow
  *
  * @param Event
  */
-interface UsfVm<Event : Any, Result, ViewState : Any, ViewEffect : Any> {
+interface UsfVm<Event : Any, ViewState : Any, ViewEffect : Any> {
 
   fun processInput(event: Event)
 
