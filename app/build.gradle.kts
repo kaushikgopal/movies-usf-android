@@ -54,7 +54,7 @@ dependencies {
   implementation(libs.kotlin.stdlib)
   implementation(libs.constraintlayout)
   implementation(libs.activity.ktx)
-  implementation(libs.flowbinding)
+  implementation(libs.flow.binding)
   implementation(libs.kotlinx.coroutines.android)
   implementation(libs.kotlinx.coroutines.core)
   implementation(libs.coil)
