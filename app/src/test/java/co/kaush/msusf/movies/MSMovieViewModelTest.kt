@@ -6,11 +6,11 @@ import app.cash.turbine.turbineScope
 import co.kaush.msusf.movies.MSMovieEvent.RestoreFromHistoryEvent
 import co.kaush.msusf.movies.MSMovieEvent.SearchMovieEvent
 import co.kaush.msusf.movies.di.TestAppComponent
+import co.kaush.msusf.movies.di.blade
 import co.kaush.msusf.movies.di.bladeRunner2049
 import co.kaush.msusf.movies.di.create
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -19,13 +19,12 @@ import org.junit.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class MSMovieViewModelTest {
 
-
   // Set the main coroutines dispatcher for unit testing.
   @ExperimentalCoroutinesApi @get:Rule val mainCoroutineRule = MainCoroutineRule()
 
   // Subject under test
   private lateinit var viewModel: MSMovieViewModel
-  private lateinit var eventProcessor: EventProcessor
+  private lateinit var eventProcessor: StreamProcessingQueue
   private lateinit var uselessRepo: MSUselessRepository
 
   // Use a fake repository to be injected into the viewModel
@@ -36,7 +35,7 @@ class MSMovieViewModelTest {
   fun setupViewModel() {
     uselessRepo = MSUselessRepository()
     viewModel = MSMovieViewModel(fakeMovieAppRepository, uselessRepo)
-    eventProcessor = EventProcessor(viewModel.viewModelScope)
+    eventProcessor = StreamProcessingQueue(viewModel.viewModelScope)
   }
 
   @Test
@@ -49,12 +48,13 @@ class MSMovieViewModelTest {
 
   @Test
   fun onScreenLoad_searchBoxText_shouldBeCleared() = runTest {
-//    viewModel.viewState.test {
-//      assertThat(awaitItem().searchBoxText).isEqualTo("Blade")
-//      processQueue(ScreenLoadEvent)
-//      assertThat(awaitItem().searchBoxText).isEmpty()
-//      expectNoEvents()
-//    }
+    viewModel.viewState.test {
+      assertThat(awaitItem().searchBoxText).isEqualTo("Blade")
+
+      processQueue(MSMovieEvent.ScreenLoadEvent)
+      assertThat(awaitItem().searchBoxText).isEmpty()
+      expectNoEvents()
+    }
   }
 
   @Test
@@ -65,8 +65,7 @@ class MSMovieViewModelTest {
       processQueue(MSMovieEvent.ScreenLoadEvent2)
 
       processQueue(SearchMovieEvent("blade runner 2049"))
-      val firstItem = awaitItem()
-      assertThat(firstItem.searchedMovieTitle).isEqualTo("Searching Movie...")
+      assertThat(awaitItem().searchedMovieTitle).isEqualTo("Searching Movie...")
 
       with(awaitItem()) {
         assertThat(searchedMovieTitle).isEqualTo("Blade Runner 2049")
@@ -122,53 +121,44 @@ class MSMovieViewModelTest {
 
   @Test
   fun onClickingMovieHistoryResult_ResultViewIsRepopulatedWithInfo() = runTest {
-    println("START onClickingMovieHistoryResult_ResultViewIsRepopulatedWithInfo")
     viewModel.viewState.test {
-
-      println("BASE")
-      val baseState = awaitItem()
-      assertThat(baseState.searchBoxText).isEqualTo("Blade")
+      assertThat(awaitItem().searchBoxText).isEqualTo("Blade")
 
       processQueue(MSMovieEvent.ScreenLoadEvent2)
-      println("${System.currentTimeMillis()} uselessRepo.emit")
       eventProcessor.addToQueue { uselessRepo.emit() }
 
-      delay(300)
+      assertThat(awaitItem().searchedMovieTitle.lowercase()).contains("batman")
 
-      val batman = awaitItem()
-      println("${batman.searchedMovieTitle}")
-      assertThat(batman.searchedMovieTitle.lowercase()).contains("batman")
-
-//       populate history
+      //       populate history
       processQueue(SearchMovieEvent("blade runner 2049"))
-
       awaitItem()
-      val bladeRunner = awaitItem()
-      println("${bladeRunner.searchedMovieTitle}")
-      assertThat(bladeRunner.searchedMovieTitle.lowercase()).contains("blade runner 2049")
+
+      assertThat(awaitItem().searchedMovieTitle.lowercase()).contains("blade runner 2049")
 
       processQueue(SearchMovieEvent("blade"))
       skipItems(2)
-//
+      //
       // click blade runner 2049 from history
       processQueue(RestoreFromHistoryEvent(bladeRunner2049))
       with(awaitItem()) {
         assertThat(searchedMovieTitle).isEqualTo("Blade Runner 2049")
         assertThat(searchedMovieRating).isEqualTo(bladeRunner2049.ratingSummary)
       }
-//
-//      // click blade again
-//      processQueue(RestoreFromHistoryEvent(blade))
-//      with(awaitItem()) {
-//        assertThat(searchedMovieTitle).isEqualTo("Blade")
-//        assertThat(searchedMovieRating).isEqualTo(blade.ratingSummary)
-//      }
-//    }
+
+      // click blade again
+      processQueue(RestoreFromHistoryEvent(blade))
+      with(awaitItem()) {
+        assertThat(searchedMovieTitle).isEqualTo("Blade")
+        assertThat(searchedMovieRating).isEqualTo(blade.ratingSummary)
+      }
     }
-    println("END onClickingMovieHistoryResult_ResultViewIsRepopulatedWithInfo")
   }
 
-  fun processQueue(event: MSMovieEvent) {
-    eventProcessor.addToQueue { viewModel.processInput(event) }
+  private fun processQueue(event: MSMovieEvent) {
+    eventProcessor.addToQueue {
+      println("${System.currentTimeMillis()} viewModel.processInput")
+      viewModel.processInput(event)
+      println("${System.currentTimeMillis()} viewModel.processInput")
+    }
   }
 }
