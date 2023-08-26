@@ -34,7 +34,7 @@ class MSMovieViewModelTest {
 
   @Before
   fun setupViewModel() {
-    viewModel = MSMovieViewModel(fakeMovieAppRepository)
+    viewModel = MSMovieViewModel(fakeMovieAppRepository, MSUselessRepository())
   }
 
   @Test
@@ -57,6 +57,7 @@ class MSMovieViewModelTest {
   fun onSearchingMovie_showLoadingIndicator_ThenResult() = runTest {
     viewModel.viewState.test {
       skipItems(1) // starting state
+      viewModel.processInput(MSMovieEvent.ScreenLoadEvent2)
 
       viewModel.processInput(SearchMovieEvent("blade runner 2049"))
       assertThat(awaitItem().searchedMovieTitle).isEqualTo("Searching Movie...")

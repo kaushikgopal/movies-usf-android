@@ -21,6 +21,7 @@ import co.kaush.msusf.movies.databinding.ActivityMainBinding
 import coil.load
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -34,7 +35,7 @@ class MSMovieActivity : ComponentActivity() {
 
   private lateinit var movieRepo: MSMovieRepository
   private val viewModel: MSMovieViewModel by viewModels {
-    MSMovieViewModel.MSMovieViewModelFactory(movieRepo)
+    MSMovieViewModel.MSMovieViewModelFactory(movieRepo, MSUselessRepository())
   }
 
   private lateinit var listAdapter: MSMovieSearchHistoryAdapter
@@ -120,6 +121,10 @@ class MSMovieActivity : ComponentActivity() {
 
     merge(
             screenLoadEvents,
+            flow {
+              kotlinx.coroutines.delay(100)
+              emit(MSMovieEvent.ScreenLoadEvent2)
+            },
             searchMovieEvents,
             addToHistoryEvents,
             restoreFromHistoryEvents,
