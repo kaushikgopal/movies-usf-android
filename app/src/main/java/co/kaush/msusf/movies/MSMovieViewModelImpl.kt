@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 
 @UsfViewModel
@@ -22,6 +23,9 @@ class MSMovieViewModelImpl(
                 coroutineScope,
         ) {
 
+    init {
+        setup(emptyList())
+    }
     // -----------------------------------------------------------------------------------
     // Event -> Results
 
@@ -38,7 +42,10 @@ class MSMovieViewModelImpl(
         MSMovieResult.ScreenLoadResult()
     }
 
-    private fun Flow<MSMovieEvent.ScreenLoadEvent2>.onScreenLoad2() = longRunningFlow.start()
+    private fun Flow<MSMovieEvent.ScreenLoadEvent2>.onScreenLoad2() = longRunningFlow.start().onEach {
+        println("${System.currentTimeMillis()} post longRunningFlow")
+    }
+
 
     private fun Flow<MSMovieEvent.SearchMovieEvent>.onSearchMovie(): Flow<MSMovieResult> =
             flatMapLatest {
