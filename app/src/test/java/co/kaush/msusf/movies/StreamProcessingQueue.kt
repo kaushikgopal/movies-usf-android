@@ -27,8 +27,9 @@ class StreamProcessingQueue(private val scope: CoroutineScope) {
           runBlocking {
             println("${System.currentTimeMillis()} processInput")
             val actionHolder = queue.remove()
+            delay(2)
             actionHolder.action()
-            delay(1)
+            delay(2)
             println("${System.currentTimeMillis()} processedInput")
           }
         }

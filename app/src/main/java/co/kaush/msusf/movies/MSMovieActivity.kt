@@ -19,6 +19,8 @@ import co.kaush.msusf.movies.MSMovieEvent.ScreenLoadEvent
 import co.kaush.msusf.movies.MSMovieEvent.SearchMovieEvent
 import co.kaush.msusf.movies.databinding.ActivityMainBinding
 import coil.load
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
@@ -34,8 +36,9 @@ import timber.log.Timber
 class MSMovieActivity : ComponentActivity() {
 
   private lateinit var movieRepo: MSMovieRepository
+  val uselessRepository = MSUselessRepository()
   private val viewModel: MSMovieViewModel by viewModels {
-    MSMovieViewModel.MSMovieViewModelFactory(movieRepo, MSUselessRepository())
+    MSMovieViewModel.MSMovieViewModelFactory(movieRepo, uselessRepository)
   }
 
   private lateinit var listAdapter: MSMovieSearchHistoryAdapter
@@ -61,6 +64,12 @@ class MSMovieActivity : ComponentActivity() {
 
     setupListView()
 
+    binding.batman.setOnClickListener {
+      GlobalScope.launch(Dispatchers.Default) {
+        uselessRepository.emit()
+      }
+    }
+
     viewModel.viewState
         .onEach { render(it) }
         .catch { Timber.e(it, "error rendering view state") }
@@ -85,7 +94,7 @@ class MSMovieActivity : ComponentActivity() {
 
   private fun render(vs: MSMovieViewState) {
     Timber.d("----- [render] ${Thread.currentThread().name}")
-    vs.searchBoxText?.let { binding.msMainScreenSearchText.setText(it) }
+    vs.searchBoxText.let { binding.msMainScreenSearchText.setText(it) }
     binding.msMainScreenTitle.text = vs.searchedMovieTitle
     binding.msMainScreenRating.text = vs.searchedMovieRating
 
