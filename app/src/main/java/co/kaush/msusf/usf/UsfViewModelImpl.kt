@@ -57,7 +57,7 @@ abstract class UsfViewModelImpl<E : Any, R : Any, VS : Any, VE : Any>(
 
     coroutineScope.launch(processingDispatcher) {
       _events
-          .flatMapConcat { event ->
+          .flatMapMerge { event ->
             logger.debugEvents(event)
             eventToResultFlow(event)
           }
