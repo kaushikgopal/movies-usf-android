@@ -3,7 +3,8 @@
   xmlns:app="http://schemas.android.com/apk/res-auto"
   xmlns:tools="http://schemas.android.com/tools"
   android:layout_width="match_parent"
-  android:layout_height="match_parent"
+  android:layout_height="0dp"
+  app:layout_constraintBottom_toTopOf="@id/longRunningTask"
   tools:context="co.kaush.msusf.movies.MSMovieActivity">
 
   <androidx.constraintlayout.widget.Guideline
@@ -35,6 +36,7 @@
 
       tools:background="@android:color/holo_blue_bright"
       tools:ignore="ContentDescription" />
+
   <TextView
     android:id="@+id/ms_mainScreen_title"
     android:textStyle="bold"
@@ -99,5 +101,13 @@
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintTop_toBottomOf="@id/ms_mainScreen_guideline_3"/>
 
+
+  <Button
+      android:id="@+id/longRunningTask"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:text="Long running task"
+      app:layout_constraintBottom_toBottomOf="parent"
+      />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
