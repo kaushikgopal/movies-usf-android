@@ -19,6 +19,8 @@ import co.kaush.msusf.movies.MSMovieEvent.ScreenLoadEvent
 import co.kaush.msusf.movies.MSMovieEvent.SearchMovieEvent
 import co.kaush.msusf.movies.databinding.ActivityMainBinding
 import coil.load
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOf
@@ -59,6 +61,12 @@ class MSMovieActivity : ComponentActivity() {
     movieRepo = appComponent.movieRepository
 
     setupListView()
+
+    binding.longRunningTask.setOnClickListener {
+      GlobalScope.launch(Dispatchers.Default) {
+        viewModel.processInput(MSMovieEvent.LongRunningEvent)
+      }
+    }
 
     viewModel.viewState
         .onEach { render(it) }
