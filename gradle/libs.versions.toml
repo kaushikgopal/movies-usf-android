@@ -10,7 +10,7 @@ kotlin = "1.8.10"
 coroutines = "1.7.1"
 
 activity = "1.7.2"
-androidGradlePlugin = "8.0.2"
+androidGradlePlugin = "8.1.1"
 androidxAppCompat = "1.1.0"
 androidxLifecycle = "2.6.1"
 androidxTest = "1.5.2"
