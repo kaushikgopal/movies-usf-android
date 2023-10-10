@@ -17,7 +17,7 @@ abstract class UsfViewModelImpl<E : Any, R : Any, VS : Any, Effect : Any>(
     private val processingDispatcher: CoroutineDispatcher = Dispatchers.IO,
     logger: UsfVmLogger =
         object : UsfVmLogger {
-          val tag = Thread.currentThread().stackTrace[2].className.split(".").last()
+          val tag = Thread.currentThread().stackTrace[4].className.split(".").last()
           override fun debug(message: String) = Timber.tag(tag).d(message)
           override fun warning(message: String) = Timber.tag(tag).w(message)
           override fun error(error: Throwable, message: String) = Timber.tag(tag).e(error, message)
