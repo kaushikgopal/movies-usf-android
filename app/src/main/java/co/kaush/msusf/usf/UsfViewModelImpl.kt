@@ -11,17 +11,18 @@ import timber.log.Timber
  * processor.
  */
 @OptIn(ExperimentalCoroutinesApi::class)
-abstract class UsfViewModelImpl<E : Any, R : Any, VS : Any, VE : Any>(
+abstract class UsfViewModelImpl<E : Any, R : Any, VS : Any, Effect : Any>(
     initialState: VS,
     private val coroutineScope: CoroutineScope,
     private val processingDispatcher: CoroutineDispatcher = Dispatchers.IO,
     logger: UsfVmLogger =
         object : UsfVmLogger {
-          override fun debug(message: String) = Timber.d(message)
-          override fun warning(message: String) = Timber.w(message)
-          override fun error(error: Throwable, message: String) = Timber.e(error, message)
+          val tag = Thread.currentThread().stackTrace[2].className.split(".").last()
+          override fun debug(message: String) = Timber.tag(tag).d(message)
+          override fun warning(message: String) = Timber.tag(tag).w(message)
+          override fun error(error: Throwable, message: String) = Timber.tag(tag).e(error, message)
         }
-) : UsfVm<E, VS, VE> {
+) : UsfVm<E, VS, Effect> {
 
   /**
    * @param event every input is processed into an [E]vent
@@ -39,15 +40,44 @@ abstract class UsfViewModelImpl<E : Any, R : Any, VS : Any, VE : Any>(
   protected abstract suspend fun resultToViewState(currentViewState: VS, result: R): VS
 
   /**
-   * @param result a single [R]esult can result in multiple [VE]s for e.g. emit a VE for navigation
-   *   and another for an analytics call hence a return type of [Flow]<[VE]>
-   * @return [Flow] of [VE]s where null emissions will be ignored automatically
+   * @param result a single [R]esult can result in multiple [Effect]s for e.g. emit a VE for
+   *   navigation and another for an analytics call hence a return type of [Flow]<[Effect]>
+   * @return [Flow] of [Effect]s where null emissions will be ignored automatically
    */
-  protected abstract suspend fun resultToEffects(result: R): Flow<VE?>
+  protected abstract suspend fun resultToEffects(result: R): Flow<Effect?>
 
-  private val _events = MutableSharedFlow<E>()
+  /**
+   * we use a "shared" flow vs state flow here to avoid conflation of state flows.
+   *
+   * every single event needs to reach the view model as they could have important implications to
+   * the VM logic state flow might conflate multiple events if they happen simultaneously.
+   */
+  private val _events =
+      MutableSharedFlow<E>(
+          /**
+           * we do this to prevent a race condition misfire for events sent in very early. for e.g.
+           * OnScreenLoad events that are sent via [processInput()] right after the VM is created
+           * can get ignored as .collect(ion) has started yet.
+           *
+           * inside the init block, we "launch" (which is fire and forget with coroutines) so the VM
+           * proceeds to "finish" initialization and allows the Screen/Fragment/Activity to send
+           * inputs to the "hot" _events flow which will drop it, since noone is listening.
+           *
+           * Adding a replay ensures that the first event is always sent to "new" subscribers.
+           */
+          replay = 1)
   private val _viewState = MutableStateFlow(initialState)
-  private val _effects = MutableSharedFlow<VE>()
+
+  /**
+   * we use a "shared" flow vs state flow here to avoid conflation of state flows.
+   *
+   * every effect must be sent out and cannot be ignored even if there are multiple side effects
+   * emitted quickly/simultaneously as that could have implications to the Screen logic
+   *
+   * there are times where we _want_ to ignore certain effects (like multiple loading spinner calls)
+   * these can be handled in the Results emission layer.
+   */
+  private val _effects = MutableSharedFlow<Effect>()
 
   override val viewState = _viewState.asStateFlow()
   override val effects = _effects.asSharedFlow()
