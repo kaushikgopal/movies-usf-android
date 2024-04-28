@@ -1,4 +1,6 @@
+
 [versions]
+#region ------------------ VERSIONS --------------------------
 compileSdk = "33"
 minSdk = "21"
 targetSdk = "33"
@@ -6,110 +8,162 @@ targetSdk = "33"
 appVersionCode = "2"
 appVersionName = "23.063.000"
 
-kotlin = "1.8.10"
-coroutines = "1.7.1"
+gradle = "8.7" # Gradle
+android-gradle-plugin = "8.3.2" # AGP
 
-activity = "1.7.2"
-androidGradlePlugin = "8.1.1"
-androidxAppCompat = "1.1.0"
-androidxLifecycle = "2.6.1"
-androidxTest = "1.5.2"
-coil = "2.4.0"
-composeBom = "2023.04.01" # https://developer.android.com/jetpack/compose/bom/bom-mapping
-composeCompiler = "1.4.2" # https://developer.android.com/jetpack/androidx/releases/compose-kotlin#kts
-constraintlayout = "2.1.4"
-dagger = "2.46.1"
-desugarJdk = "1.1.5"
-espresso = "3.1.1"
+kotlin = "1.9.23"
+kotlin-coroutines = "1.8.0"
+kotlin-serialization = "1.6.3"
+kotlin-compiler = "1.5.11"
+kotlin-bcv = "0.13.2"
+
+androidx-annotation = "1.7.1"
+androidx-compose-bom = "2024.04.01" # https://developer.android.com/jetpack/compose/bom/bom-mapping
+androidx-compose-compiler = "1.4.2" # https://developer.android.com/jetpack/androidx/releases/compose-kotlin#kts
+androidx-compose = "1.6.5"
+androidx-constraintlayout = "2.1.4"
+androidx-datastore = "1.1.0"
+androidx-lifecycle = "2.7.0"
+androidx-navigation = "2.7.7"
+androidx-work = "2.9.0"
+androidx-room = "2.6.1"
+androidx-appcompat = "1.1.0"
+androidx-test = "1.5.2"
+androidx-activity = "1.7.2"
+
+firebase-bom = "32.8.1"
+firebase-crashlytics = "18.6.4"
+firebase-crashlytics-plugin = "2.9.9"
+
+google-ksp = "1.9.23-1.0.19" # first half is kotlin version
+google-protobuf = "3.25.3"
+google-gms = "4.4.1"
+google-dagger = "2.51.1"
+
+assertj = "3.25.3"
+anvil = "2.4.9"
+coil = "2.6.0"
+datadog = "2.8.0"
+android-desugar-jdk = "2.0.4"
+espresso = "3.3.0"
 flowbinding = "1.2.0"
+grcp = "1.63.0"
+jackson = "2.17.0"
+jacoco = "0.8.12"
 junit = "4.12"
+junit-platform = "1.10.2"
+junit5 = "5.10.2"
 kotlinInject = "0.6.1"
 kotlinpoet = "1.12.0"
-ksp = "1.8.10-1.0.9" # first half is kotlin version
 leakCanary = "2.11"
-mockito = "2.23.0"
+lottie = "6.4.0"
+mockito = "5.11.0"
 mockitoKotlin = "5.0.0"
-okhttp = "4.11.0"
+okhttp = "4.12.0"
+paparazzi = "1.3.3"
 picasso = "2.71828"
-retrofit = "2.9.0"
-rxAndroid = "2.1.0"
-rxBindings = "2.2.0"
-rxBindingsViewpager = "3.0.0-alpha2"
-rxIdler = "0.9.1"
-rxJava = "2.2.2"
+retrofit = "2.11.0"
 secretsGradlePlugin = "2.0.1"
 spotless = "6.15.0"
 timber = "4.7.1"
 trueTime = "4.0.0.alpha"
 truth = "0.42"
 turbine = "1.0.0"
+#endregion
 
 [plugins]
-android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
-android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-kotlin =         { id = "org.jetbrains.kotlin.jvm",             version.ref = "kotlin" }  # for jvm only
+#region ------------------ PLUGINS --------------------------
+android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
+android-library = { id = "com.android.library", version.ref = "android-gradle-plugin" }
+android-test = { id = "com.android.test", version.ref = "android-gradle-plugin" }
+android-baseline = { id = "androidx.baselineprofile", version = "1.2.4" }
+
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-allopen = { id = "org.jetbrains.kotlin.plugin.allopen",  version.ref = "kotlin" }  #
-kotlin-android = { id = "org.jetbrains.kotlin.android",         version.ref = "kotlin" }  # for andorid projects
-kotlin-kapt =    { id = "org.jetbrains.kotlin.kapt",            version.ref = "kotlin" }  # for annotation processing
-kotlin-kmp =     { id = "org.jetbrains.kotlin.multiplatform",   version.ref = "kotlin" }  # for multiplatform projects
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
+kotlin-kovert = { id = "org.jetbrains.kotlinx.kovert", version = "0.8.0-Beta2" }
+kotlin-lombok = { id = "org.jetbrains.kotlin.plugin.lombok", version.ref = "kotlin" }
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
+kotlin-samreceiver = { id = "org.jetbrains.kotlin.plugin.sam.with.receiver", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+kotlin-compatibilityValidator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "kotlin-bcv" }
+
+
+google-ksp = { id = "com.google.devtools.ksp", version.ref = "google-ksp" }
+google-firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebase-crashlytics-plugin" }
+google-protobuf = { id = "com.google.protobuf", version = "google-protobuf" }
+google-services = { id = "com.google.gms.google-services", version = "google-gms" }
+
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 secrets-gradle-plugin = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", version.ref = "secretsGradlePlugin" }
+#endregion
 
 [libraries]
-
-truetime = { group = "com.github.instacart", name = "truetime-android", version.ref = "trueTime" }
-
-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity" }
-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activity" }
-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidxAppCompat" }
-atsl-runner = { group = "androidx.test", name = "runner", version.ref = "androidxTest" }
+#region ------------------ SINGLE ARTIFACT DEPENDENCIES --------------------------
 coil = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
-compose-material3 = { module = "androidx.compose.material3:material3" }
-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
-compose-ui-ui = { module = "androidx.compose.ui:ui" }
-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
-dagger =          { group = "com.google.dagger", name = "dagger", version.ref = "dagger" }
-dagger-compiler = { group = "com.google.dagger", name = "dagger-compiler", version.ref = "dagger" }
-desugar-jdk-lib = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "desugarJdk" }
-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso" }
+android-desugar-jdk = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "android-desugar-jdk" }
 flow-binding = { group = "io.github.reactivecircus.flowbinding", name = "flowbinding-android", version.ref = "flowbinding" }
-google-truth = { group = "com.google.truth", name = "truth", version.ref = "truth" }
+instacart-truetime = { group = "com.github.instacart", name = "truetime-android", version.ref = "trueTime" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
-kotlin-inject-compiler = { group = "me.tatarka.inject", name = "kotlin-inject-compiler-ksp", version.ref = "kotlinInject" }
-kotlin-inject-runtime = { group = "me.tatarka.inject", name = "kotlin-inject-runtime", version.ref = "kotlinInject" }
-kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib-jdk8", version.ref = "kotlin" }
-kotlinpoet-core = { group = "com.squareup", name = "kotlinpoet", version.ref = "kotlinpoet" }
-kotlinpoet-ksp = { group = "com.squareup", name = "kotlinpoet-ksp", version.ref = "kotlinpoet" }
-kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
-kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
-kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
-ksp = { group = "com.google.devtools.ksp", name = "symbol-processing-api", version.ref = "ksp" }
-leakcanary = { group = "com.squareup.leakcanary", name = "leakcanary-android", version.ref = "leakCanary" }
-leakcanary-noop = { group = "com.squareup.leakcanary", name = "leakcanary-android-no-op", version.ref = "leakCanary" }
-lifecycle-compiler = { group = "androidx.lifecycle", name = "lifecycle-compiler", version.ref = "androidxLifecycle" }
-lifecycle-runtime = { group = "androidx.lifecycle", name = "lifecycle-runtime", version.ref = "androidxLifecycle" }
-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "androidxLifecycle" }
-lifecycle-viewmodel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel", version.ref = "androidxLifecycle" }
-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "androidxLifecycle" }
-lifecycle-viewmodel-savedstate = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-savedstate", version.ref = "androidxLifecycle" }
-mockito-core = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }
-mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "mockitoKotlin" }
-okhttp-bom = { module = "com.squareup.okhttp3:okhttp-bom", version.ref = "okhttp" }
-okhttp = { group = "com.squareup.okhttp3", name = "okhttp" }
-okhttp-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor" }
-picasso = { group = "com.squareup.picasso", name = "picasso", version.ref = "picasso" }
-recyclerview = { group = "androidx.recyclerview", name = "recyclerview", version.ref = "androidxAppCompat" }
-retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
-retrofit-adapter_rxjava = { group = "com.squareup.retrofit2", name = "adapter-rxjava2", version.ref = "retrofit" }
-retrofit-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
-retrofit-mock = { group = "com.squareup.retrofit2", name = "retrofit-mock", version.ref = "retrofit" }
-rx-android = { group = "io.reactivex.rxjava2", name = "rxandroid", version.ref = "rxAndroid" }
-rx-bindings = { group = "com.jakewharton.rxbinding2", name = "rxbinding", version.ref = "rxBindings" }
-rx-java = { group = "io.reactivex.rxjava2", name = "rxjava", version.ref = "rxJava" }
-rx-replayingShare = { group = "com.jakewharton.rx2", name = "replaying-share", version.ref = "rxAndroid" }
-swiperefreshlayout = { group = "androidx.swiperefreshlayout", name = "swiperefreshlayout", version.ref = "androidxAppCompat" }
+testing-assertj-core = { group = "org.assertj", name = "assertj-core", version.ref = "assertj" }
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
+#endregion
+
+#region ------------------ FAMILY ARTIFACT DEPENDENCIES --------------------------
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
+androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "androidx-activity" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidx-appcompat" }
+androidx-atsl-runner = { group = "androidx.test", name = "runner", version.ref = "androidx-test" }
+androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "androidx-compose-bom" }
+androidx-compose-material3 = { module = "androidx.compose.material3:material3" }
+androidx-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
+androidx-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
+androidx-compose-ui-ui = { module = "androidx.compose.ui:ui" }
+androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "androidx-constraintlayout" }
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso" }
+androidx-lifecycle-compiler = { group = "androidx.lifecycle", name = "lifecycle-compiler", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-runtime = { group = "androidx.lifecycle", name = "lifecycle-runtime", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-viewmodel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-viewmodel-savedstate = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-savedstate", version.ref = "androidx-lifecycle" }
+androidx-recyclerview = { group = "androidx.recyclerview", name = "recyclerview", version.ref = "androidx-appcompat" }
+androidx-swiperefreshlayout = { group = "androidx.swiperefreshlayout", name = "swiperefreshlayout", version.ref = "androidx-appcompat" }
+
+google-dagger =          { group = "com.google.dagger", name = "dagger", version.ref = "google-dagger" }
+google-dagger-compiler = { group = "com.google.dagger", name = "dagger-compiler", version.ref = "google-dagger" }
+google-truth = { group = "com.google.truth", name = "truth", version.ref = "truth" }
+google-ksp = { group = "com.google.devtools.ksp", name = "symbol-processing-api", version.ref = "google-ksp" }
+google-firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom" }
+google-firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics", version.ref = "firebase-crashlytics" }
+google-firebase-ndk = { group = "com.google.firebase", name = "firebase-crashlytics-ndk", version.ref = "firebase-crashlytics" }
+
+kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib-jdk8", version.ref = "kotlin" }
+kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlin-coroutines" }
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlin-coroutines" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlin-coroutines" }
+
+square-kotlinpoet-core = { group = "com.squareup", name = "kotlinpoet", version.ref = "kotlinpoet" }
+square-kotlinpoet-ksp = { group = "com.squareup", name = "kotlinpoet-ksp", version.ref = "kotlinpoet" }
+square-leakcanary = { group = "com.squareup.leakcanary", name = "leakcanary-android", version.ref = "leakCanary" }
+square-leakcanary-noop = { group = "com.squareup.leakcanary", name = "leakcanary-android-no-op", version.ref = "leakCanary" }
+square-okhttp-bom = { module = "com.squareup.okhttp3:okhttp-bom", version.ref = "okhttp" }
+square-okhttp = { group = "com.squareup.okhttp3", name = "okhttp" }
+square-okhttp-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor" }
+square-picasso = { group = "com.squareup.picasso", name = "picasso", version.ref = "picasso" }
+square-retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+square-retrofit-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
+square-retrofit-mock = { group = "com.squareup.retrofit2", name = "retrofit-mock", version.ref = "retrofit" }
+
+kotlin-inject-compiler = { group = "me.tatarka.inject", name = "kotlin-inject-compiler-ksp", version.ref = "kotlinInject" }
+kotlin-inject-runtime = { group = "me.tatarka.inject", name = "kotlin-inject-runtime", version.ref = "kotlinInject" }
+
+mockito-core = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }
+mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "mockitoKotlin" }
+#endregion
+
+
+#TODO: arrange all this and rename it better
