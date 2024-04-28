@@ -48,11 +48,11 @@ dependencies {
   ksp(libs.kotlin.inject.compiler)
   implementation(libs.kotlin.inject.runtime)
 
-  ksp(project(":annotations-processors"))
+  ksp(project(":annotations-processors")) // todo: put all usf in same module
   implementation(project(":annotations"))
 
   implementation(libs.kotlin.stdlib)
-  implementation(libs.androidx.constraintlayout)
+  implementation(libs.androidx.constraintlayout) // todo: move to compose
   implementation(libs.androidx.activity.ktx)
   implementation(libs.flow.binding)
   implementation(libs.kotlinx.coroutines.android)
