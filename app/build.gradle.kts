@@ -17,7 +17,6 @@ android {
   defaultConfig {
     applicationId = "co.kaush.msusf"
     minSdk = libs.versions.minSdk.get().toInt()
-    targetSdk = libs.versions.targetSdk.get().toInt()
     versionCode = libs.versions.appVersionCode.get().toInt()
     versionName = libs.versions.appVersionName.get()
 

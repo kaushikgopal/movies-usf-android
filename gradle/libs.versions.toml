@@ -3,7 +3,6 @@
 #region ------------------ VERSIONS --------------------------
 compileSdk = "34"
 minSdk = "21"
-targetSdk = "34"
 
 appVersionCode = "2"
 appVersionName = "23.063.000"
