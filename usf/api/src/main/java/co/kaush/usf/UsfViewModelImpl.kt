@@ -2,7 +2,6 @@ package co.kaush.usf
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import timber.log.Timber
 
 /**
  * When building features, we create <Feature>ViewModelImpl.kt classes that extend this class. and
@@ -18,9 +17,9 @@ abstract class UsfViewModelImpl<E : Any, R : Any, VS : Any, Effect : Any>(
     logger: UsfVmLogger =
         object : UsfVmLogger {
           val tag = Thread.currentThread().stackTrace[4].className.split(".").last()
-          override fun debug(message: String) = Timber.tag(tag).d(message)
-          override fun warning(message: String) = Timber.tag(tag).w(message)
-          override fun error(error: Throwable, message: String) = Timber.tag(tag).e(error, message)
+          override fun debug(message: String) = run { /*do something*/}
+          override fun warning(message: String) = run { /*do something*/}
+          override fun error(error: Throwable, message: String) = run { /*do something*/}
         }
 ) : UsfVm<E, VS, Effect> {
 
