@@ -23,6 +23,7 @@ rootProject.name = "Movies USF Android"
 include(":app")
 
 include(
-    ":annotations",
-    ":annotations-processors",
+    ":usf:annotations",
+    ":usf:annotations-processors",
+    ":usf:api",
 )

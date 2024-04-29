@@ -2,7 +2,6 @@ package co.kaush.msusf.movies
 
 import co.kaush.msusf.annotations.UsfViewModel
 import co.kaush.msusf.movies.MSMovieEvent.LongRunningEvent
-import co.kaush.msusf.usf.UsfViewModelImpl
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow

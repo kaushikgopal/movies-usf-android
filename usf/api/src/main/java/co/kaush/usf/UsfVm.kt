@@ -1,4 +1,4 @@
-package co.kaush.msusf.usf
+package co.kaush.usf
 
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow

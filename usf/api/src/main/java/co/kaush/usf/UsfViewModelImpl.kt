@@ -1,4 +1,4 @@
-package co.kaush.msusf.usf
+package co.kaush.usf
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*

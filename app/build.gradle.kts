@@ -48,8 +48,9 @@ dependencies {
   ksp(libs.kotlin.inject.compiler)
   implementation(libs.kotlin.inject.runtime)
 
-  ksp(project(":annotations-processors")) // todo: put all usf in same module
-  implementation(project(":annotations"))
+  ksp(project(":usf:annotations-processors")) // todo: put all usf in same module
+  implementation(project(":usf:annotations"))
+  implementation(project(":usf:api"))
 
   implementation(libs.kotlin.stdlib)
   implementation(libs.androidx.constraintlayout) // todo: move to compose

@@ -5,7 +5,7 @@ plugins {
 }
 
 dependencies {
-  implementation(project(":annotations"))
+  implementation(project(":usf:annotations"))
   implementation(libs.google.ksp)
   implementation(libs.square.kotlinpoet.core)
   implementation(libs.square.kotlinpoet.ksp)
