@@ -2,7 +2,9 @@ package co.kaush.msusf.movies
 
 import co.kaush.msusf.movies.MSMovieEvent.LongRunningEvent
 import co.kaush.usf.UsfViewModelImpl
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -11,10 +13,12 @@ import kotlinx.coroutines.flow.flow
 class MSMovieViewModelImpl(
     private val movieRepo: MSMovieRepository,
     coroutineScope: CoroutineScope,
+    dispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) :
     UsfViewModelImpl<MSMovieEvent, MSMovieResult, MSMovieViewState, MSMovieEffect>(
         MSMovieViewState(),
         coroutineScope,
+        dispatcher,
     ) {
 
   // -----------------------------------------------------------------------------------

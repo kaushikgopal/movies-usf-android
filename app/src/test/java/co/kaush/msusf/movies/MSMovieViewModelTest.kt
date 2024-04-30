@@ -19,6 +19,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class MSMovieViewModelTest {
 
   // Set the main coroutines dispatcher for unit testing.
@@ -37,14 +38,16 @@ class MSMovieViewModelTest {
   @Test
   @DisplayName("on initialization, initial view state should have Blade prepopulated")
   fun onSubscription_InitialStateIsEmitted() = runTest {
-    viewModel = MSMovieViewModelImpl(fakeMovieAppRepository, backgroundScope)
+    viewModel =
+        MSMovieViewModelImpl(fakeMovieAppRepository, backgroundScope, testRule.testDispatcher)
     val vs = viewModel.viewState.first()
     assertThat(vs.searchBoxText).isEqualTo("Blade")
   }
 
   @Test
   fun onScreenLoad_searchBoxText_shouldBeCleared() = runTest {
-    viewModel = MSMovieViewModelImpl(fakeMovieAppRepository, backgroundScope)
+    viewModel =
+        MSMovieViewModelImpl(fakeMovieAppRepository, backgroundScope, testRule.testDispatcher)
     val vs = viewModel.viewState.first()
     viewModel.viewState.test {
       assertThat(awaitItem().searchBoxText).isEqualTo("Blade")
@@ -56,7 +59,8 @@ class MSMovieViewModelTest {
 
   @Test
   fun onSearchingMovie_showLoadingIndicator_ThenResult() = runTest {
-    viewModel = MSMovieViewModelImpl(fakeMovieAppRepository, backgroundScope)
+    viewModel =
+        MSMovieViewModelImpl(fakeMovieAppRepository, backgroundScope, testRule.testDispatcher)
     val vs = viewModel.viewState.first()
     viewModel.viewState.test {
       skipItems(1) // starting state
@@ -77,7 +81,8 @@ class MSMovieViewModelTest {
 
   @Test
   fun onClickingMovieSearchResult_shouldPopulateHistoryList() = runTest {
-    viewModel = MSMovieViewModelImpl(fakeMovieAppRepository, backgroundScope)
+    viewModel =
+        MSMovieViewModelImpl(fakeMovieAppRepository, backgroundScope, testRule.testDispatcher)
     val vs = viewModel.viewState.first()
     turbineScope {
       val vsTester = viewModel.viewState.testIn(backgroundScope)
@@ -101,7 +106,8 @@ class MSMovieViewModelTest {
 
   @Test
   fun onClickingMovieSearchResultTwice_shouldShowToastEachTime() = runTest {
-    viewModel = MSMovieViewModelImpl(fakeMovieAppRepository, backgroundScope)
+    viewModel =
+        MSMovieViewModelImpl(fakeMovieAppRepository, backgroundScope, testRule.testDispatcher)
     val vs = viewModel.viewState.first()
     viewModel.effects.test {
       viewModel.processInput(SearchMovieEvent("blade runner 2049"))
@@ -116,7 +122,8 @@ class MSMovieViewModelTest {
 
   @Test
   fun onClickingMovieHistoryResult_ResultViewIsRepopulatedWithInfo() = runTest {
-    viewModel = MSMovieViewModelImpl(fakeMovieAppRepository, backgroundScope)
+    viewModel =
+        MSMovieViewModelImpl(fakeMovieAppRepository, backgroundScope, testRule.testDispatcher)
     val vs = viewModel.viewState.first()
     viewModel.viewState.test {
       skipItems(1) // starting state
