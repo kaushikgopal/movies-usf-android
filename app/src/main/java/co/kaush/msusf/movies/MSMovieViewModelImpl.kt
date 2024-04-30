@@ -1,6 +1,5 @@
 package co.kaush.msusf.movies
 
-import co.kaush.msusf.annotations.UsfViewModel
 import co.kaush.msusf.movies.MSMovieEvent.LongRunningEvent
 import co.kaush.usf.UsfViewModelImpl
 import kotlinx.coroutines.CoroutineScope
@@ -8,7 +7,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-@UsfViewModel
+// @UsfViewModel
 class MSMovieViewModelImpl(
     private val movieRepo: MSMovieRepository,
     coroutineScope: CoroutineScope,
@@ -20,7 +19,7 @@ class MSMovieViewModelImpl(
 
   // -----------------------------------------------------------------------------------
   // Event -> Results
-  override suspend fun eventToResultFlow(event: MSMovieEvent): Flow<MSMovieResult> {
+  override fun eventToResultFlow(event: MSMovieEvent): Flow<MSMovieResult> {
     return when (event) {
       is MSMovieEvent.ScreenLoadEvent -> onScreenLoad()
       is MSMovieEvent.SearchMovieEvent -> onSearchMovie(event)
@@ -84,7 +83,7 @@ class MSMovieViewModelImpl(
   // -----------------------------------------------------------------------------------
   // Results -> ViewState
 
-  override suspend fun resultToViewState(
+  override fun resultToViewState(
       currentViewState: MSMovieViewState,
       result: MSMovieResult
   ): MSMovieViewState {
@@ -108,6 +107,5 @@ class MSMovieViewModelImpl(
   // -----------------------------------------------------------------------------------
   // Results -> Effect
 
-  override suspend fun resultToEffects(result: MSMovieResult): Flow<MSMovieEffect?> =
-      result.toEffects()
+  override fun resultToEffects(result: MSMovieResult): Flow<MSMovieEffect?> = result.toEffects()
 }

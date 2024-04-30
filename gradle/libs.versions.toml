@@ -50,7 +50,7 @@ grcp = "1.63.0"
 jackson = "2.17.0"
 jacoco = "0.8.12"
 junit = "4.12"
-junit-platform = "1.10.2"
+junit-platform = "1.10.0.0"
 junit5 = "5.10.2"
 kotlinInject = "0.6.1"
 kotlinpoet = "1.12.0"
@@ -95,6 +95,7 @@ google-firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.
 google-protobuf = { id = "com.google.protobuf", version = "google-protobuf" }
 google-services = { id = "com.google.gms.google-services", version = "google-gms" }
 
+mannodermaus-junit5 = { id = "de.mannodermaus.android-junit5", version.ref = "junit-platform" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 secrets-gradle-plugin = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", version.ref = "secretsGradlePlugin" }
 #endregion
@@ -105,10 +106,9 @@ coil = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
 android-desugar-jdk = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "android-desugar-jdk" }
 flow-binding = { group = "io.github.reactivecircus.flowbinding", name = "flowbinding-android", version.ref = "flowbinding" }
 instacart-truetime = { group = "com.github.instacart", name = "truetime-android", version.ref = "trueTime" }
-junit = { group = "junit", name = "junit", version.ref = "junit" }
 testing-assertj-core = { group = "org.assertj", name = "assertj-core", version.ref = "assertj" }
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
-turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
+testing-turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
 #endregion
 
 #region ------------------ FAMILY ARTIFACT DEPENDENCIES --------------------------
@@ -139,6 +139,14 @@ google-ksp = { group = "com.google.devtools.ksp", name = "symbol-processing-api"
 google-firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom" }
 google-firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics", version.ref = "firebase-crashlytics" }
 google-firebase-ndk = { group = "com.google.firebase", name = "firebase-crashlytics-ndk", version.ref = "firebase-crashlytics" }
+
+testing-junit5-bom = { group = "org.junit", name = "junit-bom", version.ref = "junit5" }
+testing-junit5 = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junit5" }
+testing-junit5-accesor = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junit5" }
+testing-junit5-api = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "junit5" }
+testing-junit5-engine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version.ref = "junit5" }
+testing-junit5-migrationsupport = { group = "org.junit.jupiter", name = "junit-jupiter-migrationsupport", version.ref = "junit5" }
+testing-junit5-params = { group = "org.junit.jupiter", name = "junit-jupiter-params", version.ref = "junit5" }
 
 kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib-jdk8", version.ref = "kotlin" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlin-coroutines" }

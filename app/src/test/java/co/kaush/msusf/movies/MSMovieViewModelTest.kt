@@ -11,19 +11,21 @@ import co.kaush.msusf.movies.di.TestAppComponent
 import co.kaush.msusf.movies.di.blade
 import co.kaush.msusf.movies.di.bladeRunner2049
 import co.kaush.msusf.movies.di.create
-import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class MSMovieViewModelTest {
 
   // Set the main coroutines dispatcher for unit testing.
-  @ExperimentalCoroutinesApi @get:Rule val mainCoroutineRule = MainCoroutineRule()
+  @OptIn(ExperimentalCoroutinesApi::class)
+  @JvmField
+  @RegisterExtension
+  val testRule = CoroutineTestRule()
 
   // Subject under test
   private lateinit var viewModel: MSMovieViewModel
@@ -32,7 +34,7 @@ class MSMovieViewModelTest {
   private val testAppComponent = TestAppComponent::class.create()
   private var fakeMovieAppRepository: MSMovieRepository = testAppComponent.movieRepository
 
-  @Before
+  @BeforeEach
   fun setupViewModel() {
     viewModel = MSMovieViewModel(fakeMovieAppRepository)
   }

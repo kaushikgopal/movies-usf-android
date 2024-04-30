@@ -5,6 +5,7 @@ plugins {
   alias(libs.plugins.kotlin.allopen)
   alias(libs.plugins.google.ksp)
   alias(libs.plugins.secrets.gradle.plugin)
+  alias(libs.plugins.mannodermaus.junit5)
 }
 
 allOpen { annotation("co.kaush.msusf.movies.OpenClass") }
@@ -19,8 +20,6 @@ android {
     minSdk = libs.versions.minSdk.get().toInt()
     versionCode = libs.versions.appVersionCode.get().toInt()
     versionName = libs.versions.appVersionName.get()
-
-    testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
   }
 
   buildFeatures {
@@ -52,35 +51,43 @@ dependencies {
   implementation(project(":usf:api"))
 
   implementation(libs.kotlin.stdlib)
-  implementation(libs.androidx.constraintlayout) // todo: move to compose
-  implementation(libs.androidx.activity.ktx)
-  implementation(libs.flow.binding)
   implementation(libs.kotlinx.coroutines.android)
   implementation(libs.kotlinx.coroutines.core)
-  implementation(libs.coil)
+
+  implementation(libs.androidx.constraintlayout) // todo: move to compose
+  implementation(libs.androidx.activity.ktx)
   implementation(libs.androidx.lifecycle.runtime.ktx)
   implementation(libs.androidx.lifecycle.viewmodel)
   implementation(libs.androidx.lifecycle.viewmodel.ktx)
   implementation(libs.androidx.lifecycle.viewmodel.savedstate)
-  implementation(platform(libs.square.okhttp.bom))
-  implementation(libs.square.okhttp)
-  implementation(libs.square.okhttp.logging.interceptor)
-  implementation(libs.square.retrofit.gson)
-  implementation(libs.square.retrofit)
   implementation(libs.androidx.swiperefreshlayout)
   implementation(libs.androidx.appcompat)
   implementation(libs.androidx.recyclerview)
+
+  implementation(libs.coil)
+  implementation(libs.flow.binding)
   implementation(libs.timber) // todo: remove
+
+  implementation(platform(libs.square.okhttp.bom))
+  implementation(libs.square.okhttp)
+  implementation(libs.square.okhttp.logging.interceptor)
+
+  implementation(libs.square.retrofit.gson)
+  implementation(libs.square.retrofit)
 
   debugImplementation(libs.square.leakcanary)
   releaseImplementation(libs.square.leakcanary.noop)
 
-  testImplementation(libs.google.truth) // todo: remove
-  testImplementation(libs.junit)
+  // (Required) Writing and executing Unit Tests on the JUnit Platform
+  testImplementation(libs.testing.junit5.api)
+  testRuntimeOnly(libs.testing.junit5.engine)
+
+  testImplementation(libs.testing.turbine)
+  testImplementation(libs.testing.assertj.core)
   testImplementation(libs.mockito.core)
   testImplementation(libs.mockito.kotlin)
   testImplementation(libs.kotlinx.coroutines.test)
-  testImplementation(libs.turbine)
+
   //  testImplementation(libs.atsl.runner)
 
   androidTestImplementation(libs.androidx.espresso.core)
