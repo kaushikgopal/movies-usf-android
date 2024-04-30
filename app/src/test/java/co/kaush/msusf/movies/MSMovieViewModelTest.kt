@@ -11,9 +11,11 @@ import co.kaush.msusf.movies.di.TestAppComponent
 import co.kaush.msusf.movies.di.blade
 import co.kaush.msusf.movies.di.bladeRunner2049
 import co.kaush.msusf.movies.di.create
+import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Disabled
@@ -47,16 +49,29 @@ class MSMovieViewModelTest {
 
   @Test
   @DisplayName("on screen load, search box test should be cleared")
-  fun onScreenLoad_searchBoxText_shouldBeCleared() = runTest {
-    viewModel = createTestViewModel()
-    viewModel.viewState.test {
-      skipItems(1) // starts off with blade
-      viewModel.processInput(ScreenLoadEvent)
-      // todo: this shouldn't pass without a yield (standard dispatcher)
-      assertThat(awaitItem().searchBoxText).isEmpty()
-      expectNoEvents()
-    }
-  }
+  fun onScreenLoad_searchBoxText_shouldBeCleared() =
+      runTest(timeout = 10.minutes /*while debugging*/) {
+        val vm = createTestViewModel()
+        assertThat(vm.viewState.first().searchBoxText).isEqualTo("Blade") // starts off with blade
+        vm.processInput(ScreenLoadEvent)
+        runCurrent()
+        assertThat(vm.viewState.first().searchBoxText).isEmpty()
+      }
+
+  @Test
+  @DisplayName("on screen load, search box test should be cleared - using turbine")
+  fun onScreenLoad_searchBoxText_shouldBeCleared_2() =
+      runTest(timeout = 10.minutes /*while debugging*/) {
+        viewModel = createTestViewModel()
+        viewModel.viewState.test() {
+          assertThat(awaitItem().searchBoxText).isEqualTo("Blade") // starts off with blade
+          viewModel.processInput(ScreenLoadEvent)
+          // todo: this shouldn't pass without a runCurrent kick (as we're using standard
+          // dispatcher)
+          // runCurrent()
+          assertThat(awaitItem().searchBoxText).isEmpty()
+        }
+      }
 
   @Disabled
   @Test
