@@ -54,7 +54,7 @@ class MSMovieViewModelTest {
         val vm = createTestViewModel()
         assertThat(vm.viewState.first().searchBoxText).isEqualTo("Blade") // starts off with blade
         vm.processInput(ScreenLoadEvent)
-        runCurrent()
+        runCurrent() // required for test to pass
         assertThat(vm.viewState.first().searchBoxText).isEmpty()
       }
 
@@ -66,8 +66,8 @@ class MSMovieViewModelTest {
         viewModel.viewState.test() {
           assertThat(awaitItem().searchBoxText).isEqualTo("Blade") // starts off with blade
           viewModel.processInput(ScreenLoadEvent)
-          // todo: this shouldn't pass without a runCurrent kick (as we're using standard
-          // dispatcher)
+          // todo: this shouldn't pass without a runCurrent kick (?)
+          //  as we're using standard dispatcher)
           // runCurrent()
           assertThat(awaitItem().searchBoxText).isEmpty()
         }
