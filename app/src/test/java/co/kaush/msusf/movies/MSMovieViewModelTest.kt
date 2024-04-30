@@ -11,7 +11,6 @@ import co.kaush.msusf.movies.di.TestAppComponent
 import co.kaush.msusf.movies.di.blade
 import co.kaush.msusf.movies.di.bladeRunner2049
 import co.kaush.msusf.movies.di.create
-import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.TestScope
@@ -49,26 +48,28 @@ class MSMovieViewModelTest {
 
   @Test
   @DisplayName("on screen load, search box test should be cleared")
-  fun onScreenLoad_searchBoxText_shouldBeCleared() =
-      runTest(timeout = 10.minutes /*while debugging*/) {
-        val vm = createTestViewModel()
-        assertThat(vm.viewState.first().searchBoxText).isEqualTo("Blade") // starts off with blade
-        vm.processInput(ScreenLoadEvent)
-        runCurrent()
-        assertThat(vm.viewState.first().searchBoxText).isEmpty()
-      }
+  fun onScreenLoad_searchBoxText_shouldBeCleared() = runTest {
+    val vm = createTestViewModel()
+    assertThat(vm.viewState.first().searchBoxText).isEqualTo("Blade") // starts off with blade
+    vm.processInput(ScreenLoadEvent)
+    runCurrent()
+    assertThat(vm.viewState.first().searchBoxText).isEmpty()
+  }
 
   @Test
   @DisplayName("on screen load, search box test should be cleared - using turbine")
   fun onScreenLoad_searchBoxText_shouldBeCleared_2() =
-      runTest(timeout = 10.minutes /*while debugging*/) {
+      // Functionally the exact same test as the previous one
+      // we use turbine here as a demonstration
+      runTest {
         viewModel = createTestViewModel()
         viewModel.viewState.test() {
           assertThat(awaitItem().searchBoxText).isEqualTo("Blade") // starts off with blade
           viewModel.processInput(ScreenLoadEvent)
-          // todo: this shouldn't pass without a runCurrent kick (as we're using standard
-          // dispatcher)
+          // notice that we don't need to runCurrent()
           // runCurrent()
+          // this is because Turbine uses an UnconfinedTestDispatcher internally
+          // https://github.com/cashapp/turbine/blob/trunk/src/commonMain/kotlin/app/cash/turbine/flow.kt#L199-L201
           assertThat(awaitItem().searchBoxText).isEmpty()
         }
       }
