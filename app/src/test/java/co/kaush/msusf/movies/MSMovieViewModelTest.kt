@@ -13,11 +13,12 @@ import co.kaush.msusf.movies.di.bladeRunner2049
 import co.kaush.msusf.movies.di.create
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -74,11 +75,10 @@ class MSMovieViewModelTest {
         }
       }
 
-  @Disabled
   @Test
+  @DisplayName("on search movie, show loading indicator")
   fun onSearchingMovie_showLoadingIndicator_ThenResult() = runTest {
     viewModel = createTestViewModel()
-    val vs = viewModel.viewState.first()
     viewModel.viewState.test {
       skipItems(1) // starting state
 
@@ -96,12 +96,10 @@ class MSMovieViewModelTest {
     }
   }
 
-  @Disabled
   @Test
   fun onClickingMovieSearchResult_shouldPopulateHistoryList() = runTest {
     // TODO: yield?
     viewModel = createTestViewModel()
-    val vs = viewModel.viewState.first()
     turbineScope {
       val vsTester = viewModel.viewState.testIn(backgroundScope)
       val veTester = viewModel.effects.testIn(backgroundScope)
@@ -122,28 +120,29 @@ class MSMovieViewModelTest {
     }
   }
 
-  @Disabled
   @Test
+  @DisplayName("adding to history twice, should show two toasts")
   fun onClickingMovieSearchResultTwice_shouldShowToastEachTime() = runTest {
-    // TODO: yield?
     viewModel = createTestViewModel()
-    val vs = viewModel.viewState.first()
-    viewModel.effects.test {
-      viewModel.processInput(SearchMovieEvent("blade runner 2049"))
-      viewModel.processInput(AddToHistoryEvent(bladeRunner2049))
-      viewModel.processInput(AddToHistoryEvent(bladeRunner2049))
 
-      assertThat(awaitItem()).isEqualTo(AddedToHistoryToastEffect)
-      assertThat(awaitItem()).isEqualTo(AddedToHistoryToastEffect)
-      expectNoEvents()
-    }
+    val ve = mutableListOf<MSMovieEffect>()
+    backgroundScope.launch { viewModel.effects.toList(ve) }
+
+    viewModel.processInput(SearchMovieEvent("blade runner 2049"))
+    assertThat(ve.size).isEqualTo(0)
+
+    viewModel.processInput(AddToHistoryEvent(bladeRunner2049))
+    runCurrent()
+    assertThat(ve[0]).isEqualTo(AddedToHistoryToastEffect)
+
+    viewModel.processInput(AddToHistoryEvent(bladeRunner2049))
+    runCurrent()
+    assertThat(ve[1]).isEqualTo(AddedToHistoryToastEffect)
   }
 
-  @Disabled
   @Test
   fun onClickingMovieHistoryResult_ResultViewIsRepopulatedWithInfo() = runTest {
     viewModel = createTestViewModel()
-    val vs = viewModel.viewState.first()
     viewModel.viewState.test {
       skipItems(1) // starting state
 
