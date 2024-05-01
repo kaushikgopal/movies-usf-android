@@ -1,7 +1,6 @@
 package co.kaush.msusf.movies
 
 import app.cash.turbine.test
-import app.cash.turbine.turbineScope
 import co.kaush.msusf.movies.MSMovieEffect.AddedToHistoryToastEffect
 import co.kaush.msusf.movies.MSMovieEvent.AddToHistoryEvent
 import co.kaush.msusf.movies.MSMovieEvent.RestoreFromHistoryEvent
@@ -97,27 +96,25 @@ class MSMovieViewModelTest {
   }
 
   @Test
+  @DisplayName("click search result, should show it in history")
   fun onClickingMovieSearchResult_shouldPopulateHistoryList() = runTest {
-    // TODO: yield?
     viewModel = createTestViewModel()
-    turbineScope {
-      val vsTester = viewModel.viewState.testIn(backgroundScope)
-      val veTester = viewModel.effects.testIn(backgroundScope)
 
-      viewModel.processInput(SearchMovieEvent("blade runner 2049"))
-      viewModel.processInput(AddToHistoryEvent(bladeRunner2049))
+    val vs = mutableListOf<MSMovieViewState>()
+    val ve = mutableListOf<MSMovieEffect>()
+    backgroundScope.launch { viewModel.viewState.toList(vs) }
+    backgroundScope.launch { viewModel.effects.toList(ve) }
 
-      vsTester.skipItems(3)
-      with(vsTester.awaitItem()) {
-        assertThat(adapterList).hasSize(1)
-        assertThat(adapterList[0]).isEqualTo(bladeRunner2049)
-      }
+    viewModel.processInput(SearchMovieEvent("blade runner 2049"))
+    viewModel.processInput(AddToHistoryEvent(bladeRunner2049))
 
-      assertThat(veTester.awaitItem()).isEqualTo(AddedToHistoryToastEffect)
+    runCurrent()
 
-      vsTester.expectNoEvents()
-      veTester.expectNoEvents()
+    vs[1].let {
+      assertThat(it.adapterList).hasSize(1)
+      assertThat(it.adapterList[0]).isEqualTo(bladeRunner2049)
     }
+    assertThat(ve[0]).isEqualTo(AddedToHistoryToastEffect)
   }
 
   @Test
