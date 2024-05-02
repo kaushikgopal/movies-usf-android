@@ -22,5 +22,14 @@ interface UsfVm<Event : Any, ViewState : Any, Effect : Any> {
 
   val viewState: StateFlow<ViewState>
 
+  /**
+   * we use a "shared" flow vs state flow here to avoid conflation of state flows.
+   *
+   * every effect must be sent out and cannot be ignored even if there are multiple side effects
+   * emitted quickly/simultaneously as that could have implications to the Screen logic
+   *
+   * there are times where we _want_ to ignore certain effects (like multiple loading spinner calls)
+   * these can be handled in the Results emission layer.
+   */
   val effects: SharedFlow<Effect>
 }

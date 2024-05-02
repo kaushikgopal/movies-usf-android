@@ -1,7 +1,21 @@
 package co.kaush.usf
 
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flatMapMerge
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.scan
+import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 /**
  * When building features, we create <Feature>ViewModelImpl.kt classes that extend this class. and
@@ -11,16 +25,16 @@ import kotlinx.coroutines.flow.*
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 abstract class UsfViewModelImpl<E : Any, R : Any, VS : Any, Effect : Any>(
-    initialState: VS,
-    private val coroutineScope: CoroutineScope,
-    private val processingDispatcher: CoroutineDispatcher = Dispatchers.IO,
-    logger: UsfVmLogger =
-        object : UsfVmLogger {
-          val tag = Thread.currentThread().stackTrace[4].className.split(".").last()
-          override fun debug(message: String) = run { /*do something*/}
-          override fun warning(message: String) = run { /*do something*/}
-          override fun error(error: Throwable, message: String) = run { /*do something*/}
-        }
+  initialState: VS,
+  private val coroutineScope: CoroutineScope,
+  private val processingDispatcher: CoroutineDispatcher = Dispatchers.IO,
+  logger: UsfVmLogger =
+      object : UsfVmLogger {
+        val tag = Thread.currentThread().stackTrace[4].className.split(".").last()
+        override fun debug(message: String) = run { /*do something*/ }
+        override fun warning(message: String) = run { /*do something*/ }
+        override fun error(error: Throwable, message: String) = run { /*do something*/ }
+      }
 ) : UsfVm<E, VS, Effect> {
 
   /**
@@ -63,49 +77,33 @@ abstract class UsfViewModelImpl<E : Any, R : Any, VS : Any, Effect : Any>(
            * inputs to the "hot" _events flow which will drop it, since noone is listening.
            *
            * Adding a replay ensures that the first event is always sent to "new" subscribers.
-           */
-          replay = 1)
-  private val _viewState = MutableStateFlow(initialState)
 
-  /**
-   * we use a "shared" flow vs state flow here to avoid conflation of state flows.
-   *
-   * every effect must be sent out and cannot be ignored even if there are multiple side effects
-   * emitted quickly/simultaneously as that could have implications to the Screen logic
-   *
-   * there are times where we _want_ to ignore certain effects (like multiple loading spinner calls)
-   * these can be handled in the Results emission layer.
-   */
-  private val _effects = MutableSharedFlow<Effect>()
+          replay = 1, */
+      )
 
-  override val viewState = _viewState.asStateFlow()
-  override val effects = _effects.asSharedFlow()
+  private val _results = _events
+      .flatMapMerge(concurrency = 5) { event ->
+        logger.debugEvents(event)
+        eventToResultFlow(event)
+      }
+      .onEach { logger.debugResults(it) }
+
+  override val effects = _results
+      .flatMapConcat { resultToEffects(it).filterNotNull() }
+      .onEach { logger.debugSideEffects(it) }
+      .shareIn(coroutineScope, SharingStarted.WhileSubscribed())
+
+  override val viewState = _results
+      .scan(initialState) { vs, result ->
+        resultToViewState(vs, result)
+      }
+      .distinctUntilChanged()
+      .onEach { logger.debugViewState(it) }
+      .stateIn(coroutineScope, SharingStarted.WhileSubscribed(), initialState)
+
 
   init {
     logger.debug("------ [init] ${Thread.currentThread().name}")
-
-    coroutineScope.launch(processingDispatcher) {
-      _events
-          .flatMapMerge { event ->
-            logger.debugEvents(event)
-            eventToResultFlow(event)
-          }
-          .collect { result ->
-            logger.debugResults(result)
-
-            // StateFlow already behaves as if distinctUntilChanged operator is applied to it
-            resultToViewState(_viewState.value, result).let { vs ->
-              logger.debugViewState(vs)
-              _viewState.emit(vs)
-            }
-
-            // effects are emitted after a view state by virtue of this collect call
-            // (rarely) would we want VS & VE to be emitted at the exact same instant
-            _effects.emitAll(
-                resultToEffects(result).filterNotNull().onEach { logger.debugSideEffects(it) },
-            )
-          }
-    }
   }
 
   override fun processInput(event: E) {

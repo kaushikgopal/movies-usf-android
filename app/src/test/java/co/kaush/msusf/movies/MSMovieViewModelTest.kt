@@ -21,6 +21,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
+import org.mockito.kotlin.times
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class MSMovieViewModelTest {
@@ -46,14 +47,48 @@ class MSMovieViewModelTest {
     assertThat(vs.searchBoxText).isEqualTo("Blade")
   }
 
+  // todo: write a test to emulate the memory leak
+  //  1. call OnViewCreated multiple times
+  //  2. if the connection is always live, it _will_ leak
+  //    but with the new sharingWhileSubscribed, does it dispose off the previous one?
+
+  @Test
+  fun memLeakTest() = runTest {
+    val vm = createTestViewModel()
+
+    val vs = mutableListOf<MSMovieViewState>()
+
+    val job = launch { vm.viewState.toList(vs) }
+
+    repeat(10) {
+      vm.processInput(ScreenLoadEvent)
+      runCurrent()
+    }
+
+    job.ca
+
+  }
+
   @Test
   @DisplayName("on screen load, search box test should be cleared")
   fun onScreenLoad_searchBoxText_shouldBeCleared() = runTest {
     val vm = createTestViewModel()
-    assertThat(vm.viewState.first().searchBoxText).isEqualTo("Blade") // starts off with blade
+
+    val vs = mutableListOf<MSMovieViewState>()
+    backgroundScope.launch { vm.viewState.toList(vs) }
+
+    runCurrent()
+    assertThat(vs[0].searchBoxText).isEqualTo("Blade") // starts off with blade
+
     vm.processInput(ScreenLoadEvent)
     runCurrent()
-    assertThat(vm.viewState.first().searchBoxText).isEmpty()
+    assertThat(vs[1].searchBoxText).isEmpty()
+
+//    vm.viewState.test {
+//      assertThat(awaitItem().searchBoxText).isEqualTo("Blade") // starts off with blade
+//      vm.processInput(ScreenLoadEvent)
+//      assertThat(awaitItem().searchBoxText).isEmpty()
+//    }
   }
 
   @Test

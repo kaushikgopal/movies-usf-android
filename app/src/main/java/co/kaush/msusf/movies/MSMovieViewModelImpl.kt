@@ -7,7 +7,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 
 // @UsfViewModel
 class MSMovieViewModelImpl(
@@ -33,7 +35,9 @@ class MSMovieViewModelImpl(
     }
   }
 
-  private fun onScreenLoad(): Flow<MSMovieResult> = flow { emit(MSMovieResult.ScreenLoadResult()) }
+  private fun onScreenLoad(): Flow<MSMovieResult> =
+      movieRepo.initialMovie().map { MSMovieResult.ScreenLoadResult() }
+//      flow { emit(MSMovieResult.ScreenLoadResult()) }
 
   private fun onLongRunningTask(event: LongRunningEvent): Flow<MSMovieResult> {
     return flow {
