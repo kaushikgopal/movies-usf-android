@@ -79,7 +79,6 @@ dependencies {
 //  releaseImplementation(libs.square.leakcanary.noop)
 
   // (Required) Writing and executing Unit Tests on the JUnit Platform
-  testImplementation(project(":usf:api"))
   testImplementation(testFixtures(project(":usf:api")))
 
 
