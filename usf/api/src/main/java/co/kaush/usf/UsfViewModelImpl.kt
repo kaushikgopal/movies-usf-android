@@ -32,8 +32,8 @@ abstract class UsfViewModelImpl<E : Any, R : Any, VS : Any, Effect : Any, LocalS
     }
 
     /**
-     * @param event every input is transformed into an [Event] and fed into the VM by the Screen
-     * @return [Flow]<[R]> a single [Event] can result in multiple [R]s for e.g. emit a
+     * @param event every input is transformed into an [E] and fed into the VM by the Screen
+     * @return [Flow]<[R]> a single [E] can result in multiple [R]s for e.g. emit a
      *   Result for loading and another for the actual result
      */
     protected abstract suspend fun eventToResultFlow(event: E): Flow<R>
@@ -151,7 +151,7 @@ abstract class UsfViewModelImpl<E : Any, R : Any, VS : Any, Effect : Any, LocalS
         fun debug(message: String)
 
         fun debugEvents(event: Any, message: String? = null) =
-            debug(message ?: "----- [event] ${Thread.currentThread().name} $event")
+            debug(message ?: "----- [E] ${Thread.currentThread().name} $event")
 
         fun debugResults(result: Any, message: String? = null) =
             debug(message ?: "----- [result] ${Thread.currentThread().name} $result")
