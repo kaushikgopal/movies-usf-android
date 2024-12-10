@@ -76,9 +76,13 @@ dependencies {
   implementation(libs.square.retrofit)
 
   debugImplementation(libs.square.leakcanary)
-  releaseImplementation(libs.square.leakcanary.noop)
+//  releaseImplementation(libs.square.leakcanary.noop)
 
   // (Required) Writing and executing Unit Tests on the JUnit Platform
+  testImplementation(project(":usf:api"))
+  testImplementation(testFixtures(project(":usf:api")))
+
+
   testImplementation(libs.testing.junit5.api)
   testRuntimeOnly(libs.testing.junit5.engine)
 
