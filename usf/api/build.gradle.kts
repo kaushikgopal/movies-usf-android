@@ -4,6 +4,10 @@ plugins {
     `java-test-fixtures`
 }
 
+tasks.named<Test>("test") {
+    useJUnitPlatform()
+}
+
 dependencies {
     implementation(libs.kotlinx.coroutines.core)
     // (Required) Writing and executing Unit Tests on the JUnit Platform
