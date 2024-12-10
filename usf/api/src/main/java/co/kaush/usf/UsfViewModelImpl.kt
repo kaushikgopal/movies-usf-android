@@ -1,7 +1,9 @@
 package co.kaush.usf
 
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
+import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * When building features, we create <Feature>ViewModelImpl.kt classes that extend this class. and
@@ -10,125 +12,158 @@ import kotlinx.coroutines.flow.*
  * processor.
  */
 @OptIn(ExperimentalCoroutinesApi::class)
-abstract class UsfViewModelImpl<E : Any, R : Any, VS : Any, Effect : Any>(
+abstract class UsfViewModelImpl<E : Any, R : Any, VS : Any, Effect : Any, LocalState : Any?>(
     initialState: VS,
     private val coroutineScope: CoroutineScope,
     private val processingDispatcher: CoroutineDispatcher = Dispatchers.IO,
-    logger: UsfVmLogger =
+    private val logger: UsfVmLogger =
         object : UsfVmLogger {
-          val tag = Thread.currentThread().stackTrace[4].className.split(".").last()
-          override fun debug(message: String) = run { /*do something*/}
-          override fun warning(message: String) = run { /*do something*/}
-          override fun error(error: Throwable, message: String) = run { /*do something*/}
+            val tag = Thread.currentThread().stackTrace[4].className.split(".")
+                .last() // TODO: switch to something like logcat
+
+            override fun debug(message: String) = run { /*do something*/ }
+            override fun warning(message: String) = run { /*do something*/ }
+            override fun error(error: Throwable, message: String) = run { /*do something*/ }
         }
 ) : UsfVm<E, VS, Effect> {
 
-  /**
-   * @param event every input is processed into an [E]vent
-   * @return [Flow]<[R]> a single [E]vent can result in multiple [R]esults for e.g. emit a R for
-   *   loading and another for the actual result
-   */
-  protected abstract fun eventToResultFlow(event: E): Flow<R>
-
-  /**
-   * @param currentViewState the current [VS]tate of the view (.copy it for the returned [VS]tate)
-   * @return [VS]tate Curiously, we don't return a [Flow]<[VS]> here every [R]esult will only ever
-   *   be transformed into a single [VS]tate if you want multiple [VS]tates emit multiple [R]esults
-   *   transforming each [R]esult to the respective [VS]tate
-   */
-  protected abstract fun resultToViewState(currentViewState: VS, result: R): VS
-
-  /**
-   * @param result a single [R]esult can result in multiple [Effect]s for e.g. emit a VE for
-   *   navigation and another for an analytics call hence a return type of [Flow]<[Effect]>
-   * @return [Flow] of [Effect]s where null emissions will be ignored automatically
-   */
-  protected abstract fun resultToEffects(result: R): Flow<Effect?>
-
-  /**
-   * we use a "shared" flow vs state flow here to avoid conflation of state flows.
-   *
-   * every single event needs to reach the view model as they could have important implications to
-   * the VM logic state flow might conflate multiple events if they happen simultaneously.
-   */
-  private val _events =
-      MutableSharedFlow<E>(
-          /**
-           * we do this to prevent a race condition misfire for events sent in very early. for e.g.
-           * OnScreenLoad events that are sent via [processInput()] right after the VM is created
-           * can get ignored as .collect(ion) has started yet.
-           *
-           * inside the init block, we "launch" (which is fire and forget with coroutines) so the VM
-           * proceeds to "finish" initialization and allows the Screen/Fragment/Activity to send
-           * inputs to the "hot" _events flow which will drop it, since noone is listening.
-           *
-           * Adding a replay ensures that the first event is always sent to "new" subscribers.
-           */
-          replay = 1)
-  private val _viewState = MutableStateFlow(initialState)
-
-  /**
-   * we use a "shared" flow vs state flow here to avoid conflation of state flows.
-   *
-   * every effect must be sent out and cannot be ignored even if there are multiple side effects
-   * emitted quickly/simultaneously as that could have implications to the Screen logic
-   *
-   * there are times where we _want_ to ignore certain effects (like multiple loading spinner calls)
-   * these can be handled in the Results emission layer.
-   */
-  private val _effects = MutableSharedFlow<Effect>()
-
-  override val viewState = _viewState.asStateFlow()
-  override val effects = _effects.asSharedFlow()
-
-  init {
-    logger.debug("------ [init] ${Thread.currentThread().name}")
-
-    coroutineScope.launch(processingDispatcher) {
-      _events
-          .flatMapMerge { event ->
-            logger.debugEvents(event)
-            eventToResultFlow(event)
-          }
-          .collect { result ->
-            logger.debugResults(result)
-
-            // StateFlow already behaves as if distinctUntilChanged operator is applied to it
-            resultToViewState(_viewState.value, result).let { vs ->
-              logger.debugViewState(vs)
-              _viewState.emit(vs)
-            }
-
-            // effects are emitted after a view state by virtue of this collect call
-            // (rarely) would we want VS & VE to be emitted at the exact same instant
-            _effects.emitAll(
-                resultToEffects(result).filterNotNull().onEach { logger.debugSideEffects(it) },
-            )
-          }
+    val handler: CoroutineExceptionHandler = CoroutineExceptionHandler { _, e ->
+        logger.error(e, "\uD83D\uDC80 uncaught exception in a child coroutine")
     }
-  }
 
-  override fun processInput(event: E) {
-    coroutineScope.launch(processingDispatcher) { _events.emit(event) }
-  }
+    /**
+     * @param event every input is transformed into an [Event] and fed into the VM by the Screen
+     * @return [Flow]<[R]> a single [Event] can result in multiple [R]s for e.g. emit a
+     *   Result for loading and another for the actual result
+     */
+    protected abstract suspend fun eventToResultFlow(event: E): Flow<R>
 
-  interface UsfVmLogger {
-    fun debug(message: String)
+    /**
+     * @param currentViewState the current [VS]tate of the view (.copy it for the returned [VS]tate)
+     * @return [VS]tate Curiously, we don't return a [Flow]<[VS]> here every [R]esult will only ever
+     *   be transformed into a single [VS]tate if you want multiple [VS]tates emit multiple [R]esults
+     *   transforming each [R]esult to the respective [VS]tate
+     */
+    protected abstract fun resultToViewState(currentViewState: VS, result: R): VS
 
-    fun debugEvents(event: Any, message: String? = null) =
-        debug(message ?: "----- [event] ${Thread.currentThread().name} $event")
+    /**
+     * @param result a single [R]esult can result in multiple [Effect]s for e.g. emit a VE for
+     *   navigation and another for an analytics call hence a return type of [Flow]<[Effect]>
+     * @return [Flow] of [Effect]s where null emissions will be ignored automatically
+     */
+    protected abstract fun resultToEffects(result: R): Flow<Effect>
 
-    fun debugResults(result: Any, message: String? = null) =
-        debug(message ?: "----- [result] ${Thread.currentThread().name} $result")
+    /*
+     * - Using a `Channel` allows us to buffer events emitted before the flow has started collecting.
+     *
+     *  This setup ensures that events are not lost if they are sent before the internal collector
+     *   starts, and multiple events can be buffered until they are processed.
+     */
+    private val _events = Channel<E>(10)
 
-    fun debugViewState(viewState: Any, message: String? = null) =
-        debug(message ?: "----- [view-state] ${Thread.currentThread().name} $viewState")
+    /*
+     * The `_viewState` holds the latest `ViewState` and replays it to new subscribers.
+     */
+    private val _viewState = MutableStateFlow(initialState)
+    override val viewState: StateFlow<VS> = _viewState.asStateFlow().logViewStateEmission()
 
-    fun debugSideEffects(effect: Any, message: String? = null) =
-        debug(message ?: "----- [effect] ${Thread.currentThread().name} $effect")
+    /*
+       * - Using a `Channel` ensures once a value is exhausted, it won't be consumed again.
+       */
+    private val _effects = Channel<Effect>()
+    override val effects: Flow<Effect> = _effects.receiveAsFlow()
 
-    fun warning(message: String)
+    init {
+        logger.debug("[  VM   ] \uD83D\uDC76 on ${Thread.currentThread().name}")
 
-    fun error(error: Throwable, message: String)
-  }
+        _events
+            .receiveAsFlow()
+            .flatMapMerge { event ->
+                try {
+                    eventToResultFlow(event)
+                } catch (e: Exception) {
+                    if (e is CancellationException) throw e // propagate cancellation
+                    logger.error(e, "[ev →  r] \uD83D\uDC80 on $event")
+                    emptyFlow()
+                }
+            }
+            .onCompletion { logger.debug("[ev →  r] ✗") }
+            .flowOn(processingDispatcher) // ensure upstream runs on processingDispatcher
+            .onEach { rslt ->
+                try {
+                    // logger.debug("[ev →  r] ${rslt.javaClass.simpleName}") // too noisy for prod
+
+                    // do conversion in processingDispatcher but emit back on main thread
+                    // (might be an over-optimization)
+                    val vs = withContext(processingDispatcher) {
+                        resultToViewState(
+                            _viewState.value,
+                            rslt
+                        )
+                    }
+                    _viewState.emit(vs)
+
+                    resultToEffects(rslt)
+                        .flowOn(processingDispatcher)
+                        .catch { logger.error(it, "[r  → ef] \uD83D\uDC80") }
+                        .onEach { effect ->
+                            logger.debug("[ef →   ] ${effect.javaClass.simpleName}")
+                            _effects.send(effect)
+                        }
+                        .launchIn(coroutineScope + handler)
+                } catch (e: Exception) {
+                    if (e is CancellationException) throw e // propagate cancellation
+                    logger.error(e, "[r  →  *] \uD83D\uDC80 onEach")
+                }
+            }
+            // catch exceptions upstream otherwise not caught, including ones unhandled in onEach
+            .catch { e -> logger.error(e, "[ev →  *] \uD83D\uDC80 ✗") }
+            .launchIn(coroutineScope + handler)
+    }
+
+    open fun getLocalState(): LocalState? = null
+
+    override fun processInput(event: E) {
+        coroutineScope.launch(handler) {
+            _events.send(event)
+            withContext(processingDispatcher) { logger.debug("[ev →   ] ${event.javaClass.simpleName}") }
+        }
+    }
+
+
+    /**
+     * Creates a parallel flow chain for logging ViewState emissions and can be slapped on an existing
+     * StateFlow
+     *
+     * The separate flow chain leverages StateFlow's distinctUntilChanged() behavior, meaning logging
+     * only occurs when the ViewState actually changes.
+     *
+     * @return The original StateFlow, unmodified
+     */
+    private fun <ViewState : Any> StateFlow<ViewState>.logViewStateEmission(): StateFlow<ViewState> {
+        onEach { logger.debug("[vs →   ] ${viewState.javaClass.simpleName}") }
+            .flowOn(processingDispatcher)
+            .launchIn(coroutineScope)
+        return this
+    }
+
+    interface UsfVmLogger {
+        fun debug(message: String)
+
+        fun debugEvents(event: Any, message: String? = null) =
+            debug(message ?: "----- [event] ${Thread.currentThread().name} $event")
+
+        fun debugResults(result: Any, message: String? = null) =
+            debug(message ?: "----- [result] ${Thread.currentThread().name} $result")
+
+        fun debugViewState(viewState: Any, message: String? = null) =
+            debug(message ?: "----- [view-state] ${Thread.currentThread().name} $viewState")
+
+        fun debugSideEffects(effect: Any, message: String? = null) =
+            debug(message ?: "----- [effect] ${Thread.currentThread().name} $effect")
+
+        fun warning(message: String)
+
+        fun error(error: Throwable, message: String)
+    }
 }
