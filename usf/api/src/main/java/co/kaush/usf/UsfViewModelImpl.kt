@@ -73,9 +73,10 @@ abstract class UsfViewModelImpl<E : Any, R : Any, VS : Any, Effect : Any, LocalS
     private val _effects = Channel<Effect>()
     override val effects: Flow<Effect> = _effects.receiveAsFlow()
 
-    init {
-        logger.debug("[  VM   ] \uD83D\uDC76 on ${Thread.currentThread().name}")
-
+    /*
+     * Lazy pipeline setup that will be initialized on first event
+     */
+    private val pipeline = lazy {
         _events
             .receiveAsFlow()
             .flatMapMerge { event ->
@@ -121,10 +122,15 @@ abstract class UsfViewModelImpl<E : Any, R : Any, VS : Any, Effect : Any, LocalS
             .launchIn(coroutineScope + handler)
     }
 
+    init {
+        logger.debug("[  VM   ] \uD83D\uDC76 on ${Thread.currentThread().name}")
+    }
+
     open fun getLocalState(): LocalState? = null
 
     override fun processInput(event: E) {
         coroutineScope.launch(handler) {
+            pipeline.value // Initialize pipeline on first event
             _events.send(event)
             withContext(processingDispatcher) { logger.debug("[ev →   ] ${event.javaClass.simpleName}") }
         }
