@@ -1,6 +1,4 @@
-package co.kaush.usf.fixtures
-
-import co.kaush.usf.UsfViewModelImpl
+package co.kaush.usf
 
 object TestLogger : UsfViewModelImpl.UsfVmLogger {
     override fun debug(message: String) = println(message)

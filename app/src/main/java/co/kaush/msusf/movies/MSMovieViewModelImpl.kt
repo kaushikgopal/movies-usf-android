@@ -14,11 +14,17 @@ class MSMovieViewModelImpl(
     private val movieRepo: MSMovieRepository,
     coroutineScope: CoroutineScope,
     dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    logger: UsfVmLogger = object: UsfVmLogger {
+        override fun debug(message: String) = run { /*do something*/ }
+        override fun warning(message: String) = run { /*do something*/ }
+        override fun error(error: Throwable, message: String) = run { /*do something*/ }
+    }
 ) :
     UsfViewModelImpl<MSMovieEvent, MSMovieResult, MSMovieViewState, MSMovieEffect, Nothing>(
         MSMovieViewState(),
         coroutineScope,
         dispatcher,
+        logger = logger,
     ) {
 
     // -----------------------------------------------------------------------------------

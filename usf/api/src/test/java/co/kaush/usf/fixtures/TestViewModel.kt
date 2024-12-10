@@ -1,5 +1,6 @@
 package co.kaush.usf.fixtures
 
+import co.kaush.usf.TestLogger
 import co.kaush.usf.UsfViewModelImpl
 import co.kaush.usf.fixtures.TestEffect.TestDelayedEffect
 import co.kaush.usf.fixtures.TestEvent.TestDelayedEvent

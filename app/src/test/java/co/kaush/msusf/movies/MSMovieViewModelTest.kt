@@ -11,6 +11,7 @@ import co.kaush.msusf.movies.di.blade
 import co.kaush.msusf.movies.di.bladeRunner2049
 import co.kaush.msusf.movies.di.create
 import co.kaush.usf.CoroutineTestRule
+import co.kaush.usf.TestLogger
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.toList
@@ -107,10 +108,9 @@ class MSMovieViewModelTest {
 
         viewModel.processInput(SearchMovieEvent("blade runner 2049"))
         viewModel.processInput(AddToHistoryEvent(bladeRunner2049))
-
         runCurrent()
 
-        vs[1].let {
+        vs.last().let {
             assertThat(it.adapterList).hasSize(1)
             assertThat(it.adapterList[0]).isEqualTo(bladeRunner2049)
         }
@@ -170,5 +170,6 @@ class MSMovieViewModelTest {
         fakeMovieAppRepository,
         backgroundScope,
         testRule.testDispatcher,
+        TestLogger,
     )
 }
